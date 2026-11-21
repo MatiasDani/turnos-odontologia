@@ -1,5 +1,62 @@
 {
   "version": 5,
   "step": "discovery",
-  "owner": "active-orchestrator"
+  "owner": "active-orchestrator",
+  "discovery": {
+    "created_by": "discovery-research",
+    "output_dir": "docs/discovery/",
+    "checklist_file": "docs/discovery/checklist-discovery.md",
+    "report_file": "docs/discovery/informe-discovery.md",
+    "sources_fetched_at": "2026-11-21",
+    "sources": ["docs/discovery/informe-discovery.md#referencias-completas"],
+    "competitors": [
+      { "name": "DentalCore", "notes_file": "docs/discovery/informe-discovery.md" },
+      { "name": "AgendaPro", "notes_file": "docs/discovery/informe-discovery.md" },
+      { "name": "DentalSoft", "notes_file": "docs/discovery/informe-discovery.md" },
+      { "name": "ClinIA", "notes_file": "docs/discovery/informe-discovery.md" },
+      { "name": "Dentalink", "notes_file": "docs/discovery/informe-discovery.md" }
+    ],
+    "problema": "Consultorios odontológicos chicos en Argentina gestionan la agenda en papel/planillas/WhatsApp, lo que genera turnos superpuestos por profesional y por sillón y tiempo perdido coordinando.",
+    "usuarios": ["Recepción/secretaria", "Odontólogo", "Paciente (autogestión)", "Administrador/dueño"],
+    "casos_de_uso": [
+      "Como recepción, quiero dar un turno con profesional, sillón y prestación sin que se solape",
+      "Como recepción o paciente, quiero reprogramar o cancelar un turno y liberar el horario",
+      "Como paciente, quiero reservar un turno online 24/7 desde un enlace",
+      "Como paciente, quiero recibir un recordatorio y confirmar asistencia",
+      "Como odontólogo, quiero bloquear horarios"
+    ],
+    "funcionalidades_necesarias": [
+      "Agenda diaria/semanal multi-profesional y multi-sillón sin solapamientos, duración por prestación, bloqueos",
+      "Alta, cancelación y reprogramación de turnos con liberación del horario",
+      "Reserva online del paciente por enlace público 24/7",
+      "Recordatorios y confirmación por e-mail + enlace wa.me",
+      "Roles básicos: administrador, odontólogo, recepción, paciente"
+    ],
+    "funcionalidades_opcionales": [
+      "WhatsApp Cloud API", "Señas con Mercado Pago", "Lista de espera", "Seguimiento de ausentes y controles periódicos",
+      "Tablero de ocupación", "Ficha clínica y odontograma", "Presupuestos y caja", "Facturación ARCA", "Obras sociales", "Multi-sucursal"
+    ],
+    "reglas_de_negocio": [
+      "RN-01 Un turno ocupa profesional y sillón durante la duración de la prestación",
+      "RN-02 Sin solapamiento de turnos activos por profesional",
+      "RN-03 Sin solapamiento de turnos activos por sillón/box",
+      "RN-04 No existen sobreturnos",
+      "RN-05 Intervalos semiabiertos [inicio, fin): contiguos no se solapan",
+      "RN-06 La duración la define la prestación",
+      "RN-07 No se dan turnos en bloqueos ni fuera del horario de atención",
+      "RN-08 Paciente cancela/reprograma online solo con >=24 h; con menos, solo recepción",
+      "RN-09 Cancelar libera el horario"
+    ],
+    "integraciones": ["E-mail (MVP)", "wa.me click-to-chat (MVP)", "Google Calendar (opcional)", "WhatsApp Cloud API (post-MVP)", "Mercado Pago (post-MVP)"],
+    "restricciones": ["Costo $0 (free tier)", "Plazo del TP: un change completo", "Solo datos ficticios; Ley 25.326 y Ley 26.529", "Stack no impuesto"],
+    "riesgos": ["Datos sensibles de salud (principal)", "Efectividad de e-mail + wa.me vs WhatsApp automático (supuesto)", "Costo WhatsApp en producción (supuesto)", "Adopción por la secretaria (supuesto)", "Competidores consolidados"],
+    "preguntas_abiertas": [
+      "Stack tecnológico", "Tarifas WhatsApp Argentina", "¿Odontólogo puede dar turno sobre su propio bloqueo?",
+      "Zona horaria", "¿Duración fija o ajustable por turno?", "¿Registro del paciente o DNI + teléfono?",
+      "¿Qué pasa con turnos existentes al crear un bloqueo encima?", "Datos 'No evidenciado' del informe a verificar"
+    ],
+    "adjustments": [
+      "2026-11-21: D.3 (MVP) del informe se redujo para alinearlo al checklist confirmado; ficha/odontograma, presupuesto/caja y auditoría pasaron a etapas posteriores; WhatsApp API y Mercado Pago a diferenciador"
+    ]
+  }
 }
