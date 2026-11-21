@@ -47,7 +47,7 @@ Usuario     0..1 ── 1 Profesional        (un usuario odontólogo se vincula 
 ### Profesional
 - `id`, `consultorioId`, `nombre`, `apellido`, `matricula?: string` (ficticia en seed), `activo: boolean`, `prestacionIds: string[]`.
 - Relaciones: N a N con Prestacion; 1 a N con Turno, BloqueoHorario.
-- Constraint: un profesional inactivo no recibe turnos nuevos.
+- Constraint: un profesional inactivo no recibe turnos nuevos. La consulta de disponibilidad (C-07) solo lo ofrece para las prestaciones de su `prestacionIds` (RN-13, DD-12); el alta de C-01 no lo exige (pregunta abierta).
 
 ### Sillon (Box)
 - `id`, `consultorioId`, `nombre` (ej. "Sillón 1"), `activo: boolean`.
@@ -55,7 +55,7 @@ Usuario     0..1 ── 1 Profesional        (un usuario odontólogo se vincula 
 - Constraint: no se admiten dos turnos activos solapados en el mismo sillón (RN-03).
 
 ### Prestacion
-- `id`, `consultorioId`, `nombre`, `duracionMinutos: number` (entero > 0), `activa: boolean`, `requiereSillonIds?: string[]` (**Suposición**: opcional, para prestaciones que solo pueden hacerse en ciertos sillones).
+- `id`, `consultorioId`, `nombre`, `duracionMinutos: number` (entero > 0), `activa: boolean`, `requiereSillonIds?: string[]` (**Suposición**: opcional, para prestaciones que solo pueden hacerse en ciertos sillones; C-07 no lo evalúa: cualquier sillón activo sirve, DD-12 y pregunta abierta).
 - Constraint: `duracionMinutos` es la duración por defecto del turno (RN-06). Cada turno puede ajustarla de forma opcional (DD-10, RN-16). Una prestación inactiva no puede usarse para dar turnos (RN-18).
 
 ### Paciente

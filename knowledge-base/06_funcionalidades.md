@@ -40,10 +40,13 @@ Organizadas por épica e historia de usuario (US-NNN). Etapa: **MVP** (D.3 "Impr
 **Para** elegir un horario viable
 
 **Criterios de aceptación**:
-- [ ] La disponibilidad respeta duración de la prestación, horario de atención, bloqueos y turnos activos.
-- [ ] Solo se ofrecen huecos en los que exista un profesional y un sillón libres a la vez.
+- [ ] La disponibilidad respeta la duración efectiva (la de la prestación o la ajustada por el personal; el paciente solo la de la prestación), el horario de atención, los bloqueos y los turnos activos.
+- [ ] Solo se ofrecen huecos en los que exista un profesional habilitado (que realiza la prestación) y un sillón activos y libres a la vez.
+- [ ] No se ofrecen huecos con inicio anterior al instante actual; el rango consultado es de hasta 31 días.
+- [ ] Los huecos se generan con un paso configurable (por defecto 15 min) alineado al inicio de cada tramo y se devuelven en orden determinista; el paciente los ve agrupados por horario.
+- [ ] Consultar no reserva el hueco ni modifica la agenda.
 
-**Reglas relacionadas**: RN-01 a RN-07, RN-13
+**Reglas relacionadas**: RN-01 a RN-07, RN-13, RN-16, RN-17, RN-18 (DD-12)
 
 ## Épica 2: Cancelación y reprogramación (MVP)
 

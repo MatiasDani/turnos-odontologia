@@ -37,6 +37,14 @@ Definición operativa: un turno es **activo** si su estado es `reservado`, `conf
 | Turno 12:45-13:15 (cruza el corte 13:00-15:00) | Rechazado | RN-17 |
 | Turno con profesional, sillón o prestación inactivos | Rechazado | RN-18 |
 | Intento del administrador de forzar un solapamiento | Rechazado con RN-02/RN-03 (no existe opción de forzar) | RN-04, RN-02, RN-03 |
+| Disponibilidad de `pr1` (30 min) el lunes 2026-11-23 con agenda vacía y paso 15 | Primer hueco 09:00-09:30, último de la mañana 12:30-13:00, primero de la tarde 15:00-15:30, último 18:30-19:00; cada horario con los combos `p1`/`s1`, `p1`/`s2`, `p2`/`s1`, `p2`/`s2` en ese orden | RN-13, RN-17 |
+| Turno activo de `p1` en `s1` lunes 09:00-09:45; disponibilidad de `pr1` | 09:45-10:15 con `p1`/`s1` aparece (contiguo); 09:30-10:00 con `p1` o con `s1` no aparece | RN-05, RN-02, RN-03, RN-13 |
+| Disponibilidad de `pr1` con un hueco 12:45-13:15 | No aparece (cruza el corte 13:00-15:00) | RN-17, RN-13 |
+| Disponibilidad el miércoles 2026-11-25 a las 15:00 | `p1` excluida por su bloqueo 15:00-17:00; se ofrecen `p2`/`s1` y `p2`/`s2` | RN-07, RN-13 |
+| Profesional con `prestacionIds` que no incluye la prestación | Nunca aparece en la disponibilidad de esa prestación | RN-13 |
+| `ahora` = lunes 10:07 y consulta del lunes | No aparece ningún hueco con inicio anterior a 10:07 | RN-13 |
+| Disponibilidad del sábado 2026-11-28 | Lista vacía (sin tramos de atención) | RN-07, RN-13 |
+| Rango invertido, vacío o de más de 31 días; `pasoMinutos` 0, 7 o 12,5 | Rechazado como consulta inválida (validación de entrada, sin código RN) | RN-13 |
 
 ## Dominio: Cancelación y reprogramación
 
@@ -51,7 +59,15 @@ Definición operativa: un turno es **activo** si su estado es `reservado`, `conf
 
 ## Dominio: Reserva online y recordatorios (derivadas de D.3 y checklist 5 y 8)
 
-- **RN-13** *(derivada)*: la reserva online solo ofrece horarios libres que cumplan RN-01 a RN-07; el paciente no elige el sillón (lo asigna el sistema) — **Suposición**.
+- **RN-13** *(derivada; refinada en explore C-07, 2026-11-21, DD-12)*: la consulta de disponibilidad solo ofrece huecos donde existan a la vez un profesional **habilitado** (activo y cuyo `prestacionIds` incluye la prestación) y un sillón activo libres durante toda la duración efectiva, cumpliendo RN-01 a RN-07, RN-17 y RN-18. Precisiones:
+  - Es una **lectura instantánea**: no reserva el hueco ni modifica la agenda, y es idempotente. Si el hueco se ocupa entre la consulta y el alta, lo resuelve RN-12 al agendar.
+  - Devuelve combinaciones `{inicio, fin, profesionalId, sillonId}` en orden determinista: `inicio`, luego `profesionalId`, luego `sillonId`. Para la vista del paciente se agrupan por horario único; la reserva online toma el primer combo del horario elegido (el paciente no elige el sillón, SU-05 — **Suposición**).
+  - Los inicios candidatos se alinean al inicio de cada tramo de atención con un paso `pasoMinutos` (por defecto 15).
+  - Se excluyen los huecos cuyo `inicio` es anterior a `ahora` (instante actual informado por quien consulta).
+  - El rango consultado `[desde, hasta)` es semiabierto y de hasta 31 días; un hueco pertenece al rango si su `inicio` está dentro.
+  - La duración sigue RN-06 y RN-16 (el paciente solo consulta con la duración de la prestación).
+  - Rango invertido o vacío, rango de más de 31 días y `pasoMinutos` que no sea entero > 0 múltiplo de 5 son **validación de entrada** de la consulta (no son reglas de agenda y no llevan código RN propio).
+  - `Prestacion.requiereSillonIds` no se considera todavía: cualquier sillón activo sirve (pregunta abierta, C-05). `AgendarTurno` (C-01) no exige la habilitación del profesional (pregunta abierta, posible RN-19).
 - **RN-14** *(derivada)*: el recordatorio por e-mail incluye el enlace de confirmación/cancelación; el enlace `wa.me` contiene el mensaje armado y lo envía manualmente la recepción (sin API, costo $0). Momento por defecto: 24 h antes (suposición).
 - **RN-15** *(derivada)*: el token de gestión del turno es de un solo turno, no adivinable y no revela datos de otros pacientes.
 

@@ -35,9 +35,9 @@ Recepción → Caso de uso AgendarTurno → Dominio (reglas) → Repositorio (at
 
 **Pasos**:
 1. El paciente elige la prestación.
-2. `ConsultarDisponibilidad` calcula huecos donde existan a la vez un profesional habilitado y un sillón libres para la duración completa (RN-13).
+2. `ConsultarDisponibilidad` calcula, a partir del instante actual y con paso de 15 min, los huecos donde existan a la vez un profesional habilitado y un sillón libres para la duración completa de la prestación (RN-13, DD-12). La consulta no reserva nada; los combos se agrupan por horario para mostrarlos al paciente.
 3. El paciente elige un horario e informa sus datos mínimos (DNI y teléfono; pregunta abierta) y consentimiento de contacto.
-4. `ReservarOnline` reutiliza `AgendarTurno` (mismas reglas, sin excepciones por canal); el sistema asigna el sillón.
+4. `ReservarOnline` reutiliza `AgendarTurno` (mismas reglas, sin excepciones por canal) con el primer combo del horario elegido: así el sistema asigna profesional y sillón.
 5. Se genera `tokenGestion` y se envía e-mail de confirmación con el enlace.
 
 **Casos de error**:

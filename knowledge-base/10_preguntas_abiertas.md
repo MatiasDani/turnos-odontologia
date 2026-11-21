@@ -63,7 +63,9 @@
 | Resuelta | ¿Hace falta el estado `reservado` además de `confirmado`? | n/a | Resuelta el 2026-11-21: se mantiene; alta interna nace `confirmado`, reserva online `reservado` (DD-11) |
 | Media | ¿El horario de atención se define por consultorio, por profesional o ambos? (SU-09). C-01 solo evalúa el horario del consultorio | C-05 | Equipo |
 | Media | ¿`AgendarTurno` debe validar que el paciente exista? En C-01 no se valida (no hay repositorio de pacientes) | C-05 | Equipo |
-| Media | ¿Se limita qué prestaciones puede realizar cada profesional y en qué sillones? | Primer change | Equipo |
+| Media | ¿El alta (`AgendarTurno`) también debe exigir que el profesional realice la prestación? (posible RN-19). Desde el 2026-11-21 la disponibilidad (C-07) solo ofrece profesionales habilitados, pero el alta de C-01 no lo valida (DD-12) | C-05, C-10 | Equipo |
+| Baja | ¿Se respeta `Prestacion.requiereSillonIds` (sillones compatibles con la prestación)? En C-07 no se considera: cualquier sillón activo sirve (DD-12) | C-05 | Equipo |
+| Parcial | ¿Se limita qué prestaciones puede realizar cada profesional y en qué sillones? | C-05 | Parcialmente resuelta el 2026-11-21 (DD-12): la disponibilidad usa `Profesional.prestacionIds`; siguen abiertas la exigencia en el alta (posible RN-19) y `requiereSillonIds` (ver las dos filas anteriores) |
 | Baja | ¿Cómo se maneja el consentimiento de contacto y la eliminación de datos del paciente (Ley 25.326)? | Reserva online | Equipo |
 | Baja | ¿La API REST con Fastify se implementa dentro del TP o solo los casos de uso con tests? | Alcance del change | Equipo |
 | Baja | Versión mínima de Node LTS y de Vitest a fijar | Inicialización del proyecto | Equipo técnico |
