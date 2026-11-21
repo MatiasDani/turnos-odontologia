@@ -9,10 +9,10 @@ Flujos extremo a extremo del MVP. Las validaciones de agenda residen en el **dom
 
 **Pasos**:
 1. La recepción elige paciente (existente o alta rápida), prestación, profesional, sillón y fecha/hora de inicio.
-2. Caso de uso `AgendarTurno` obtiene la prestación y calcula `fin = inicio + duración` (RN-06).
-3. Dominio valida: profesional y sillón activos; dentro de HorarioAtencion y fuera de BloqueoHorario (RN-07).
+2. Caso de uso `AgendarTurno` obtiene la prestación y calcula `fin = inicio + duración efectiva`: la `duracionMinutos` informada (solo recepción, odontólogo o administrador; RN-16) o, si no se informa, la de la prestación (RN-06).
+3. Dominio valida: profesional, sillón y prestación activos (RN-18); dentro de un único tramo de HorarioAtencion en la zona horaria del consultorio (RN-07, RN-17, DD-09); fuera de BloqueoHorario del profesional y del sillón (RN-07).
 4. Dominio consulta turnos activos del profesional y del sillón en el rango y verifica que no haya solapamiento con la regla `a1 < b2 && b1 < a2` (RN-02, RN-03, RN-05).
-5. En una operación atómica (RN-12) se persiste el turno en estado `reservado`/`confirmado` y se programa el recordatorio.
+5. En una operación atómica (RN-12) se persiste el turno en estado `confirmado` (alta interna; DD-11) y se programa el recordatorio.
 6. Se devuelve el turno creado.
 
 ```
@@ -24,7 +24,9 @@ Recepción → Caso de uso AgendarTurno → Dominio (reglas) → Repositorio (at
 - Solapamiento por profesional o sillón → rechazo con `RN-02`/`RN-03` y turno en conflicto.
 - Fuera de horario o sobre bloqueo → rechazo con `RN-07`.
 - Intento de forzar (sobreturno) → rechazo con `RN-04`.
-- Recurso inactivo → rechazo.
+- Recurso inactivo → rechazo con `RN-18`.
+- Turno que cruza el corte entre tramos → rechazo con `RN-17`.
+- Duración informada inválida (no entera, <= 0 o no múltiplo de 5) o informada por el paciente → rechazo con `RN-06`/`RN-16`.
 
 ## Flujo 2: Reserva online del paciente
 

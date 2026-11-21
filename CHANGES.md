@@ -133,12 +133,14 @@ Carriles: **A** = núcleo y reserva online (Matías: C-01 → C-07 → C-10); **
   - Scaffolding mínimo: `package.json`, `tsconfig.json`, Vitest, estructura `src/domain`, `src/application`, `src/adapters/persistence`, `tests/` (layout de `08_arquitectura_propuesta.md`); `.env.example` solo con valores ficticios
   - Objeto valor `Intervalo` semiabierto `[inicio, fin)`; solapan sii `a1 < b2 && b1 < a2` (RN-05); tests de borde (contiguos válidos, parcial, contención total)
   - Entidades: `Turno` (con `EstadoTurno` y `origen`), `Profesional`, `Sillon`, `Prestacion`, `Paciente`, `BloqueoHorario`, `HorarioAtencion`, tipo `Rol`/`Actor` mínimo (solo tipo, sin auth)
-  - `fin = inicio + prestacion.duracionMinutos` (RN-06); duración fija por prestación (SU-06)
-  - Validaciones de dominio puras en `src/domain/reglas/`: sin solapamiento por profesional (RN-02) y por sillón (RN-03), un turno ocupa profesional y sillón (RN-01), sin sobreturnos para ningún rol (RN-04), horario de atención y bloqueos (RN-07); solo turnos activos ocupan recursos (`reservado`, `confirmado`, `atendido`; DD-05)
+  - `fin = inicio + duracionMinutos`, con duración ajustable por turno de forma opcional: por defecto `prestacion.duracionMinutos`; si se informa, entero > 0 y múltiplo de 5, solo recepción/odontólogo/administrador (RN-06, RN-16; DD-10)
+  - Zona horaria IANA por consultorio con instantes en UTC y horario `HH:mm` local vía `Intl.DateTimeFormat` (DD-09); alta interna nace `confirmado` (DD-11)
+  - Un turno cabe completo en un único tramo de atención (RN-17); solo profesional, sillón y prestación activos (RN-18); bloqueos de profesional y de sillón (RN-07)
+  - Validaciones de dominio puras en `src/domain/reglas/`: sin solapamiento por profesional (RN-02) y por sillón (RN-03), un turno ocupa profesional y sillón (RN-01), sin sobreturnos para ningún rol (RN-04), horario de atención y bloqueos de profesional y sillón (RN-07, RN-17, RN-18); solo turnos activos ocupan recursos (`reservado`, `confirmado`, `atendido`; DD-05)
   - Caso de uso `AgendarTurno` + puertos de repositorios; repositorios en memoria con operación atómica de validar+persistir (RN-12; sección crítica)
   - Fixtures en memoria 100 % ficticios tomados del seed de `04_modelo_de_datos.md` (consultorio demo, p1/p2, s1/s2, pr1..pr4, horario L-V 09-13 y 15-19, bloqueo de p1 los miércoles 15-17, pa1..pa3); **sin ABM**: C-05 reemplaza los fixtures por casos de uso
   - Errores tipados que informan el código `RN-XX` violado y el turno en conflicto
-  - Tests (TDD estricto, mínimo 2 casos por comportamiento): tabla de verificación de RN-01..RN-07 de `05_reglas_de_negocio.md` (contiguos A 09:00-09:45 / B 09:45-10:15; solapamiento 09:44; mismo sillón con otro profesional; mismo profesional con otro sillón; turno de 60 min que excede el cierre; sobre bloqueo; intento de forzar como administrador)
+  - Tests (TDD estricto, mínimo 2 casos por comportamiento): tabla de verificación de RN-01..RN-07 y RN-16..RN-18 de `05_reglas_de_negocio.md` (contiguos A 09:00-09:45 / B 09:45-10:15; solapamiento 09:44; mismo sillón con otro profesional; mismo profesional con otro sillón; turno de 60 min que excede el cierre; sobre bloqueo de profesional y de sillón; duración ajustada y duración inválida; turno que cruza el corte 13-15; recurso inactivo; intento de forzar como administrador)
   - Cubre US-001
 - **Dependencias**: ninguna
 - **Governance**: CRITICO (modelo core que todo el resto referencia; invariante RN-04)
@@ -222,7 +224,7 @@ Carriles: **A** = núcleo y reserva online (Matías: C-01 → C-07 → C-10); **
   - `knowledge-base/04_modelo_de_datos.md` §Profesional, §Sillon, §Prestacion, §HorarioAtencion
   - `knowledge-base/06_funcionalidades.md` §US-008
   - `knowledge-base/05_reglas_de_negocio.md` RN-06, RN-07
-  - `knowledge-base/09_decisiones_y_supuestos.md` SU-06, SU-08, SU-09
+  - `knowledge-base/09_decisiones_y_supuestos.md` DD-10, SU-08, SU-09
 
 ### [C-06] `bloquear-horarios-profesional`
 - **Estado**: `[ ]` pendiente
@@ -435,7 +437,7 @@ Carriles: **A** = núcleo y reserva online (Matías: C-01 → C-07 → C-10); **
 |---|---|---|---|---|
 | R-1 | C-01 mal modelado (Intervalo, Turno, estados activos) obliga a reescribir los demás | Alto: todo el MVP depende de él | TDD estricto con la tabla de verificación de `05_reglas_de_negocio.md`; revisión de Franco y Luka antes de abrir el GATE 0; no abrir GATE 0 sin `verify` | C-01 y todos |
 | R-2 | Condiciones de carrera entre reserva online y recepción (RN-12) | Turnos solapados en producción | Sección crítica en repos en memoria; diseño que mapea a exclusión/transacción en PostgreSQL | C-01, C-03, C-10 |
-| R-3 | Preguntas abiertas sin resolver (bloqueo sobre turnos, duración fija vs ajustable, registro del paciente, zona horaria) | Retrabajo de scope | Adoptar las suposiciones provisorias DD-06, SU-03, SU-04, SU-06; resolverlas en `/opsx:explore` del change afectado | C-06, C-10, C-01 |
+| R-3 | Preguntas abiertas sin resolver (bloqueo sobre turnos, registro del paciente; duración, zona horaria y estados resueltos el 2026-11-21) | Retrabajo de scope | Adoptar la suposición provisoria DD-06 (duración, estados y zona horaria ya resueltos: DD-09, DD-10, DD-11); resolverlas en `/opsx:explore` del change afectado | C-06, C-10, C-01 |
 | R-4 | Datos sensibles de salud y datos personales (Ley 25.326, Ley 26.529) | Incumplimiento normativo | Solo datos ficticios (RN-D-01), mínimo dato, consentimiento de contacto, RBAC en casos de uso; revisión de seguridad en C-09/C-10/C-11 | C-09, C-10, C-11, C-12, C-13 |
 | R-5 | C-09 (RBAC) llega tarde y deja casos de uso sin control de permisos | Brecha de seguridad temporal | C-01 define el tipo `Actor`; todos los casos de uso lo reciben desde el inicio; C-09 aplica y verifica la matriz completa | C-02..C-08, C-09 |
 | R-6 | Cuello de botella en el camino crítico (C-02, C-07, C-10, C-11 concentran 5 pasos) | Retraso del MVP | Matías concentra C-01, C-07 y C-10: Alejo y Mara actúan como pares/revisores de C-07 y C-10 y Franco y Luka cubren C-02/C-11; priorizar C-07 en el GATE 0 | C-02, C-07, C-10, C-11 |

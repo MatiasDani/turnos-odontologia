@@ -35,7 +35,7 @@
 **Contexto**: D.3 lista confirmado, cancelado, ausente y atendido sin definir ocupación; RN-09 exige que cancelar libere el horario.
 **Alternativas consideradas**: que `ausente` siga ocupando el hueco.
 **Justificación**: coherencia con RN-02/RN-03 ("turnos activos") y RN-09.
-**Trade-offs aceptados**: `reservado` es un estado añadido por suposición (ver SU-03).
+**Trade-offs aceptados**: `reservado` es un estado añadido por el equipo (ver DD-11).
 
 ### DD-06 — Bloqueo sobre turnos existentes (provisoria)
 **Decisión provisoria**: si al crear un bloqueo hay turnos activos debajo, el sistema informa los conflictos y no crea el bloqueo hasta que se reprogramen o cancelen.
@@ -54,6 +54,27 @@
 **Decisión**: el TP implementa un change completo; el primer change es "dar un turno sin solapamiento" (caso de uso 1, bloquea el MVP). El resto se documenta como roadmap.
 **Justificación**: plazo del TP.
 
+### DD-09 — Zona horaria IANA por consultorio
+**Decisión** (2026-11-21, explore de C-01): cada consultorio define `Consultorio.zonaHoraria` (IANA), por defecto `America/Argentina/Buenos_Aires`. Los instantes se guardan en UTC (`Date`); el horario de atención se expresa `HH:mm` en hora local del consultorio. La conversión usa `Intl.DateTimeFormat({ timeZone })`, sin dependencias.
+**Contexto**: antes era el supuesto SU-04 y la pregunta abierta del checklist (IN-04).
+**Alternativas consideradas**: librería de fechas (luxon, date-fns-tz); offset fijo UTC-3.
+**Justificación**: costo $0, sin dependencias y robusto ante cambios de offset.
+**Trade-offs aceptados**: el dominio debe convertir hora local a UTC con cuidado en los bordes de cambio de offset.
+
+### DD-10 — Duración del turno ajustable de forma opcional
+**Decisión** (2026-11-21, explore de C-01): la duración puede ajustarse por turno. Sin `duracionMinutos`, `fin = inicio + prestacion.duracionMinutos`; con `duracionMinutos`, `fin = inicio + duracionMinutos`. Debe ser un entero > 0 y múltiplo de 5, sin tope (lo limita el horario de atención). Solo recepción, odontólogo y administrador pueden informarla; el paciente usa siempre la de la prestación (RN-06, RN-16).
+**Contexto**: reemplaza el supuesto SU-06 (duración fija) y cierra la pregunta abierta del checklist.
+**Alternativas consideradas**: duración fija por prestación; tope máximo por prestación.
+**Justificación**: los casos reales varían (p. ej. una consulta que se extiende); el solapamiento sigue protegido porque se valida con `fin` efectivo.
+**Trade-offs aceptados**: `Turno` persiste la duración efectiva además de `fin`.
+
+### DD-11 — Estados del turno y estado inicial
+**Decisión** (2026-11-21, explore de C-01): se mantienen los 5 estados (`reservado`, `confirmado`, `cancelado`, `ausente`, `atendido`). El turno creado por recepción, odontólogo o administrador nace `confirmado`; la reserva online del paciente (C-10) nace `reservado`. Activos: `reservado`, `confirmado`, `atendido` (DD-05).
+**Contexto**: cierra SU-03 y la pregunta abierta sobre `reservado`.
+**Alternativas consideradas**: eliminar `reservado`.
+**Justificación**: la reserva online necesita una instancia de confirmación; el alta interna no.
+**Trade-offs aceptados**: dos estados iniciales según el origen.
+
 ## Supuestos inferidos
 
 ### SU-01 — E-mail + `wa.me` es suficiente frente a WhatsApp automático
@@ -67,13 +88,13 @@
 **Riesgo si es falso**: el sistema no se usa.
 **Cómo validar**: entrevistas y prueba de usabilidad con una secretaria.
 
-### SU-03 — Estado `reservado` previo a `confirmado`
+### SU-03 — Estado `reservado` previo a `confirmado` *(resuelto: DD-11, 2026-11-21)*
 **Supuesto**: el alta crea el turno sin confirmar.
 **Origen**: D.3 solo enumera confirmado, cancelado, ausente, atendido.
 **Riesgo si es falso**: estados sobrantes; simplificable a `confirmado` en el alta.
 **Cómo validar**: decisión del equipo antes del primer change.
 
-### SU-04 — Zona horaria única por consultorio
+### SU-04 — Zona horaria única por consultorio *(confirmado: DD-09, 2026-11-21)*
 **Supuesto**: `America/Argentina/Buenos_Aires` (UTC-3, sin horario de verano) como valor por defecto, almacenada por consultorio.
 **Origen**: contexto argentino; pregunta abierta del checklist.
 **Riesgo si es falso**: errores de horario.
@@ -85,8 +106,8 @@
 **Riesgo si es falso**: hace falta exponer el sillón al paciente.
 **Cómo validar**: revisar con el equipo.
 
-### SU-06 — Duración fija por prestación
-**Supuesto**: hasta resolver la pregunta abierta, la duración es la de la prestación (RN-06).
+### SU-06 — Duración fija por prestación *(rechazado: reemplazado por DD-10, 2026-11-21)*
+**Supuesto**: hasta resolver la pregunta abierta, la duración es la de la prestación (RN-06). El equipo decidió que sea ajustable por turno de forma opcional.
 **Origen**: RN-06 del checklist.
 
 ### SU-07 — Recordatorio por defecto 24 h antes

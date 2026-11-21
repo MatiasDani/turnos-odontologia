@@ -11,8 +11,8 @@
 
 ## Convenciones de tiempo
 
-- Un intervalo es **semiabierto [inicio, fin)** (RN-05). `fin = inicio + duración de la prestación`.
-- Los instantes se guardan como `Date`/ISO 8601 en UTC; cada Consultorio define su `zonaHoraria` (por defecto `America/Argentina/Buenos_Aires`, UTC-3 sin horario de verano). **Suposición**, ver pregunta abierta sobre zona horaria.
+- Un intervalo es **semiabierto [inicio, fin)** (RN-05). `fin = inicio + duración efectiva` (la de la prestación, o la informada en el turno; RN-06).
+- Los instantes se guardan como `Date`/ISO 8601 en UTC; cada Consultorio define su `zonaHoraria` (IANA; por defecto `America/Argentina/Buenos_Aires`, UTC-3 sin horario de verano). **Decisión DD-09** (2026-11-21): el horario de atención `HH:mm` se interpreta en esa zona y la conversión se hace con `Intl.DateTimeFormat({ timeZone })`, sin dependencias.
 - Los horarios de atención se expresan en hora local del consultorio (`HH:mm`) y se convierten al comparar.
 
 ## ERD (texto)
@@ -56,7 +56,7 @@ Usuario     0..1 ── 1 Profesional        (un usuario odontólogo se vincula 
 
 ### Prestacion
 - `id`, `consultorioId`, `nombre`, `duracionMinutos: number` (entero > 0), `activa: boolean`, `requiereSillonIds?: string[]` (**Suposición**: opcional, para prestaciones que solo pueden hacerse en ciertos sillones).
-- Constraint: `duracionMinutos` define la duración del turno (RN-06). Si la duración se puede ajustar por turno es una pregunta abierta.
+- Constraint: `duracionMinutos` es la duración por defecto del turno (RN-06). Cada turno puede ajustarla de forma opcional (DD-10, RN-16). Una prestación inactiva no puede usarse para dar turnos (RN-18).
 
 ### Paciente
 - `id`, `nombre`, `apellido`, `dni: string`, `telefono: string` (para `wa.me`), `email?: string`, `consentimientoContacto: boolean`.
@@ -65,16 +65,16 @@ Usuario     0..1 ── 1 Profesional        (un usuario odontólogo se vincula 
 - Índice: (`dni`) y (`telefono`) para búsqueda por recepción.
 
 ### Turno
-- `id`, `pacienteId`, `profesionalId`, `sillonId`, `prestacionId`, `inicio: Date`, `fin: Date`, `estado: EstadoTurno`, `origen: 'recepcion' | 'online'`, `tokenGestion?: string` (turnos online), `creadoEn`, `actualizadoEn`, `canceladoEn?`, `canceladoPor?: Rol`.
-- `EstadoTurno`: `reservado` (**Suposición**: alta sin confirmar), `confirmado`, `cancelado`, `ausente`, `atendido`. D.3 del informe lista confirmado, cancelado, ausente y atendido.
-- Estados **activos** (ocupan profesional y sillón): `reservado`, `confirmado`, `atendido`. **Suposición** en DD-05.
-- Constraints: `fin = inicio + prestacion.duracionMinutos` (RN-06); sin solapamiento activo por `profesionalId` (RN-02) ni por `sillonId` (RN-03); dentro de HorarioAtencion y fuera de BloqueoHorario (RN-07).
+- `id`, `pacienteId`, `profesionalId`, `sillonId`, `prestacionId`, `inicio: Date`, `fin: Date`, `duracionMinutos: number` (duración efectiva; entero > 0 y múltiplo de 5), `estado: EstadoTurno`, `origen: 'recepcion' | 'online'`, `tokenGestion?: string` (turnos online), `creadoEn`, `actualizadoEn`, `canceladoEn?`, `canceladoPor?: Rol`.
+- `EstadoTurno`: `reservado` (reserva online del paciente, aún sin confirmar; **Decisión DD-11**), `confirmado` (nace así el turno creado por recepción, odontólogo o administrador), `cancelado`, `ausente`, `atendido`. D.3 del informe lista confirmado, cancelado, ausente y atendido.
+- Estados **activos** (ocupan profesional y sillón): `reservado`, `confirmado`, `atendido`. Ver DD-05.
+- Constraints: `fin = inicio + duracionMinutos` efectiva, que por defecto es `prestacion.duracionMinutos` (RN-06, RN-16); profesional, sillón y prestación activos (RN-18); contenido en un único tramo de atención (RN-17); sin solapamiento activo por `profesionalId` (RN-02) ni por `sillonId` (RN-03); dentro de HorarioAtencion y fuera de BloqueoHorario de su profesional y de su sillón (RN-07).
 - Índices: (`profesionalId`, `inicio`), (`sillonId`, `inicio`), (`pacienteId`), (`tokenGestion`) único.
 - Transiciones permitidas: `reservado → confirmado | cancelado`, `confirmado → atendido | ausente | cancelado`. Reprogramar conserva el `id` y cambia `inicio`/`fin`/recursos (ver flujo 3).
 
 ### BloqueoHorario
 - `id`, `profesionalId`, `sillonId?` (opcional), `inicio: Date`, `fin: Date`, `motivo?: string`, `creadoPor: usuarioId`.
-- Constraint: intervalo semiabierto; un bloqueo impide turnos nuevos que lo toquen (RN-07). Qué pasa con turnos existentes bajo un bloqueo nuevo: pregunta abierta (por defecto, rechazar el bloqueo si hay turnos activos debajo y listar los conflictos; **Suposición**).
+- Constraint: intervalo semiabierto; un bloqueo impide turnos nuevos que lo toquen: con `profesionalId`, los de ese profesional; con `sillonId`, los de ese sillón (RN-07). Qué pasa con turnos existentes bajo un bloqueo nuevo: pregunta abierta (por defecto, rechazar el bloqueo si hay turnos activos debajo y listar los conflictos; **Suposición**).
 
 ### HorarioAtencion
 - `id`, `consultorioId`, `profesionalId?` (si es nulo, aplica al consultorio), `diaSemana: 0..6`, `desde: 'HH:mm'`, `hasta: 'HH:mm'`.

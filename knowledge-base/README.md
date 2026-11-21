@@ -10,7 +10,7 @@ Base de conocimiento generada a partir de los documentos de Discovery (`docs/dis
 | [02_descripcion_general.md](02_descripcion_general.md) | Stack, arquitectura hexagonal, integraciones, API REST opcional |
 | [03_actores_y_roles.md](03_actores_y_roles.md) | Actores, matriz RBAC, rutas públicas |
 | [04_modelo_de_datos.md](04_modelo_de_datos.md) | Entidades, ERD, estados del turno, seed ficticio |
-| [05_reglas_de_negocio.md](05_reglas_de_negocio.md) | RN-01 a RN-09 (checklist), reglas derivadas y casos de verificación |
+| [05_reglas_de_negocio.md](05_reglas_de_negocio.md) | RN-01 a RN-09 (checklist), RN-10 a RN-18 (derivadas y decisiones del explore de C-01), reglas derivadas y casos de verificación |
 | [06_funcionalidades.md](06_funcionalidades.md) | Épicas e historias de usuario con criterios de aceptación |
 | [07_flujos_principales.md](07_flujos_principales.md) | Agendar, reserva online, reprogramar, cancelar, bloquear, recordar |
 | [08_arquitectura_propuesta.md](08_arquitectura_propuesta.md) | Patrones, estructura `src/` y `tests/`, TDD, seguridad, variables de entorno |

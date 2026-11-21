@@ -47,7 +47,7 @@ La fuente de verdad del dominio vive en `knowledge-base/` (índice: [README](kno
 **Discovery (origen de la KB)**: `docs/discovery/` contiene el [informe](docs/discovery/informe-discovery.md) (competidores, alcance D.3) y el [checklist](docs/discovery/checklist-discovery.md) (mayor autoridad ante conflicto).
 
 > Resolver las preguntas de prioridad **Alta** de `10_preguntas_abiertas.md` antes de codear el change que las bloquea:
-> - Zona horaria (SU-04) y duración fija vs ajustable por turno (RN-06): bloquean **C-01**.
+> - ~~Zona horaria y duración de la prestación~~ — **resueltas para C-01** el 2026-11-21 en el explore: zona horaria IANA por consultorio (DD-09), duración ajustable opcional (RN-06, RN-16, DD-10), estados y estado inicial (DD-11), turno dentro de un único tramo (RN-17), recursos activos (RN-18), bloqueo de sillón (RN-07).
 > - ¿El odontólogo puede dar turno sobre su propio bloqueo? y qué pasa con los turnos existentes al crear un bloqueo encima (provisoria: rechazar y listar conflictos, DD-06): bloquean **C-06**.
 
 ---

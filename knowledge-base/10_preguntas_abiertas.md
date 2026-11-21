@@ -20,7 +20,7 @@
 **Resolución propuesta**: tratarlo como precio en USD.
 
 ### IN-04 — Zona horaria no definida frente a un supuesto
-**Suposición de la KB**: `America/Argentina/Buenos_Aires`; **checklist**: pregunta abierta. Ver SU-04.
+**Suposición de la KB**: `America/Argentina/Buenos_Aires`; **checklist**: pregunta abierta. **Resuelta el 2026-11-21**: ver DD-09.
 
 ## Preguntas abiertas (priorizadas)
 
@@ -30,8 +30,8 @@
 |---|---|---|---|
 | Alta | ¿Puede el odontólogo dar un turno sobre un bloqueo propio? (por defecto: no, RN-07) | Change de bloqueos | Equipo / Product Owner |
 | Alta | ¿Qué pasa con los turnos ya dados cuando se crea un bloqueo encima? (provisoria: rechazar y listar conflictos, DD-06) | Change de bloqueos | Equipo |
-| Alta | ¿La duración es fija por prestación o el profesional puede ajustarla en cada turno? (por defecto: fija, RN-06) | Primer change (cálculo de `fin`) | Equipo |
-| Alta | ¿Qué zona horaria se usa? ¿Una por consultorio? (SU-04) | Primer change | Equipo técnico |
+| Resuelta | ¿La duración es fija por prestación o el profesional puede ajustarla en cada turno? | n/a | Resuelta el 2026-11-21: ajustable de forma opcional (DD-10, RN-06, RN-16) |
+| Resuelta | ¿Qué zona horaria se usa? ¿Una por consultorio? | n/a | Resuelta el 2026-11-21: IANA por consultorio (DD-09) |
 | Media | ¿El paciente necesita registrarse o alcanza con DNI y teléfono para reservar? | Change de reserva online | Equipo |
 | Media | ¿Cuáles son las tarifas vigentes de WhatsApp Business Platform para Argentina? | Etapa WhatsApp Cloud API | Equipo (verificar en Meta) |
 | Baja | ¿Qué proveedor de e-mail (SMTP/transaccional) con free tier se usa? | Change de recordatorios | Equipo técnico |
@@ -60,7 +60,7 @@
 
 | Prioridad | Pregunta | Bloquea | Decisor |
 |---|---|---|---|
-| Media | ¿Hace falta el estado `reservado` además de `confirmado`? (SU-03) | Primer change (modelo de estados) | Equipo |
+| Resuelta | ¿Hace falta el estado `reservado` además de `confirmado`? | n/a | Resuelta el 2026-11-21: se mantiene; alta interna nace `confirmado`, reserva online `reservado` (DD-11) |
 | Media | ¿El horario de atención se define por consultorio, por profesional o ambos? (SU-09) | Primer change | Equipo |
 | Media | ¿Se limita qué prestaciones puede realizar cada profesional y en qué sillones? | Primer change | Equipo |
 | Baja | ¿Cómo se maneja el consentimiento de contacto y la eliminación de datos del paciente (Ley 25.326)? | Reserva online | Equipo |

@@ -41,7 +41,7 @@ Global-desarrollo/
 ## Orden de implementación sugerido (primer change)
 
 1. `Intervalo` y regla de solapamiento semiabierto (RN-05) con tests de borde.
-2. `Turno` con `fin` derivado de la prestación (RN-06) y estados.
+2. `Turno` con `fin` derivado de la duración efectiva (prestación o ajuste por turno; RN-06) y estados.
 3. Validación por profesional y por sillón (RN-01 a RN-04).
 4. Horario de atención y bloqueos (RN-07).
 5. Caso de uso `AgendarTurno` con repositorios en memoria.

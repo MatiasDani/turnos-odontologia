@@ -10,14 +10,17 @@ Organizadas por épica e historia de usuario (US-NNN). Etapa: **MVP** (D.3 "Impr
 **Para** que no se superponga con otro turno
 
 **Criterios de aceptación**:
-- [ ] El turno ocupa profesional y sillón durante la duración de la prestación; `fin = inicio + duración`.
+- [ ] El turno ocupa profesional y sillón durante su duración; `fin = inicio + duración`, donde la duración es la de la prestación o, si se informa, una `duracionMinutos` entera > 0 y múltiplo de 5 (solo recepción, odontólogo o administrador; RN-06, RN-16).
+- [ ] Solo se puede dar un turno con profesional, sillón y prestación activos (RN-18).
+- [ ] El turno debe caber completo en un único tramo de atención; no cruza el corte entre tramos (RN-17).
+- [ ] El turno creado por recepción, odontólogo o administrador nace `confirmado` (DD-11).
 - [ ] Se rechaza si se solapa con un turno activo del mismo profesional o del mismo sillón.
 - [ ] Turnos contiguos (fin = inicio del otro) son válidos.
-- [ ] Se rechaza fuera del horario de atención o sobre un bloqueo.
+- [ ] Se rechaza fuera del horario de atención o sobre un bloqueo del profesional o del sillón.
 - [ ] Ningún rol puede forzar el solapamiento (sin sobreturnos).
 - [ ] El error informa el código `RN-XX` violado y el turno en conflicto.
 
-**Reglas relacionadas**: RN-01, RN-02, RN-03, RN-04, RN-05, RN-06, RN-07, RN-12
+**Reglas relacionadas**: RN-01, RN-02, RN-03, RN-04, RN-05, RN-06, RN-07, RN-12, RN-16, RN-17, RN-18
 
 ### US-002 — Ver la agenda diaria y semanal
 **Como** recepción u odontólogo
