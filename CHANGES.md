@@ -127,7 +127,7 @@ Carriles: **A** = núcleo y reserva online (Matías: C-01 → C-07 → C-10); **
 > C-01 es el único bloqueante del resto y es el change que el equipo lleva por el ciclo OPSX completo. Tras C-01 se abre un FORK.
 
 ### [C-01] `crear-turno-sin-solapamientos`
-- **Estado**: `[ ]` pendiente
+- **Estado**: `[x]` completado (archivado 2026-11-21)
 - **Owner**: Matías Ibañez (52006)
 - **Scope**:
   - Scaffolding mínimo: `package.json`, `tsconfig.json`, Vitest, estructura `src/domain`, `src/application`, `src/adapters/persistence`, `tests/` (layout de `08_arquitectura_propuesta.md`); `.env.example` solo con valores ficticios
@@ -230,7 +230,7 @@ Carriles: **A** = núcleo y reserva online (Matías: C-01 → C-07 → C-10); **
 - **Estado**: `[ ]` pendiente
 - **Owner**: Mara Ferrer (51974)
 - **Scope**:
-  - Caso de uso `BloquearHorario` / `LiberarBloqueo` sobre `BloqueoHorario` (profesional y sillón opcional), intervalo semiabierto
+  - Caso de uso `BloquearHorario` / `LiberarBloqueo` sobre `BloqueoHorario` (`profesionalId?` y/o `sillonId?`, al menos uno; ver 04), intervalo semiabierto
   - Conflicto con turnos activos existentes: se informa la lista de conflictos y **no** se crea el bloqueo (DD-06, suposición provisoria; pregunta abierta en `10_preguntas_abiertas.md`)
   - El odontólogo solo bloquea su propia agenda (la verificación por usuario se aplica en C-09; aquí se valida `profesionalId` del actor)
   - Los turnos nuevos que toquen el bloqueo son rechazados (RN-07, ya garantizado por C-01; test de integración)
