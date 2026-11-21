@@ -1,0 +1,112 @@
+# Modelo de Datos
+
+> Modelo del MVP. Es agnóstico de la persistencia: en el MVP vive en repositorios en memoria; PostgreSQL es el destino futuro. Los tipos están expresados en TypeScript. **Todos los datos de ejemplo y seed son ficticios.**
+
+## Dominios
+
+- **Configuración del consultorio**: Consultorio, Profesional, Sillon, Prestacion, HorarioAtencion.
+- **Agenda**: Turno, BloqueoHorario.
+- **Personas y acceso**: Paciente, Usuario, Rol.
+- **Comunicación**: Recordatorio.
+
+## Convenciones de tiempo
+
+- Un intervalo es **semiabierto [inicio, fin)** (RN-05). `fin = inicio + duración de la prestación`.
+- Los instantes se guardan como `Date`/ISO 8601 en UTC; cada Consultorio define su `zonaHoraria` (por defecto `America/Argentina/Buenos_Aires`, UTC-3 sin horario de verano). **Suposición**, ver pregunta abierta sobre zona horaria.
+- Los horarios de atención se expresan en hora local del consultorio (`HH:mm`) y se convierten al comparar.
+
+## ERD (texto)
+
+```
+Consultorio 1 ──── * Profesional
+Consultorio 1 ──── * Sillon
+Consultorio 1 ──── * Prestacion
+Consultorio 1 ──── * HorarioAtencion
+Consultorio 1 ──── * Usuario
+Profesional * ──── * Prestacion          (qué prestaciones realiza cada profesional)
+Profesional 1 ──── * HorarioAtencion     (horario propio, opcional)
+Profesional 1 ──── * BloqueoHorario
+Sillon      1 ──── * BloqueoHorario      (opcional: bloqueo de un sillón)
+Profesional 1 ──── * Turno
+Sillon      1 ──── * Turno
+Prestacion  1 ──── * Turno
+Paciente    1 ──── * Turno
+Turno       1 ──── * Recordatorio
+Usuario     * ──── 1 Rol
+Usuario     0..1 ── 1 Profesional        (un usuario odontólogo se vincula a su profesional)
+```
+
+## Entidades
+
+### Consultorio
+- `id: string`, `nombre: string`, `zonaHoraria: string`, `telefonoContacto: string`, `email: string`.
+- Relaciones: 1 a N con Profesional, Sillon, Prestacion, HorarioAtencion, Usuario.
+- Constraint: tamaño objetivo 1 a 5 profesionales y 1 a 3 sillones (no se impone por código; es el segmento de diseño).
+- MVP: un solo consultorio por instalación (multi-sucursal es etapa posterior).
+
+### Profesional
+- `id`, `consultorioId`, `nombre`, `apellido`, `matricula?: string` (ficticia en seed), `activo: boolean`, `prestacionIds: string[]`.
+- Relaciones: N a N con Prestacion; 1 a N con Turno, BloqueoHorario.
+- Constraint: un profesional inactivo no recibe turnos nuevos.
+
+### Sillon (Box)
+- `id`, `consultorioId`, `nombre` (ej. "Sillón 1"), `activo: boolean`.
+- Relaciones: 1 a N con Turno y BloqueoHorario.
+- Constraint: no se admiten dos turnos activos solapados en el mismo sillón (RN-03).
+
+### Prestacion
+- `id`, `consultorioId`, `nombre`, `duracionMinutos: number` (entero > 0), `activa: boolean`, `requiereSillonIds?: string[]` (**Suposición**: opcional, para prestaciones que solo pueden hacerse en ciertos sillones).
+- Constraint: `duracionMinutos` define la duración del turno (RN-06). Si la duración se puede ajustar por turno es una pregunta abierta.
+
+### Paciente
+- `id`, `nombre`, `apellido`, `dni: string`, `telefono: string` (para `wa.me`), `email?: string`, `consentimientoContacto: boolean`.
+- Relaciones: 1 a N con Turno.
+- Constraint: **solo datos ficticios en el repositorio** (Ley 25.326). Datos de salud: sensibles; en el MVP no se almacenan datos clínicos. Si el paciente debe registrarse o alcanza con DNI y teléfono es una pregunta abierta.
+- Índice: (`dni`) y (`telefono`) para búsqueda por recepción.
+
+### Turno
+- `id`, `pacienteId`, `profesionalId`, `sillonId`, `prestacionId`, `inicio: Date`, `fin: Date`, `estado: EstadoTurno`, `origen: 'recepcion' | 'online'`, `tokenGestion?: string` (turnos online), `creadoEn`, `actualizadoEn`, `canceladoEn?`, `canceladoPor?: Rol`.
+- `EstadoTurno`: `reservado` (**Suposición**: alta sin confirmar), `confirmado`, `cancelado`, `ausente`, `atendido`. D.3 del informe lista confirmado, cancelado, ausente y atendido.
+- Estados **activos** (ocupan profesional y sillón): `reservado`, `confirmado`, `atendido`. **Suposición** en DD-05.
+- Constraints: `fin = inicio + prestacion.duracionMinutos` (RN-06); sin solapamiento activo por `profesionalId` (RN-02) ni por `sillonId` (RN-03); dentro de HorarioAtencion y fuera de BloqueoHorario (RN-07).
+- Índices: (`profesionalId`, `inicio`), (`sillonId`, `inicio`), (`pacienteId`), (`tokenGestion`) único.
+- Transiciones permitidas: `reservado → confirmado | cancelado`, `confirmado → atendido | ausente | cancelado`. Reprogramar conserva el `id` y cambia `inicio`/`fin`/recursos (ver flujo 3).
+
+### BloqueoHorario
+- `id`, `profesionalId`, `sillonId?` (opcional), `inicio: Date`, `fin: Date`, `motivo?: string`, `creadoPor: usuarioId`.
+- Constraint: intervalo semiabierto; un bloqueo impide turnos nuevos que lo toquen (RN-07). Qué pasa con turnos existentes bajo un bloqueo nuevo: pregunta abierta (por defecto, rechazar el bloqueo si hay turnos activos debajo y listar los conflictos; **Suposición**).
+
+### HorarioAtencion
+- `id`, `consultorioId`, `profesionalId?` (si es nulo, aplica al consultorio), `diaSemana: 0..6`, `desde: 'HH:mm'`, `hasta: 'HH:mm'`.
+- Constraint: sin turnos fuera de horario de atención (RN-07). Si hay horario por profesional, prevalece sobre el del consultorio (**Suposición**).
+
+### Usuario
+- `id`, `consultorioId`, `email`, `hashClave: string` (nunca en texto plano), `rolId`, `profesionalId?`, `activo`.
+- Constraint: `email` único. Los pacientes no tienen usuario en el MVP: operan con el token de su turno (**Suposición**, ver pregunta abierta).
+
+### Rol
+- `id`, `nombre: 'administrador' | 'odontologo' | 'recepcion' | 'paciente'`.
+- Los permisos están en `03_actores_y_roles.md`.
+
+### Recordatorio
+- `id`, `turnoId`, `canal: 'email' | 'wa_me'`, `programadoPara: Date` (por defecto 24 h antes, **Suposición**), `estado: 'pendiente' | 'enviado' | 'fallido'`, `enlaceWaMe?: string`, `enviadoEn?`.
+- Para `wa_me`, no hay envío automático: el sistema genera la URL `https://wa.me/<telefono>?text=<mensaje>` y la recepción la abre y envía.
+
+## Seed data inicial (100 % ficticia)
+
+Un consultorio ficticio con datos de ejemplo para tests y demos. Los teléfonos usan un prefijo no real y los nombres son inventados.
+
+| Entidad | Datos |
+|---|---|
+| Consultorio | `c1` "Consultorio Odontológico Demo", zona `America/Argentina/Buenos_Aires` |
+| Roles | administrador, odontologo, recepcion, paciente |
+| Usuarios | `admin@demo.test` (administrador), `recepcion@demo.test` (recepción), `dra.ejemplo@demo.test` (odontólogo, vinculada a `p1`) |
+| Profesionales | `p1` Ana Ejemplo (matrícula ficticia 0001), `p2` Bruno Muestra (matrícula ficticia 0002) |
+| Sillones | `s1` "Sillón 1", `s2` "Sillón 2" |
+| Prestaciones | `pr1` Consulta/control 30 min, `pr2` Limpieza 45 min, `pr3` Extracción simple 60 min, `pr4` Endodoncia 90 min |
+| Horario de atención | Lunes a viernes 09:00 a 13:00 y 15:00 a 19:00 (hora local) |
+| Pacientes | `pa1` Carla Prueba (DNI ficticio 00000001, tel `+54 9 11 0000-0001`), `pa2` Diego Modelo (DNI 00000002, tel `+54 9 11 0000-0002`), `pa3` Eva Simulada (DNI 00000003, tel `+54 9 11 0000-0003`) |
+| Bloqueo de ejemplo | `p1` bloqueada los miércoles de 15:00 a 17:00 (motivo "capacitación") |
+| Turnos de ejemplo | `pa1` con `p1` en `s1`, `pr2` lunes 09:00 a 09:45; `pa2` con `p2` en `s2`, `pr1` lunes 09:45 a 10:15 (borde contiguo válido por RN-05) |
+
+Regla: nunca cargar nombres, DNI, teléfonos, e-mails ni datos de salud reales en el repositorio, fixtures, capturas ni ejemplos (ver RN-D-01).

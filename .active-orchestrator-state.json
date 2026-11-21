@@ -1,6 +1,6 @@
 {
   "version": 5,
-  "step": "kb",
+  "step": "visual-design",
   "owner": "active-orchestrator",
   "discovery": {
     "created_by": "discovery-research",
@@ -8,16 +8,38 @@
     "checklist_file": "docs/discovery/checklist-discovery.md",
     "report_file": "docs/discovery/informe-discovery.md",
     "sources_fetched_at": "2026-11-21",
-    "sources": ["docs/discovery/informe-discovery.md#referencias-completas"],
+    "sources": [
+      "docs/discovery/informe-discovery.md#referencias-completas"
+    ],
     "competitors": [
-      { "name": "DentalCore", "notes_file": "docs/discovery/informe-discovery.md" },
-      { "name": "AgendaPro", "notes_file": "docs/discovery/informe-discovery.md" },
-      { "name": "DentalSoft", "notes_file": "docs/discovery/informe-discovery.md" },
-      { "name": "ClinIA", "notes_file": "docs/discovery/informe-discovery.md" },
-      { "name": "Dentalink", "notes_file": "docs/discovery/informe-discovery.md" }
+      {
+        "name": "DentalCore",
+        "notes_file": "docs/discovery/informe-discovery.md"
+      },
+      {
+        "name": "AgendaPro",
+        "notes_file": "docs/discovery/informe-discovery.md"
+      },
+      {
+        "name": "DentalSoft",
+        "notes_file": "docs/discovery/informe-discovery.md"
+      },
+      {
+        "name": "ClinIA",
+        "notes_file": "docs/discovery/informe-discovery.md"
+      },
+      {
+        "name": "Dentalink",
+        "notes_file": "docs/discovery/informe-discovery.md"
+      }
     ],
     "problema": "Consultorios odontológicos chicos en Argentina gestionan la agenda en papel/planillas/WhatsApp, lo que genera turnos superpuestos por profesional y por sillón y tiempo perdido coordinando.",
-    "usuarios": ["Recepción/secretaria", "Odontólogo", "Paciente (autogestión)", "Administrador/dueño"],
+    "usuarios": [
+      "Recepción/secretaria",
+      "Odontólogo",
+      "Paciente (autogestión)",
+      "Administrador/dueño"
+    ],
     "casos_de_uso": [
       "Como recepción, quiero dar un turno con profesional, sillón y prestación sin que se solape",
       "Como recepción o paciente, quiero reprogramar o cancelar un turno y liberar el horario",
@@ -33,8 +55,16 @@
       "Roles básicos: administrador, odontólogo, recepción, paciente"
     ],
     "funcionalidades_opcionales": [
-      "WhatsApp Cloud API", "Señas con Mercado Pago", "Lista de espera", "Seguimiento de ausentes y controles periódicos",
-      "Tablero de ocupación", "Ficha clínica y odontograma", "Presupuestos y caja", "Facturación ARCA", "Obras sociales", "Multi-sucursal"
+      "WhatsApp Cloud API",
+      "Señas con Mercado Pago",
+      "Lista de espera",
+      "Seguimiento de ausentes y controles periódicos",
+      "Tablero de ocupación",
+      "Ficha clínica y odontograma",
+      "Presupuestos y caja",
+      "Facturación ARCA",
+      "Obras sociales",
+      "Multi-sucursal"
     ],
     "reglas_de_negocio": [
       "RN-01 Un turno ocupa profesional y sillón durante la duración de la prestación",
@@ -47,16 +77,63 @@
       "RN-08 Paciente cancela/reprograma online solo con >=24 h; con menos, solo recepción",
       "RN-09 Cancelar libera el horario"
     ],
-    "integraciones": ["E-mail (MVP)", "wa.me click-to-chat (MVP)", "Google Calendar (opcional)", "WhatsApp Cloud API (post-MVP)", "Mercado Pago (post-MVP)"],
-    "restricciones": ["Costo $0 (free tier)", "Plazo del TP: un change completo", "Solo datos ficticios; Ley 25.326 y Ley 26.529", "Stack no impuesto"],
-    "riesgos": ["Datos sensibles de salud (principal)", "Efectividad de e-mail + wa.me vs WhatsApp automático (supuesto)", "Costo WhatsApp en producción (supuesto)", "Adopción por la secretaria (supuesto)", "Competidores consolidados"],
+    "integraciones": [
+      "E-mail (MVP)",
+      "wa.me click-to-chat (MVP)",
+      "Google Calendar (opcional)",
+      "WhatsApp Cloud API (post-MVP)",
+      "Mercado Pago (post-MVP)"
+    ],
+    "restricciones": [
+      "Costo $0 (free tier)",
+      "Plazo del TP: un change completo",
+      "Solo datos ficticios; Ley 25.326 y Ley 26.529",
+      "Stack no impuesto"
+    ],
+    "riesgos": [
+      "Datos sensibles de salud (principal)",
+      "Efectividad de e-mail + wa.me vs WhatsApp automático (supuesto)",
+      "Costo WhatsApp en producción (supuesto)",
+      "Adopción por la secretaria (supuesto)",
+      "Competidores consolidados"
+    ],
     "preguntas_abiertas": [
-      "Stack tecnológico", "Tarifas WhatsApp Argentina", "¿Odontólogo puede dar turno sobre su propio bloqueo?",
-      "Zona horaria", "¿Duración fija o ajustable por turno?", "¿Registro del paciente o DNI + teléfono?",
-      "¿Qué pasa con turnos existentes al crear un bloqueo encima?", "Datos 'No evidenciado' del informe a verificar"
+      "Stack tecnológico",
+      "Tarifas WhatsApp Argentina",
+      "¿Odontólogo puede dar turno sobre su propio bloqueo?",
+      "Zona horaria",
+      "¿Duración fija o ajustable por turno?",
+      "¿Registro del paciente o DNI + teléfono?",
+      "¿Qué pasa con turnos existentes al crear un bloqueo encima?",
+      "Datos 'No evidenciado' del informe a verificar"
     ],
     "adjustments": [
       "2026-11-21: D.3 (MVP) del informe se redujo para alinearlo al checklist confirmado; ficha/odontograma, presupuesto/caja y auditoría pasaron a etapas posteriores; WhatsApp API y Mercado Pago a diferenciador"
+    ]
+  },
+  "kb": {
+    "created_by": "kb-creator",
+    "source": "ingest",
+    "discovery": {
+      "problem": "Los consultorios odontológicos chicos de Argentina gestionan la agenda en papel, planillas o WhatsApp, lo que produce turnos superpuestos por profesional y por sillón y tiempo de recepción perdido en coordinar.",
+      "system_type": "api (backend de dominio; web app futura)",
+      "domain": "salud: gestión de turnos y agenda de consultorios odontológicos",
+      "scale": "team (consultorios de 1 a 5 profesionales y 1 a 3 sillones)",
+      "stack": "TypeScript + Node.js (LTS), dominio puro hexagonal, Vitest, Fastify (opcional), repositorios en memoria (PostgreSQL futuro)",
+      "needs_infra": false
+    },
+    "files": [
+      "knowledge-base/01_vision_y_objetivos.md",
+      "knowledge-base/02_descripcion_general.md",
+      "knowledge-base/03_actores_y_roles.md",
+      "knowledge-base/04_modelo_de_datos.md",
+      "knowledge-base/05_reglas_de_negocio.md",
+      "knowledge-base/06_funcionalidades.md",
+      "knowledge-base/07_flujos_principales.md",
+      "knowledge-base/08_arquitectura_propuesta.md",
+      "knowledge-base/09_decisiones_y_supuestos.md",
+      "knowledge-base/10_preguntas_abiertas.md",
+      "knowledge-base/README.md"
     ]
   }
 }
