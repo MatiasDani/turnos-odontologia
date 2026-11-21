@@ -39,3 +39,19 @@ export class RecursoNoEncontradoError extends Error {
     this.id = id;
   }
 }
+
+/**
+ * Consulta de disponibilidad mal formada (límites de entrada, RN-13). No es una regla de agenda,
+ * por eso no amplía `CodigoRN`.
+ */
+export class ConsultaInvalidaError extends Error {
+  readonly campo: 'rango' | 'paso';
+  readonly motivo: string;
+
+  constructor(campo: 'rango' | 'paso', motivo: string) {
+    super(`Consulta inválida (${campo}): ${motivo}`);
+    this.name = 'ConsultaInvalidaError';
+    this.campo = campo;
+    this.motivo = motivo;
+  }
+}

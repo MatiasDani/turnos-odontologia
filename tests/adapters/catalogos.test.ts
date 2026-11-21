@@ -25,6 +25,24 @@ describe('repositorios de catálogo en memoria', () => {
     expect(await new ConsultorioRepositorioEnMemoria([e.consultorio]).obtenerPorId('c9')).toBeUndefined();
   });
 
+  test('listarPorConsultorio: solo los profesionales del consultorio, incluidos inactivos', async () => {
+    const ajeno = { ...e.profesionales[0]!, id: 'p8', consultorioId: 'c2' };
+    const inactivo = { ...e.profesionales[1]!, id: 'p7', activo: false };
+    const repo = new ProfesionalRepositorioEnMemoria([...e.profesionales, inactivo, ajeno]);
+    expect((await repo.listarPorConsultorio('c1')).map((p) => p.id)).toEqual(['p1', 'p2', 'p7']);
+    expect((await repo.listarPorConsultorio('c2')).map((p) => p.id)).toEqual(['p8']);
+    expect(await repo.listarPorConsultorio('c9')).toEqual([]);
+  });
+
+  test('listarPorConsultorio: solo los sillones del consultorio, incluidos inactivos', async () => {
+    const ajeno = { ...e.sillones[0]!, id: 's8', consultorioId: 'c2' };
+    const inactivo = { ...e.sillones[1]!, id: 's7', activo: false };
+    const repo = new SillonRepositorioEnMemoria([...e.sillones, inactivo, ajeno]);
+    expect((await repo.listarPorConsultorio('c1')).map((s) => s.id)).toEqual(['s1', 's2', 's7']);
+    expect((await repo.listarPorConsultorio('c2')).map((s) => s.id)).toEqual(['s8']);
+    expect(await repo.listarPorConsultorio('c9')).toEqual([]);
+  });
+
   test('horarios: lista solo los del consultorio pedido', async () => {
     const repo = new HorarioAtencionRepositorioEnMemoria(e.horarios);
     expect(await repo.listarPorConsultorio('c1')).toHaveLength(10);

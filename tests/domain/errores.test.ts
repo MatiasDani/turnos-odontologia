@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { RecursoNoEncontradoError, ReglaNegocioError } from '../../src/domain/errores.js';
+import { ConsultaInvalidaError, RecursoNoEncontradoError, ReglaNegocioError } from '../../src/domain/errores.js';
 import type { Turno } from '../../src/domain/turno.js';
 
 const turno: Turno = {
@@ -50,5 +50,24 @@ describe('RecursoNoEncontradoError', () => {
     expect(e.tipo).toBe('profesional');
     expect(e.id).toBe('p9');
     expect(e.message).toContain('p9');
+  });
+});
+
+describe('ConsultaInvalidaError', () => {
+  test('preserva instanceof, name, campo y motivo (rango)', () => {
+    const e = new ConsultaInvalidaError('rango', 'hasta debe ser posterior a desde');
+    expect(e).toBeInstanceOf(ConsultaInvalidaError);
+    expect(e).toBeInstanceOf(Error);
+    expect(e).not.toBeInstanceOf(ReglaNegocioError);
+    expect(e.name).toBe('ConsultaInvalidaError');
+    expect(e.campo).toBe('rango');
+    expect(e.motivo).toBe('hasta debe ser posterior a desde');
+  });
+
+  test('campo paso con otro motivo', () => {
+    const e = new ConsultaInvalidaError('paso', 'debe ser entero positivo');
+    expect(e.campo).toBe('paso');
+    expect(e.motivo).toBe('debe ser entero positivo');
+    expect(e.message).toContain('paso');
   });
 });

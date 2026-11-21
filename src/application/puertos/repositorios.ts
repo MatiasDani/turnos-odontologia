@@ -10,10 +10,14 @@ import type { Turno } from '../../domain/turno.js';
 
 export interface ProfesionalRepositorio {
   obtenerPorId(id: string): Promise<Profesional | undefined>;
+  /** Profesionales del consultorio, activos e inactivos (el filtrado es de quien consulta). */
+  listarPorConsultorio(consultorioId: string): Promise<readonly Profesional[]>;
 }
 
 export interface SillonRepositorio {
   obtenerPorId(id: string): Promise<Sillon | undefined>;
+  /** Sillones del consultorio, activos e inactivos (el filtrado es de quien consulta). */
+  listarPorConsultorio(consultorioId: string): Promise<readonly Sillon[]>;
 }
 
 export interface PrestacionRepositorio {

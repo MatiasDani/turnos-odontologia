@@ -23,8 +23,21 @@ class PorId<T extends { readonly id: string }> {
   }
 }
 
-export class ProfesionalRepositorioEnMemoria extends PorId<Profesional> implements ProfesionalRepositorio {}
-export class SillonRepositorioEnMemoria extends PorId<Sillon> implements SillonRepositorio {}
+/** Base con además listado por consultorio, conservando el orden de carga. */
+class PorIdYConsultorio<T extends { readonly id: string; readonly consultorioId: string }> extends PorId<T> {
+  constructor(private readonly coleccion: readonly T[]) {
+    super(coleccion);
+  }
+
+  listarPorConsultorio(consultorioId: string): Promise<readonly T[]> {
+    return Promise.resolve(this.coleccion.filter((item) => item.consultorioId === consultorioId));
+  }
+}
+
+export class ProfesionalRepositorioEnMemoria
+  extends PorIdYConsultorio<Profesional>
+  implements ProfesionalRepositorio {}
+export class SillonRepositorioEnMemoria extends PorIdYConsultorio<Sillon> implements SillonRepositorio {}
 export class PrestacionRepositorioEnMemoria extends PorId<Prestacion> implements PrestacionRepositorio {}
 export class ConsultorioRepositorioEnMemoria extends PorId<Consultorio> implements ConsultorioRepositorio {}
 

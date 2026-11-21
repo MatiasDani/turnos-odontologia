@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { aHoraLocal } from '../../src/domain/tiempo.js';
+import { aHoraLocal, deHoraLocal } from '../../src/domain/tiempo.js';
 
 const BA = 'America/Argentina/Buenos_Aires';
 
@@ -19,5 +19,32 @@ describe('aHoraLocal(instante, zona)', () => {
       diaSemana: 2,
       minutosDelDia: 120,
     });
+  });
+});
+
+describe('deHoraLocal(fecha, minutos, zona)', () => {
+  test.each([
+    ['lunes 09:00 local → 12:00Z', '2026-11-23', 540, '2026-11-23T12:00:00.000Z'],
+    ['lunes 23:00 local → 02:00Z del día siguiente', '2026-11-23', 1380, '2026-11-24T02:00:00.000Z'],
+    ['medianoche local', '2026-11-28', 0, '2026-11-28T03:00:00.000Z'],
+    ['15:45 local', '2026-11-23', 945, '2026-11-23T18:45:00.000Z'],
+  ])('%s', (_n, fecha, minutos, esperado) => {
+    expect(deHoraLocal(fecha, minutos, BA).toISOString()).toBe(esperado);
+  });
+
+  test('respeta la zona informada (UTC)', () => {
+    expect(deHoraLocal('2026-11-23', 540, 'UTC').toISOString()).toBe('2026-11-23T09:00:00.000Z');
+  });
+
+  test('ida y vuelta con aHoraLocal', () => {
+    for (const minutos of [0, 15, 540, 765, 900, 1425]) {
+      const instante = deHoraLocal('2026-11-25', minutos, BA);
+      expect(aHoraLocal(instante, BA)).toEqual({ diaSemana: 3, minutosDelDia: minutos });
+    }
+  });
+
+  test('zona con horario de verano: corrige el desfase (America/New_York)', () => {
+    expect(deHoraLocal('2026-07-15', 540, 'America/New_York').toISOString()).toBe('2026-07-15T13:00:00.000Z');
+    expect(deHoraLocal('2026-01-15', 540, 'America/New_York').toISOString()).toBe('2026-01-15T14:00:00.000Z');
   });
 });
