@@ -1,0 +1,54 @@
+import { describe, expect, test } from 'vitest';
+import { RecursoNoEncontradoError, ReglaNegocioError } from '../../src/domain/errores.js';
+import type { Turno } from '../../src/domain/turno.js';
+
+const turno: Turno = {
+  id: 't1',
+  pacienteId: 'pa1',
+  profesionalId: 'p1',
+  sillonId: 's1',
+  prestacionId: 'pr1',
+  inicio: new Date('2026-11-23T12:00:00Z'),
+  fin: new Date('2026-11-23T12:30:00Z'),
+  duracionMinutos: 30,
+  estado: 'confirmado',
+  origen: 'recepcion',
+};
+
+describe('ReglaNegocioError', () => {
+  test('preserva instanceof y el código', () => {
+    const e = new ReglaNegocioError({ codigo: 'RN-18' });
+    expect(e).toBeInstanceOf(ReglaNegocioError);
+    expect(e).toBeInstanceOf(Error);
+    expect(e.codigo).toBe('RN-18');
+    expect(e.turnoEnConflicto).toBeUndefined();
+  });
+
+  test('preserva turno en conflicto', () => {
+    const e = new ReglaNegocioError({ codigo: 'RN-02', turnoEnConflicto: turno });
+    expect(e.codigo).toBe('RN-02');
+    expect(e.turnoEnConflicto).toBe(turno);
+  });
+
+  test('preserva bloqueo en conflicto y recurso bloqueado', () => {
+    const bloqueo = { id: 'b1', sillonId: 's1', inicio: turno.inicio, fin: turno.fin };
+    const e = new ReglaNegocioError({
+      codigo: 'RN-07',
+      bloqueoEnConflicto: bloqueo,
+      recursoBloqueado: 'sillon',
+    });
+    expect(e.bloqueoEnConflicto).toBe(bloqueo);
+    expect(e.recursoBloqueado).toBe('sillon');
+  });
+});
+
+describe('RecursoNoEncontradoError', () => {
+  test('preserva instanceof, tipo e id, y no es ReglaNegocioError', () => {
+    const e = new RecursoNoEncontradoError('profesional', 'p9');
+    expect(e).toBeInstanceOf(RecursoNoEncontradoError);
+    expect(e).not.toBeInstanceOf(ReglaNegocioError);
+    expect(e.tipo).toBe('profesional');
+    expect(e.id).toBe('p9');
+    expect(e.message).toContain('p9');
+  });
+});

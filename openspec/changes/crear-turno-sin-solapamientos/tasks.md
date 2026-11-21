@@ -11,25 +11,25 @@
 
 ## 2. Intervalo y tiempo
 
-- [ ] 2.1 RED/GREEN/TRIANGULATE `Intervalo` semiabierto (`src/domain/intervalo.ts`): `seSolapa` con contiguos (falso en ambos sentidos), parcial, contención total, idénticos; rechaza `fin <= inicio`; verificar `tests/domain/intervalo.test.ts` en verde
-- [ ] 2.2 RED/GREEN/TRIANGULATE `aHoraLocal(instante, zona)` (`src/domain/tiempo.ts`) con `Intl.DateTimeFormat`: 12:00Z → lunes 540 min en Buenos Aires; 02:00Z del martes → lunes 23:00 local; verificar `tests/domain/tiempo.test.ts` en verde
-- [ ] 2.3 Crear `tests/fixtures/seed.ts` con el seed ficticio de `04` (c1, p1/p2, s1/s2, pr1..pr4, horario L-V 09-13 y 15-19, bloqueo p1 miércoles 2026-11-25 15-17, pa1..pa3), helper `local(fecha, 'HH:mm')` con `-03:00` y fábrica `crearEntorno(overrides)`; verificar con un test que `local('2026-11-23','09:00')` es `2026-11-23T12:00:00Z`
+- [x] 2.1 RED/GREEN/TRIANGULATE `Intervalo` semiabierto (`src/domain/intervalo.ts`): `seSolapa` con contiguos (falso en ambos sentidos), parcial, contención total, idénticos; rechaza `fin <= inicio`; verificar `tests/domain/intervalo.test.ts` en verde
+- [x] 2.2 RED/GREEN/TRIANGULATE `aHoraLocal(instante, zona)` (`src/domain/tiempo.ts`) con `Intl.DateTimeFormat`: 12:00Z → lunes 540 min en Buenos Aires; 02:00Z del martes → lunes 23:00 local; verificar `tests/domain/tiempo.test.ts` en verde
+- [x] 2.3 Crear `tests/fixtures/seed.ts` con el seed ficticio de `04` (c1, p1/p2, s1/s2, pr1..pr4, horario L-V 09-13 y 15-19, bloqueo p1 miércoles 2026-11-25 15-17, pa1..pa3), helper `local(fecha, 'HH:mm')` con `-03:00` y fábrica `crearEntorno(overrides)`; verificar con un test que `local('2026-11-23','09:00')` es `2026-11-23T12:00:00Z`
 
 ## 3. Entidades y estados
 
-- [ ] 3.1 Tipos de entidades (`consultorio`, `profesional`, `sillon`, `prestacion`, `paciente`, `horario-atencion`, `bloqueo-horario` con `profesionalId?`/`sillonId?`, `actor` con `Rol`) sin `any`; verificar con `npm run typecheck`
-- [ ] 3.2 RED/GREEN/TRIANGULATE `EstadoTurno`, `esActivo` (`test.each` de los 5 estados) y `estadoInicial(rol)` (paciente → reservado/online; recepción, odontólogo, administrador → confirmado/recepcion); verificar `tests/domain/turno.test.ts` en verde
-- [ ] 3.3 Definir `ReglaNegocioError` (`codigo`, `turnoEnConflicto?`, `bloqueoEnConflicto?`, `recursoBloqueado?`) y `RecursoNoEncontradoError` en `src/domain/errores.ts`; verificar con test que `instanceof` y campos se preservan
+- [x] 3.1 Tipos de entidades (`consultorio`, `profesional`, `sillon`, `prestacion`, `paciente`, `horario-atencion`, `bloqueo-horario` con `profesionalId?`/`sillonId?`, `actor` con `Rol`) sin `any`; verificar con `npm run typecheck`
+- [x] 3.2 RED/GREEN/TRIANGULATE `EstadoTurno`, `esActivo` (`test.each` de los 5 estados) y `estadoInicial(rol)` (paciente → reservado/online; recepción, odontólogo, administrador → confirmado/recepcion); verificar `tests/domain/turno.test.ts` en verde
+- [x] 3.3 Definir `ReglaNegocioError` (`codigo`, `turnoEnConflicto?`, `bloqueoEnConflicto?`, `recursoBloqueado?`) y `RecursoNoEncontradoError` en `src/domain/errores.ts`; verificar con test que `instanceof` y campos se preservan
 
 ## 4. Reglas de dominio puras (`src/domain/reglas/`)
 
-- [ ] 4.1 RED/GREEN/TRIANGULATE `recursos-activos` (RN-18): profesional, sillón y prestación inactivos → violación; todos activos → null; verificar test en verde
-- [ ] 4.2 RED/GREEN/TRIANGULATE `duracion` (RN-06, RN-16): default de prestación; ajuste por recepción/odontólogo/administrador; 0, 37, -5, 12.5 → RN-06; paciente con duración distinta → RN-16; paciente con duración igual → válida; verificar test en verde
-- [ ] 4.3 RED/GREEN/TRIANGULATE `horario` (RN-07, RN-17) con zona del consultorio: antes de apertura, corte 13:30, sábado, exceder cierre de la tarde → RN-07; 12:45 + 30 → RN-17; 12:30 + 30 → válido; verificar test en verde
-- [ ] 4.4 RED/GREEN/TRIANGULATE `bloqueos` (RN-07): solapa bloqueo de profesional → violación con `recursoBloqueado: 'profesional'`; de sillón → `'sillon'`; contiguo 17:00 → null; otro profesional → null; verificar test en verde
-- [ ] 4.5 RED/GREEN/TRIANGULATE `solapamiento` (RN-02, RN-03): mismo profesional → RN-02 con turno en conflicto; mismo sillón → RN-03; contiguos → null; ignora cancelado/ausente vía `esActivo`; verificar test en verde
-- [ ] 4.6 RED/GREEN/TRIANGULATE `validarAlta` con orden fijo RN-18 → RN-16 → RN-06 → RN-07/RN-17 → bloqueos → RN-02 → RN-03; casos con violaciones múltiples devuelven solo la primera; REFACTOR de duplicación entre reglas con tests en verde
-- [ ] 4.7 CHECKPOINT: mostrar al usuario reglas y orden de errores; esperar OK
+- [x] 4.1 RED/GREEN/TRIANGULATE `recursos-activos` (RN-18): profesional, sillón y prestación inactivos → violación; todos activos → null; verificar test en verde
+- [x] 4.2 RED/GREEN/TRIANGULATE `duracion` (RN-06, RN-16): default de prestación; ajuste por recepción/odontólogo/administrador; 0, 37, -5, 12.5 → RN-06; paciente con duración distinta → RN-16; paciente con duración igual → válida; verificar test en verde
+- [x] 4.3 RED/GREEN/TRIANGULATE `horario` (RN-07, RN-17) con zona del consultorio: antes de apertura, corte 13:30, sábado, exceder cierre de la tarde → RN-07; 12:45 + 30 → RN-17; 12:30 + 30 → válido; verificar test en verde
+- [x] 4.4 RED/GREEN/TRIANGULATE `bloqueos` (RN-07): solapa bloqueo de profesional → violación con `recursoBloqueado: 'profesional'`; de sillón → `'sillon'`; contiguo 17:00 → null; otro profesional → null; verificar test en verde
+- [x] 4.5 RED/GREEN/TRIANGULATE `solapamiento` (RN-02, RN-03): mismo profesional → RN-02 con turno en conflicto; mismo sillón → RN-03; contiguos → null; ignora cancelado/ausente vía `esActivo`; verificar test en verde
+- [x] 4.6 RED/GREEN/TRIANGULATE `validarAlta` con orden fijo RN-18 → RN-16 → RN-06 → RN-07/RN-17 → bloqueos → RN-02 → RN-03; casos con violaciones múltiples devuelven solo la primera; REFACTOR de duplicación entre reglas con tests en verde
+- [x] 4.7 CHECKPOINT: mostrar al usuario reglas y orden de errores; esperar OK
 
 ## 5. Caso de uso `AgendarTurno` y puertos
 
