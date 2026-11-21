@@ -78,7 +78,7 @@
 ### DD-12 — Consulta de disponibilidad: combos, `ahora`, paso y estrategia
 **Decisión** (2026-11-21, explore de C-07, Matías Ibañez): `ConsultarDisponibilidad` solo ofrece profesionales habilitados (su `prestacionIds` incluye la prestación) y cualquier sillón activo (no evalúa `requiereSillonIds`); `AgendarTurno` (C-01) no se modifica. Además:
 - **Salida**: combinaciones `{inicio, fin, profesionalId, sillonId}` ordenadas de forma determinista (inicio, luego `profesionalId`, luego `sillonId`), con filtro opcional `profesionalId`, y un helper puro que las agrupa por horario único para la vista del paciente. C-10 toma el primer combo del horario elegido y llama a `AgendarTurno`; la carrera la resuelve RN-12.
-- **Pasado y rango**: el input recibe `ahora: Date` (quien llama pasa `reloj.ahora()` cuando exista el `Reloj` de C-02); se excluyen huecos con `inicio < ahora`. Rango `{desde, hasta}` semiabierto, de hasta 31 días; rango invertido o vacío, o de más de 31 días, es error de validación.
+- **Pasado y rango**: el input recibe `ahora: Date` (quien llama pasa `reloj.ahora()`; el puerto `Reloj` lo crea C-10, DD-16); se excluyen huecos con `inicio < ahora`. Rango `{desde, hasta}` semiabierto, de hasta 31 días; rango invertido o vacío, o de más de 31 días, es error de validación.
 - **Duración**: `duracionMinutos` opcional más `actor`, reutilizando RN-06 y RN-16 (el paciente solo con la duración de la prestación).
 - **Granularidad**: `pasoMinutos` (entero > 0, múltiplo de 5, por defecto 15); los candidatos se alinean al inicio de cada tramo de atención.
 - **Errores** (implementado en C-07): validación de entrada con `ConsultaInvalidaError` (`campo: 'rango' | 'paso'`, sin ampliar `CodigoRN`); orden fijo rango → paso → prestación inexistente → profesional filtrado inexistente → RN-18 de la prestación → RN-16 → RN-06 (las validaciones de rango y paso ocurren antes de generar candidatos).
@@ -97,25 +97,55 @@
 
 ### DD-14 — `ReservarOnline`: pedido, paciente, carrera, error público y `Reloj`
 **Decisión** (2026-11-21, explore de C-10, Matías Ibañez):
-- **Pedido**: `{prestacionId, inicio, profesionalId?, paciente: {dni, telefono, email?, consentimientoContacto}}`; sin `duracionMinutos` ni `sillonId` (RN-16, SU-05). `ReservarOnline` consulta `ConsultarDisponibilidad` (C-07) con actor paciente y `ahora` para ese `inicio`, toma el primer combo (filtrado por `profesionalId` si viene), verifica RN-19 y RN-20 y llama a `AgendarTurno` con estado `reservado` y `origen: 'online'` (DD-11).
+- **Pedido**: `{prestacionId, inicio, profesionalId?, paciente: {dni, nombre, apellido, telefono, email?, consentimientoContacto}}` (nombre y apellido agregados el 2026-11-21, DD-17); sin `duracionMinutos` ni `sillonId` (RN-16, SU-05). `ReservarOnline` consulta `ConsultarDisponibilidad` (C-07) con actor paciente y `ahora` para ese `inicio`, toma el primer combo (filtrado por `profesionalId` si viene), verifica RN-19 y RN-20 y llama a `AgendarTurno` con estado `reservado` y `origen: 'online'` (DD-11).
 - **Carrera**: si `AgendarTurno` rechaza por RN-02/RN-03, reintenta UNA vez con el siguiente combo del mismo horario; si falla, error público "horario no disponible" y nueva oferta de disponibilidad del día de `inicio` (RN-12).
-- **Paciente**: alta mínima con DNI (7-8 dígitos), teléfono argentino normalizado y `consentimientoContacto === true` obligatorio; e-mail opcional. Si el DNI ya existe, el turno se vincula al `pacienteId` existente sin modificar teléfono ni datos y la respuesta no revela que el DNI existía (RN-22). Puerto mínimo `PacienteRepositorio` (`obtenerPorDni`, `guardar`).
+- **Paciente**: alta mínima con DNI (7-8 dígitos), nombre, apellido, teléfono argentino normalizado y `consentimientoContacto === true` obligatorio; e-mail opcional (formatos en DD-17). Si el DNI ya existe, el turno se vincula al `pacienteId` existente sin modificar teléfono ni datos y la respuesta no revela que el DNI existía (RN-22). Puerto mínimo `PacienteRepositorio` (`obtenerPorDni`, `guardar`), creado por C-10 (DD-16).
 - **Error público**: la ruta pública nunca devuelve `turnoEnConflicto`, `bloqueoEnConflicto` ni datos de otros pacientes; los `ReglaNegocioError` se mapean a un error público genérico (RN-22).
 - **Límites**: máximo 2 turnos online activos futuros por DNI y reserva repetida idempotente (RN-23).
 - **Mail de confirmación**: fuera de C-10; el token va en la respuesta y los envíos son de C-12.
-- **Ahora**: `ReservarOnline` obtiene `ahora` de un puerto `Reloj` (`ahora(): Date`).
+- **Ahora**: `ReservarOnline` obtiene `ahora` de un puerto `Reloj` (`ahora(): Date`), creado por C-10 (DD-16).
 **Contexto**: US-009 y el flujo 2 no definían el pedido, el tratamiento de un DNI existente, la carrera ni qué se expone en la ruta pública; cierra la pregunta abierta sobre registro vs. DNI + teléfono (alta mínima sin cuenta).
 **Alternativas consideradas**: pedir `sillonId` al paciente (contradice SU-05); actualizar teléfono de un DNI existente (permitiría pisar datos ajenos desde una ruta pública); enviar el e-mail desde C-10 (acopla con el notificador de C-12); reintentar sin límite ante la carrera.
 **Justificación**: reutiliza la única fuente de verdad (C-07 y C-01); el vínculo por DNI sin revelar existencia evita enumeración de pacientes y modificación de datos ajenos (RN-D-02); un solo reintento acota el costo y mantiene el comportamiento determinista.
 **Trade-offs aceptados**: un paciente con DNI existente y teléfono desactualizado conserva el dato viejo hasta que lo corrija recepción; el segundo combo puede asignar otro profesional distinto al que vio el paciente.
-**Coordinación pendiente**: creador y firma de `src/application/puertos/reloj.ts` (con Franco Petri, C-02) y de `PacienteRepositorio` (con Alejo Carabelli, C-05).
+**Coordinación** *(resuelta el 2026-11-21)*: C-10 crea el puerto `Reloj` y el puerto `PacienteRepositorio` (DD-16); C-02 reutiliza el `Reloj` y C-05 extiende `PacienteRepositorio`. Lo autorizó Matías Ibañez, único integrante activo hasta cerrar C-10.
 
 ### DD-15 — Token de gestión: entidad `TokenGestion` con hash SHA-256
-**Decisión** (2026-11-21, explore de C-10, Matías Ibañez): el token son 32 bytes aleatorios (`node:crypto`) en base64url. Se almacena solo el hash SHA-256 en una entidad/repositorio propio `TokenGestion` (`turnoId`, `hash`, `creadoEn`), separado de `Turno`; un token por turno. El token en claro se devuelve una única vez en la respuesta de la reserva. Vence al pasar el `fin` del turno o al cancelarse (sin TTL propio). Servicio reutilizable por C-11 y C-12 con `emitir(turnoId)` y `resolver(tokenPlano)` (RN-21, RN-15).
+**Decisión** (2026-11-21, explore de C-10, Matías Ibañez): el token son 32 bytes aleatorios (`node:crypto`) en base64url. Se almacena solo el hash SHA-256 en una entidad/repositorio propio `TokenGestion` (`turnoId`, `hash`, `creadoEn`), separado de `Turno`; un token por turno. El token en claro se devuelve una única vez en la respuesta de la reserva. Vence al pasar el `fin` del turno o al cancelarse (sin TTL propio). Servicio reutilizable por C-11 y C-12 con `emitir(turnoId)`, `resolver(tokenPlano)` y `rotar(turnoId)` (RN-21, RN-15).
+- **Enlace de C-12** *(decisión del 2026-11-21; se implementa en C-12, no en C-10)*: **rotación**. Al enviar cada recordatorio, C-12 llama a `rotar(turnoId)`: emite un token nuevo (cuyo valor en claro va solo en el enlace del e-mail) e invalida el anterior. Así nunca se guarda un token en claro; el último enlace enviado es el único válido.
 **Contexto**: el modelo tenía `Turno.tokenGestion` en claro con índice único; un volcado de datos habría expuesto todos los enlaces de gestión.
 **Alternativas consideradas**: guardar el token en claro dentro de `Turno`; token firmado (JWT) con TTL.
 **Justificación**: con 256 bits de entropía basta un hash rápido (SHA-256) sin sal; separar la entidad mantiene `Turno` libre de secretos y permite resolver por hash sin exponer el token.
-**Trade-offs aceptados**: un token perdido no se puede recuperar (hay que emitir otro); C-12 necesita que C-10 o C-11 expongan un modo de entregar el enlace sin guardar el token en claro (a coordinar en C-12).
+**Trade-offs aceptados**: un token perdido no se puede recuperar (hay que rotarlo); cada recordatorio invalida el enlace anterior (el de la respuesta de la reserva o el de un e-mail previo), por lo que el paciente debe usar el último enlace recibido.
+
+### DD-16 — Puertos `Reloj` y `PacienteRepositorio` creados por C-10
+**Decisión** (2026-11-21, Matías Ibañez): C-10 crea, como piezas aditivas:
+- El puerto `src/application/puertos/reloj.ts` → `export interface Reloj { ahora(): Date }`; el adaptador de sistema `src/adapters/reloj/reloj-sistema.ts` (único lugar del código con `new Date()` sin argumentos, fuera del dominio) y un reloj fijo para tests en `tests/fixtures/`.
+- El puerto `PacienteRepositorio { obtenerPorDni(dni): Promise<Paciente | undefined>; guardar(paciente): Promise<void> }` con su adaptador en memoria.
+C-02 **reutiliza** el `Reloj` (no lo redefine) y C-05 **extiende** `PacienteRepositorio` (p. ej. `obtenerPorId`, búsqueda por teléfono, modificación por recepción).
+**Contexto**: C-10 necesita ambos puertos y sus dueños originales (C-02 y C-05) todavía no empezaron; Matías Ibañez es el único integrante activo hasta cerrar C-10 y autorizó crearlos sin coordinación previa.
+**Alternativas consideradas**: esperar a C-02 y C-05; pasar `ahora` como dato del pedido (lo pondría en manos del cliente público).
+**Justificación**: desbloquea el camino crítico sin duplicar puertos; las firmas son mínimas y extensibles.
+**Trade-offs aceptados**: C-02 y C-05 heredan firmas que no diseñaron; cualquier cambio de firma debe mantener compatibles a C-10 y sus tests.
+
+### DD-17 — Datos del alta online del paciente
+**Decisión** (2026-11-21, Matías Ibañez): el alta online **sí pide nombre y apellido** (el modelo `Paciente` los requiere, `src/domain/paciente.ts`). Formatos:
+- `dni`: se quitan los puntos; deben quedar 7 u 8 dígitos.
+- `nombre` y `apellido`: texto con `trim`, no vacío, longitud máxima 80.
+- `telefono`: teléfono argentino normalizado a solo dígitos (formato preciso en el design de C-10).
+- `email`: opcional; si viene, formato válido.
+- `consentimientoContacto`: debe ser exactamente `true`.
+**Contexto**: la KB solo mencionaba DNI y teléfono, pero `Paciente` exige nombre y apellido y la recepción los necesita para atender.
+**Alternativas consideradas**: alta sin nombre (rompe el modelo); nombre opcional completado por recepción.
+**Justificación**: dato mínimo necesario para identificar al paciente en la agenda (RN-D-02) sin abrir campos nuevos.
+**Trade-offs aceptados**: un DNI existente conserva el nombre ya cargado aunque el pedido traiga otro (RN-22).
+
+### DD-18 — Datos de profesionales en las rutas públicas
+**Decisión** (2026-11-21, Matías Ibañez): la respuesta de la reserva online incluye `inicio`, `fin`, el nombre de la prestación y el nombre y apellido del profesional asignado (personal del consultorio, no dato de pacientes); nunca el sillón interno, ids de otros turnos ni datos de otros pacientes. La consulta pública de disponibilidad (cuando exista HTTP) puede mostrar el nombre del profesional.
+**Contexto**: pregunta abierta sobre si se exponen nombres de profesionales en lo público.
+**Alternativas consideradas**: ocultar al profesional hasta el día del turno; mostrar solo la matrícula.
+**Justificación**: el paciente necesita saber con quién se atiende; el nombre del profesional es información que el consultorio ya publica. El sillón es un recurso interno (SU-05).
+**Trade-offs aceptados**: ante una carrera, el reintento puede asignar otro profesional; la respuesta lo informa.
 
 ## Supuestos inferidos
 

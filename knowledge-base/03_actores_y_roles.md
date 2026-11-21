@@ -35,8 +35,8 @@ Reglas transversales de permisos:
 
 ## Rutas públicas (sin autenticación)
 
-- Enlace de reserva online del consultorio: consulta de prestaciones, profesionales y disponibilidad (pregunta abierta: si se exponen nombres de profesionales).
-- Alta de reserva por el paciente: identificación mínima sin cuenta (DNI, teléfono y consentimiento de contacto; DD-14). La ruta pública no modifica pacientes existentes ni revela datos de otros (RN-22).
-- Enlace de gestión del turno con **token no adivinable** (confirmar, cancelar, reprogramar), sujeto a RN-08.
+- Enlace de reserva online del consultorio: consulta de prestaciones, profesionales y disponibilidad. Se puede mostrar el nombre y apellido de los profesionales (personal del consultorio); nunca el sillón interno ni datos de pacientes (DD-18).
+- Alta de reserva por el paciente: identificación mínima sin cuenta (DNI, nombre, apellido, teléfono y consentimiento de contacto; e-mail opcional; DD-14, DD-17). La respuesta incluye `inicio`, `fin`, el nombre de la prestación y el nombre y apellido del profesional asignado (DD-18). La ruta pública no modifica pacientes existentes ni revela datos de otros (RN-22).
+- Enlace de gestión del turno con **token no adivinable** (confirmar, cancelar, reprogramar), sujeto a RN-08. Cada recordatorio rota el token: solo el último enlace recibido es válido (DD-15).
 
 Todo lo demás requiere autenticación (usuario con rol).

@@ -156,7 +156,7 @@ Carriles: **A** = núcleo y reserva online (Matías: C-01 → C-07 → C-10); **
 - **Owner**: Franco Petri (52080)
 - **Scope**:
   - Caso de uso `CancelarTurno`: estado → `cancelado`, registra `canceladoPor` (Rol) y `canceladoEn`; rechaza si ya está cancelado o atendido (transiciones de `04_modelo_de_datos.md`)
-  - Puerto `Reloj` inyectable y política de anticipación: actor paciente solo con `inicio - ahora >= 24 h` (umbral inclusivo, RN-08); recepción y administrador sin restricción de anticipación
+  - **Reutiliza** el puerto `Reloj` (`ahora(): Date`), su adaptador de sistema y el reloj fijo de tests creados por C-10 (DD-16); no lo redefine. Política de anticipación: actor paciente solo con `inicio - ahora >= 24 h` (umbral inclusivo, RN-08); recepción y administrador sin restricción de anticipación
   - Liberación efectiva de profesional y sillón: un nuevo turno puede ocupar el hueco (RN-09); cancelación de recordatorios pendientes si existen (hook no-op hasta C-12)
   - Tests: cancelación libera y permite agendar en el mismo horario, umbral exacto de 24 h (23:59 rechaza, 24:00 permite), paciente con < 24 h rechazado con `RN-08`, recepción con < 24 h permitido, doble cancelación rechazada
   - Cubre US-004 (parte de dominio; el acceso del paciente por token llega en C-11)
@@ -215,6 +215,7 @@ Carriles: **A** = núcleo y reserva online (Matías: C-01 → C-07 → C-10); **
 - **Scope**:
   - Casos de uso de alta/modificación/baja lógica de `Profesional`, `Sillon`, `Prestacion` (`duracionMinutos` entero > 0) y `HorarioAtencion` por consultorio y opcional por profesional (el del profesional prevalece, SU-09)
   - Reemplaza los fixtures de C-01 por carga vía casos de uso (los fixtures quedan como seed para tests/demo)
+  - **Extiende** el puerto `PacienteRepositorio` (`obtenerPorDni`, `guardar`) y su adaptador en memoria creados por C-10 (DD-16), sin romper sus contratos
   - Regla: no se desactiva un recurso con turnos activos futuros sin resolver; un profesional inactivo no recibe turnos nuevos
   - Tests: ABM, desactivación bloqueada con turnos futuros, prevalencia del horario por profesional
   - Cubre US-008
@@ -313,11 +314,12 @@ Carriles: **A** = núcleo y reserva online (Matías: C-01 → C-07 → C-10); **
 - **Scope**:
   - Caso de uso `ReservarOnline` que **reutiliza** `AgendarTurno` (mismas reglas, sin excepciones por canal); el sistema asigna el sillón (RN-13, SU-05); `origen: 'online'`
   - Pedido `{prestacionId, inicio, profesionalId?, paciente}` sin `duracionMinutos` ni `sillonId`; consulta `ConsultarDisponibilidad` (C-07) y toma el primer combo del horario; reglas nuevas RN-19 a RN-23 (DD-14)
-  - Alta mínima de `Paciente` sin cuenta (DNI + teléfono + consentimiento de contacto; e-mail opcional); si el DNI existe se vincula sin modificarlo ni revelarlo (RN-22); puerto `PacienteRepositorio` a coordinar con C-05
-  - Token de gestión (RN-15, RN-21): 32 bytes aleatorios, solo el hash SHA-256 en la entidad `TokenGestion` separada de `Turno`; se devuelve en claro una única vez; servicio `emitir`/`resolver` reutilizable por C-11 y C-12 (DD-15)
+  - Alta mínima de `Paciente` sin cuenta (DNI + nombre + apellido + teléfono + consentimiento de contacto; e-mail opcional; DD-17); si el DNI existe se vincula sin modificarlo ni revelarlo (RN-22); **crea** el puerto `PacienteRepositorio` (`obtenerPorDni`, `guardar`) con adaptador en memoria, que C-05 extiende (DD-16)
+  - Token de gestión (RN-15, RN-21): 32 bytes aleatorios, solo el hash SHA-256 en la entidad `TokenGestion` separada de `Turno`; se devuelve en claro una única vez; servicio `emitir`/`resolver`/`rotar` reutilizable por C-11 y C-12 (DD-15)
   - Manejo de la carrera: un reintento con el siguiente combo; si falla, error público "horario no disponible" y nueva oferta del día (RN-12); errores públicos genéricos sin datos de otros pacientes
   - Capa HTTP sin Fastify ni dependencias: solo DTO de entrada y validador puro de frontera en `src/adapters/http/` (DD-13); endpoints, rate limit y logs redactados quedan para C-14 o el change que integre HTTP
-  - El e-mail de confirmación queda fuera de C-10 (el token va en la respuesta; envíos en C-12); `ahora` viene de un puerto `Reloj` a coordinar con C-02
+  - Respuesta con `inicio`, `fin`, nombre de la prestación y nombre y apellido del profesional asignado, sin sillón (DD-18)
+  - El e-mail de confirmación queda fuera de C-10 (el token va en la respuesta; envíos en C-12); `ahora` viene del puerto `Reloj` que **crea** C-10 (con adaptador de sistema y reloj fijo de tests), que C-02 reutiliza (DD-16)
   - Tests: reserva exitosa, hueco ocupado entre consulta y reserva (carrera), mismas reglas que recepción, token único y solo hash almacenado, datos inválidos, DNI existente sin modificación, límite de 2 turnos y reserva repetida, sin fuga de datos de otros pacientes
   - Cubre US-009 (parte de dominio/API; la pantalla es C-14)
 - **Dependencias**: `C-07`
@@ -327,7 +329,7 @@ Carriles: **A** = núcleo y reserva online (Matías: C-01 → C-07 → C-10); **
   - `knowledge-base/05_reglas_de_negocio.md` RN-12, RN-13, RN-15, RN-19 a RN-23, RN-D-02
   - `knowledge-base/06_funcionalidades.md` §US-009
   - `knowledge-base/03_actores_y_roles.md` §Rutas públicas
-  - `knowledge-base/09_decisiones_y_supuestos.md` SU-05, DD-13, DD-14, DD-15
+  - `knowledge-base/09_decisiones_y_supuestos.md` SU-05, DD-13, DD-14, DD-15, DD-16, DD-17, DD-18
 
 ### [C-11] `gestionar-turno-online-por-token`
 - **Estado**: `[ ]` pendiente
@@ -358,7 +360,7 @@ Carriles: **A** = núcleo y reserva online (Matías: C-01 → C-07 → C-10); **
   - Entidad `Recordatorio` (canal `email`, `programadoPara` = `inicio - RECORDATORIO_HORAS_ANTES`, por defecto 24 h, SU-07; estados `pendiente | enviado | fallido`)
   - Puerto `Notificador` + adaptador SMTP (`SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` por entorno) y adaptador falso para tests; free tier, costo $0
   - Caso de uso `GenerarRecordatorio` que programa/reprograma/cancela con alta, reprogramación y cancelación (completa los hooks de C-02 y C-03)
-  - E-mail con enlace de confirmación/cancelación basado en el token de gestión de C-10 (RN-21, DD-15: solo se guarda el hash; la entrega del enlace sin token en claro se coordina en C-12); confirmar desde el enlace pasa el turno a `confirmado` (usa C-04)
+  - E-mail con enlace de confirmación/cancelación basado en el token de gestión de C-10 (RN-21, DD-15: solo se guarda el hash; **reutiliza** el servicio de tokens de C-10 y en cada envío llama a `rotar(turnoId)`, que emite un token nuevo para el enlace e invalida el anterior); confirmar desde el enlace pasa el turno a `confirmado` (usa C-04)
   - No envía a pacientes sin `consentimientoContacto`; fallo de envío → estado `fallido` y aviso a recepción
   - Tests: programación por defecto 24 h, reprogramación mueve el recordatorio, cancelación lo anula, confirmación cambia estado, sin consentimiento no envía, fallo registrado
   - Cubre US-011
@@ -399,7 +401,7 @@ Carriles: **A** = núcleo y reserva online (Matías: C-01 → C-07 → C-10); **
 - **Estado**: `[ ]` pendiente
 - **Owner**: Alejo Carabelli (51928)
 - **Scope**:
-  - Pantalla pública de reserva por enlace: elegir prestación, ver huecos reales (C-07), cargar DNI + teléfono + consentimiento, confirmar (C-10)
+  - Pantalla pública de reserva por enlace: elegir prestación, ver huecos reales (C-07), cargar DNI + nombre + apellido + teléfono + consentimiento (e-mail opcional), confirmar y mostrar profesional asignado (C-10, DD-17, DD-18)
   - Pantalla de gestión por enlace con token: ver turno, cancelar, reprogramar; mensaje de contacto cuando faltan menos de 24 h (C-11)
   - Estados vacío/error/carga, accesibilidad y responsive; uso de `design-system/tokens.css` y `brand.js`; marcar `(TBD)` provisorios
   - Paso previo obligatorio: mockup aprobado (`Approval: approved`) y verificación visual contra el mockup en `verify`

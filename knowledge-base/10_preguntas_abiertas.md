@@ -32,7 +32,7 @@
 | Alta | ¿Qué pasa con los turnos ya dados cuando se crea un bloqueo encima? (provisoria: rechazar y listar conflictos, DD-06) | Change de bloqueos | Equipo |
 | Resuelta | ¿La duración es fija por prestación o el profesional puede ajustarla en cada turno? | n/a | Resuelta el 2026-11-21: ajustable de forma opcional (DD-10, RN-06, RN-16) |
 | Resuelta | ¿Qué zona horaria se usa? ¿Una por consultorio? | n/a | Resuelta el 2026-11-21: IANA por consultorio (DD-09) |
-| Resuelta | ¿El paciente necesita registrarse o alcanza con DNI y teléfono para reservar? | n/a | Resuelta el 2026-11-21 (explore de C-10): alta mínima sin cuenta con DNI, teléfono y consentimiento de contacto (DD-14, RN-22) |
+| Resuelta | ¿El paciente necesita registrarse o alcanza con DNI y teléfono para reservar? | n/a | Resuelta el 2026-11-21 (explore de C-10): alta mínima sin cuenta con DNI, nombre, apellido, teléfono y consentimiento de contacto (DD-14, DD-17, RN-22) |
 | Media | ¿Cuáles son las tarifas vigentes de WhatsApp Business Platform para Argentina? | Etapa WhatsApp Cloud API | Equipo (verificar en Meta) |
 | Baja | ¿Qué proveedor de e-mail (SMTP/transaccional) con free tier se usa? | Change de recordatorios | Equipo técnico |
 | Resuelta | ¿Qué stack tecnológico se usa? | n/a | Decidido: ver DD-01 |
@@ -68,9 +68,10 @@
 | Parcial | ¿Se limita qué prestaciones puede realizar cada profesional y en qué sillones? | C-05 | Parcialmente resuelta el 2026-11-21 (DD-12): la disponibilidad usa `Profesional.prestacionIds`; siguen abiertas la exigencia en el alta interna (RN-19 la fija solo para la reserva online) y `requiereSillonIds` (ver las dos filas anteriores) |
 | Baja | ¿Cómo se maneja el consentimiento de contacto y la eliminación de datos del paciente (Ley 25.326)? | Reserva online | Equipo |
 | Parcial | ¿La API REST con Fastify se implementa dentro del TP o solo los casos de uso con tests? | Alcance del change | Parcialmente resuelta el 2026-11-21 (explore de C-10, DD-13): C-10 no agrega Fastify (solo DTO y validador puro en `src/adapters/http/`); endpoints, rate limit y logs redactados quedan para C-14 o el change que integre HTTP |
-| Media | ¿El alta online pide nombre y apellido? `Paciente` los requiere en el modelo, pero la KB solo menciona DNI + teléfono para la reserva | C-10 | Equipo |
-| Media | ¿La consulta pública expone nombres de profesionales? (`03_actores_y_roles.md` §Rutas públicas los lista) | C-10 | Equipo |
-| Media | Coordinación pendiente: ¿quién crea el puerto `Reloj` (`src/application/puertos/reloj.ts`) y con qué firma (con Franco Petri, C-02) y el puerto `PacienteRepositorio` (con Alejo Carabelli, C-05)? | C-10 | Matías Ibañez con Franco Petri y Alejo Carabelli |
+| Resuelta | ¿El alta online pide nombre y apellido? | n/a | Resuelta el 2026-11-21: sí, nombre y apellido obligatorios (trim, no vacíos, máx. 80); e-mail opcional con formato válido (DD-17) |
+| Resuelta | ¿La consulta pública expone nombres de profesionales? | n/a | Resuelta el 2026-11-21: sí, nombre y apellido del profesional (personal del consultorio); nunca el sillón ni datos de pacientes (DD-18) |
+| Resuelta | ¿Quién crea el puerto `Reloj` y el puerto `PacienteRepositorio`, y con qué firma? | n/a | Resuelta el 2026-11-21: los crea C-10 (`Reloj { ahora(): Date }`; `PacienteRepositorio { obtenerPorDni, guardar }`); C-02 reutiliza el `Reloj` y C-05 extiende el repositorio (DD-16) |
+| Resuelta | ¿Cómo entrega C-12 el enlace de gestión si solo se guarda el hash del token? | n/a | Resuelta el 2026-11-21: rotación; cada recordatorio llama a `rotar(turnoId)` del servicio de tokens de C-10, que emite uno nuevo e invalida el anterior (DD-15) |
 | Baja | Versión mínima de Node LTS y de Vitest a fijar | Inicialización del proyecto | Equipo técnico |
 
 ### Campos de discovery con baja confianza

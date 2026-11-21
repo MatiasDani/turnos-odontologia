@@ -62,7 +62,7 @@ Usuario     0..1 ── 1 Profesional        (un usuario odontólogo se vincula 
 ### Paciente
 - `id`, `nombre`, `apellido`, `dni: string`, `telefono: string` (para `wa.me`), `email?: string`, `consentimientoContacto: boolean`.
 - Relaciones: 1 a N con Turno.
-- Constraint: **solo datos ficticios en el repositorio** (Ley 25.326). Datos de salud: sensibles; en el MVP no se almacenan datos clínicos. La reserva online hace un alta mínima sin cuenta (DNI de 7-8 dígitos, teléfono normalizado y `consentimientoContacto` verdadero; e-mail opcional); si el DNI ya existe se reutiliza el paciente sin modificarlo (DD-14, RN-22). Si el alta online exige nombre y apellido es una pregunta abierta.
+- Constraint: **solo datos ficticios en el repositorio** (Ley 25.326). Datos de salud: sensibles; en el MVP no se almacenan datos clínicos. La reserva online hace un alta mínima sin cuenta (DNI de 7-8 dígitos, nombre y apellido no vacíos de hasta 80 caracteres, teléfono normalizado y `consentimientoContacto` verdadero; e-mail opcional con formato válido; DD-17); si el DNI ya existe se reutiliza el paciente sin modificarlo (DD-14, RN-22). Puerto `PacienteRepositorio` (`obtenerPorDni`, `guardar`) creado por C-10 y extendido por C-05 (DD-16).
 - Índice: (`dni`) y (`telefono`) para búsqueda por recepción.
 
 ### Turno
@@ -77,7 +77,7 @@ Usuario     0..1 ── 1 Profesional        (un usuario odontólogo se vincula 
 - `turnoId`, `hash: string` (SHA-256 del token), `creadoEn`.
 - El token son 32 bytes aleatorios en base64url; solo se persiste su hash, nunca el valor en claro (DD-15, RN-21). Un token por turno; vence al pasar el `fin` del turno o al cancelarse (sin TTL propio).
 - Relaciones: 1 a 1 con Turno. Índice: (`hash`) único.
-- Servicio reutilizable por C-11 y C-12: `emitir(turnoId)` y `resolver(tokenPlano)`.
+- Servicio reutilizable por C-11 y C-12: `emitir(turnoId)`, `resolver(tokenPlano)` y `rotar(turnoId)` (emite uno nuevo e invalida el anterior; C-12 lo usa en cada recordatorio, DD-15).
 
 ### BloqueoHorario
 - `id`, `profesionalId?`, `sillonId?` (al menos uno de los dos), `inicio: Date`, `fin: Date`, `motivo?: string`, `creadoPor: usuarioId`.

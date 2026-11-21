@@ -10,7 +10,7 @@
 | Repositorio (puerto + adaptador en memoria) | `src/adapters/persistence` | MVP en memoria; PostgreSQL después sin tocar el dominio |
 | Objeto valor `Intervalo` | `src/domain` | Encapsula `[inicio, fin)` y la prueba de solapamiento |
 | Inyección de dependencias manual | Composición en la raíz | Sin framework de DI; costo $0 y simplicidad |
-| Reloj inyectable (`Reloj`) | Puerto | Probar RN-08 (24 h) de forma determinista |
+| Reloj inyectable (`Reloj`) | Puerto | Probar RN-08 (24 h) y RN-20 de forma determinista; lo crea C-10 y lo reutiliza C-02 (DD-16) |
 
 ## Estructura de directorios (layout según el TP: `src/` y `tests/` en la raíz)
 
