@@ -3,7 +3,7 @@ import { ReglaNegocioError, type Violacion } from '../../../domain/errores.js';
 import type { Turno } from '../../../domain/turno.js';
 
 export class TurnoRepositorioEnMemoria implements TurnoRepositorio {
-  private readonly turnos: Turno[];
+  protected readonly turnos: Turno[];
 
   constructor(iniciales: readonly Turno[] = []) {
     this.turnos = [...iniciales];
@@ -28,6 +28,14 @@ export class TurnoRepositorioEnMemoria implements TurnoRepositorio {
 
   listarPorRecursos(profesionalId: string, sillonId: string): Promise<readonly Turno[]> {
     return Promise.resolve(this.filtrarPorRecursos(profesionalId, sillonId));
+  }
+
+  obtenerPorId(id: string): Promise<Turno | undefined> {
+    return Promise.resolve(this.turnos.find((t) => t.id === id));
+  }
+
+  listarPorPaciente(pacienteId: string): Promise<readonly Turno[]> {
+    return Promise.resolve(this.turnos.filter((t) => t.pacienteId === pacienteId));
   }
 
   private filtrarPorRecursos(profesionalId: string, sillonId: string): Turno[] {

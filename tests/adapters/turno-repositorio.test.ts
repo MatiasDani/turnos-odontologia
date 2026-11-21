@@ -50,3 +50,45 @@ describe('TurnoRepositorioEnMemoria.agregarSiDisponible (RN-12)', () => {
     expect(validar).toHaveBeenCalledWith([primero]);
   });
 });
+
+describe('TurnoRepositorioEnMemoria.obtenerPorId (C-10)', () => {
+  test('devuelve el turno con ese id', async () => {
+    const t1 = crearTurno({ id: 't1' });
+    const repo = new TurnoRepositorioEnMemoria([t1, crearTurno({ id: 't2', profesionalId: 'p2', sillonId: 's2' })]);
+    await expect(repo.obtenerPorId('t1')).resolves.toEqual(t1);
+  });
+
+  test('un id inexistente devuelve undefined', async () => {
+    const repo = new TurnoRepositorioEnMemoria([crearTurno({ id: 't1' })]);
+    await expect(repo.obtenerPorId('inexistente')).resolves.toBeUndefined();
+  });
+
+  test('encuentra turnos de cualquier estado, incluso cancelados', async () => {
+    const cancelado = crearTurno({ id: 'tc', estado: 'cancelado' });
+    const repo = new TurnoRepositorioEnMemoria([cancelado]);
+    await expect(repo.obtenerPorId('tc')).resolves.toEqual(cancelado);
+  });
+});
+
+describe('TurnoRepositorioEnMemoria.listarPorPaciente (C-10)', () => {
+  test('devuelve solo los turnos del paciente, de cualquier estado', async () => {
+    const activo = crearTurno({ id: 'a', pacienteId: 'pa1' });
+    const cancelado = crearTurno({ id: 'b', pacienteId: 'pa1', estado: 'cancelado', profesionalId: 'p2', sillonId: 's2' });
+    const ajeno = crearTurno({ id: 'c', pacienteId: 'pa2', profesionalId: 'p2', sillonId: 's1' });
+    const repo = new TurnoRepositorioEnMemoria([activo, cancelado, ajeno]);
+    expect(await repo.listarPorPaciente('pa1')).toEqual([activo, cancelado]);
+  });
+
+  test('un paciente sin turnos devuelve una lista vacía', async () => {
+    const repo = new TurnoRepositorioEnMemoria([crearTurno({ id: 'a', pacienteId: 'pa1' })]);
+    expect(await repo.listarPorPaciente('pa3')).toEqual([]);
+  });
+
+  test('un turno agregado después se ve en la lectura', async () => {
+    const repo = new TurnoRepositorioEnMemoria();
+    const nuevo = crearTurno({ id: 'n', pacienteId: 'pa2' });
+    await repo.agregarSiDisponible(nuevo, () => null);
+    expect(await repo.listarPorPaciente('pa2')).toEqual([nuevo]);
+    await expect(repo.obtenerPorId('n')).resolves.toEqual(nuevo);
+  });
+});

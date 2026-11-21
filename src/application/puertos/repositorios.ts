@@ -3,9 +3,11 @@ import type { Consultorio } from '../../domain/consultorio.js';
 import type { Violacion } from '../../domain/errores.js';
 import type { HorarioAtencion } from '../../domain/horario-atencion.js';
 import type { Intervalo } from '../../domain/intervalo.js';
+import type { Paciente } from '../../domain/paciente.js';
 import type { Prestacion } from '../../domain/prestacion.js';
 import type { Profesional } from '../../domain/profesional.js';
 import type { Sillon } from '../../domain/sillon.js';
+import type { TokenGestion } from '../../domain/token-gestion.js';
 import type { Turno } from '../../domain/turno.js';
 
 export interface ProfesionalRepositorio {
@@ -54,4 +56,28 @@ export interface TurnoRepositorio {
 
   /** Lectura de los turnos del profesional o del sillón (cualquier estado). */
   listarPorRecursos(profesionalId: string, sillonId: string): Promise<readonly Turno[]>;
+
+  /** Turno por id (cualquier estado), o `undefined` si no existe. */
+  obtenerPorId(id: string): Promise<Turno | undefined>;
+
+  /** Turnos del paciente, de cualquier estado. */
+  listarPorPaciente(pacienteId: string): Promise<readonly Turno[]>;
+}
+
+export interface PacienteRepositorio {
+  /** Paciente con ese DNI normalizado, o `undefined` si no existe. */
+  obtenerPorDni(dni: string): Promise<Paciente | undefined>;
+  /** Persiste el paciente (alta; si el id ya existe reemplaza el registro). */
+  guardar(paciente: Paciente): Promise<void>;
+}
+
+export interface TokenGestionRepositorio {
+  /** Persiste el registro; rechaza si el hash ya existe (índice único). */
+  guardar(token: TokenGestion): Promise<void>;
+  /** Registro por hash, vigente o invalidado. */
+  obtenerPorHash(hash: string): Promise<TokenGestion | undefined>;
+  /** Registro vigente (no invalidado) del turno. */
+  obtenerPorTurno(turnoId: string): Promise<TokenGestion | undefined>;
+  /** Invalida los registros vigentes del turno; sin registros vigentes no hace nada. */
+  invalidar(turnoId: string, en: Date): Promise<void>;
 }
