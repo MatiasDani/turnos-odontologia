@@ -20,17 +20,17 @@
 
 ## 3. Caso de uso `ConsultarDisponibilidad`
 
-- [ ] 3.1 Extender `tests/fixtures/sistema.ts`: `crearSistema` cablea `ConsultarDisponibilidad` con los mismos repos en memoria y agrega un helper `consultar(sistema, {...})` con los valores por defecto del contexto común del spec (recepción, `pr1`, paso 15, `ahora` domingo 08:00, rango del día); verificar que los tests de `agendar-turno.test.ts` siguen en verde
-- [ ] 3.2 RED/GREEN escenarios de "Rango de consulta acotado", "Paso de los inicios candidatos" (solo "Paso inválido rechazado") y "Errores de la consulta con orden fijo" en `tests/application/consultar-disponibilidad.test.ts` (`src/application/consultar-disponibilidad.ts`: validaciones previas en el orden de design D2); verificar en verde
-- [ ] 3.3 RED/GREEN escenarios de "Solo recursos activos" (prestación inexistente e inactiva), "Duración efectiva de la consulta" (RN-16 y RN-06) y "Filtro opcional por profesional" (profesional inexistente); verificar en verde
-- [ ] 3.4 RED/GREEN escenarios de "Huecos con profesional y sillón libres a la vez" (enumeración profesional habilitado × sillón × inicio evaluada con `validarAlta`, sin duplicar reglas); verificar en verde
-- [ ] 3.5 RED/GREEN escenarios de "Solo los turnos activos bloquean huecos" y "Huecos dentro de un único tramo de atención"; verificar en verde
-- [ ] 3.6 RED/GREEN escenarios de "Bloqueos excluyen solo al recurso bloqueado" (bloqueos cargados por par con `listarPorRecursos`); verificar en verde
-- [ ] 3.7 RED/GREEN escenarios restantes de "Solo profesionales habilitados para la prestación", "Solo recursos activos" (recursos inactivos excluidos), "Duración efectiva de la consulta" (duración ajustada) y "Filtro opcional por profesional" (filtro por `p1`); verificar en verde
-- [ ] 3.8 RED/GREEN escenarios restantes de "Paso de los inicios candidatos", "Sin huecos en el pasado" y "Rango de consulta acotado" (semiabierto y 31 días exactos) a nivel de caso de uso; verificar en verde
-- [ ] 3.9 RED/GREEN escenarios de "Orden determinista de los combos" (repos cargados en orden `p2`,`p1` / `s2`,`s1`) y "Agrupación por horario único"; verificar en verde
-- [ ] 3.10 RED/GREEN escenarios de "Consistencia con el alta de turnos" (cada combo agendado por separado con `AgendarTurno` sobre un sistema nuevo con la misma agenda) y "Consulta de solo lectura"; REFACTOR del caso de uso con tests en verde
-- [ ] 3.11 CHECKPOINT: mostrar al usuario el caso de uso completo, el orden de errores y la cobertura de escenarios; esperar OK
+- [x] 3.1 Extender `tests/fixtures/sistema.ts`: `crearSistema` cablea `ConsultarDisponibilidad` con los mismos repos en memoria y agrega un helper `consultar(sistema, {...})` con los valores por defecto del contexto común del spec (recepción, `pr1`, paso 15, `ahora` domingo 08:00, rango del día); verificar que los tests de `agendar-turno.test.ts` siguen en verde
+- [x] 3.2 RED/GREEN escenarios de "Rango de consulta acotado", "Paso de los inicios candidatos" (solo "Paso inválido rechazado") y "Errores de la consulta con orden fijo" en `tests/application/consultar-disponibilidad.test.ts` (`src/application/consultar-disponibilidad.ts`: validaciones previas en el orden de design D2); verificar en verde
+- [x] 3.3 RED/GREEN escenarios de "Solo recursos activos" (prestación inexistente e inactiva), "Duración efectiva de la consulta" (RN-16 y RN-06) y "Filtro opcional por profesional" (profesional inexistente); verificar en verde
+- [x] 3.4 RED/GREEN escenarios de "Huecos con profesional y sillón libres a la vez" (enumeración profesional habilitado × sillón × inicio evaluada con `validarAlta`, sin duplicar reglas); verificar en verde
+- [x] 3.5 RED/GREEN escenarios de "Solo los turnos activos bloquean huecos" y "Huecos dentro de un único tramo de atención"; verificar en verde
+- [x] 3.6 RED/GREEN escenarios de "Bloqueos excluyen solo al recurso bloqueado" (bloqueos cargados por par con `listarPorRecursos`); verificar en verde
+- [x] 3.7 RED/GREEN escenarios restantes de "Solo profesionales habilitados para la prestación", "Solo recursos activos" (recursos inactivos excluidos), "Duración efectiva de la consulta" (duración ajustada) y "Filtro opcional por profesional" (filtro por `p1`); verificar en verde
+- [x] 3.8 RED/GREEN escenarios restantes de "Paso de los inicios candidatos", "Sin huecos en el pasado" y "Rango de consulta acotado" (semiabierto y 31 días exactos) a nivel de caso de uso; verificar en verde
+- [x] 3.9 RED/GREEN escenarios de "Orden determinista de los combos" (repos cargados en orden `p2`,`p1` / `s2`,`s1`) y "Agrupación por horario único"; verificar en verde
+- [x] 3.10 RED/GREEN escenarios de "Consistencia con el alta de turnos" (cada combo agendado por separado con `AgendarTurno` sobre un sistema nuevo con la misma agenda) y "Consulta de solo lectura"; REFACTOR del caso de uso con tests en verde
+- [x] 3.11 CHECKPOINT: mostrar al usuario el caso de uso completo, el orden de errores y la cobertura de escenarios; esperar OK
 
 ## 4. Verificación integral
 
