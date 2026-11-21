@@ -33,19 +33,19 @@
 
 ## 5. Caso de uso `AgendarTurno` y puertos
 
-- [ ] 5.1 Definir puertos en `src/application/puertos/` (`TurnoRepositorio.agregarSiDisponible`, `ProfesionalRepositorio`, `SillonRepositorio`, `PrestacionRepositorio`, `ConsultorioRepositorio`, `HorarioAtencionRepositorio`, `BloqueoRepositorio`, `GeneradorId`) y `AgendarTurnoInput` sin campo de forzado; verificar con `npm run typecheck`
-- [ ] 5.2 Implementar adaptadores en memoria en `src/adapters/persistence/en-memoria/` con `agregarSiDisponible` como sección crítica síncrona (sin `await` entre leer, validar e insertar, con comentario); verificar con tests de adaptador en verde
-- [ ] 5.3 RED/GREEN escenarios de "Ocupación conjunta de profesional y sillón", "Sin solapamiento por profesional" y "Sin solapamiento por sillón" en `tests/application/agendar-turno.test.ts`; verificar en verde
-- [ ] 5.4 RED/GREEN escenarios de "Solo los turnos activos ocupan recursos" y "Sin sobreturnos para ningún rol" (incluye `expectTypeOf<AgendarTurnoInput>().not.toHaveProperty('forzar')`); verificar en verde
-- [ ] 5.5 RED/GREEN escenarios de "Duración efectiva del turno" y "Ajuste de duración solo por personal del consultorio"; verificar en verde
-- [ ] 5.6 RED/GREEN escenarios de "Horario de atención en la zona del consultorio", "Turno en un único tramo de atención" y "Bloqueos de profesional y de sillón"; verificar en verde
-- [ ] 5.7 RED/GREEN escenarios de "Solo recursos activos", "Estado inicial según el origen" y "Errores tipados con orden de evaluación fijo" (incluye recurso inexistente); verificar en verde
+- [x] 5.1 Definir puertos en `src/application/puertos/` (`TurnoRepositorio.agregarSiDisponible`, `ProfesionalRepositorio`, `SillonRepositorio`, `PrestacionRepositorio`, `ConsultorioRepositorio`, `HorarioAtencionRepositorio`, `BloqueoRepositorio`, `GeneradorId`) y `AgendarTurnoInput` sin campo de forzado; verificar con `npm run typecheck`
+- [x] 5.2 Implementar adaptadores en memoria en `src/adapters/persistence/en-memoria/` con `agregarSiDisponible` como sección crítica síncrona (sin `await` entre leer, validar e insertar, con comentario); verificar con tests de adaptador en verde
+- [x] 5.3 RED/GREEN escenarios de "Ocupación conjunta de profesional y sillón", "Sin solapamiento por profesional" y "Sin solapamiento por sillón" en `tests/application/agendar-turno.test.ts`; verificar en verde
+- [x] 5.4 RED/GREEN escenarios de "Solo los turnos activos ocupan recursos" y "Sin sobreturnos para ningún rol" (incluye `expectTypeOf<AgendarTurnoInput>().not.toHaveProperty('forzar')`); verificar en verde
+- [x] 5.5 RED/GREEN escenarios de "Duración efectiva del turno" y "Ajuste de duración solo por personal del consultorio"; verificar en verde
+- [x] 5.6 RED/GREEN escenarios de "Horario de atención en la zona del consultorio", "Turno en un único tramo de atención" y "Bloqueos de profesional y de sillón"; verificar en verde
+- [x] 5.7 RED/GREEN escenarios de "Solo recursos activos", "Estado inicial según el origen" y "Errores tipados con orden de evaluación fijo" (incluye recurso inexistente); verificar en verde
 
 ## 6. Atomicidad (RN-12)
 
-- [ ] 6.1 RED/GREEN "Dos altas simultáneas al mismo horario" con `Promise.allSettled`: 1 fulfilled, 1 rejected RN-02, repositorio con 1 turno; verificar en verde
-- [ ] 6.2 RED/GREEN "Un rechazo no persiste nada"; verificar en verde
-- [ ] 6.3 CHECKPOINT: mostrar al usuario el caso de uso completo; esperar OK
+- [x] 6.1 RED/GREEN "Dos altas simultáneas al mismo horario" con `Promise.allSettled`: 1 fulfilled, 1 rejected RN-02, repositorio con 1 turno; verificar en verde
+- [x] 6.2 RED/GREEN "Un rechazo no persiste nada"; verificar en verde
+- [x] 6.3 CHECKPOINT: mostrar al usuario el caso de uso completo; esperar OK
 
 ## 7. Verificación integral
 
