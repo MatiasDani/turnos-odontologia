@@ -246,7 +246,7 @@ Carriles: **A** = núcleo y reserva online (Matías: C-01 → C-07 → C-10); **
   - `knowledge-base/10_preguntas_abiertas.md` (bloqueo sobre turnos existentes)
 
 ### [C-07] `consultar-disponibilidad`
-- **Estado**: `[ ]` pendiente
+- **Estado**: `[x]` completado (archivado 2026-11-21)
 - **Owner**: Matías Ibañez (52006)
 - **Scope**:
   - Caso de uso `ConsultarDisponibilidad({actor, prestacionId, rango, ahora, duracionMinutos?, pasoMinutos?, profesionalId?})`: devuelve huecos donde existen a la vez un profesional habilitado (que realiza la prestación) y un sillón libres para toda la duración (RN-13)
