@@ -51,13 +51,15 @@ Justificación: el valor diferencial es la **regla de agenda por recursos**; ais
 
 | Servicio | Propósito | Etapa | Tipo | Costo |
 |---|---|---|---|---|
-| E-mail (SMTP o transaccional) | Recordatorios y confirmación | MVP | SMTP/REST detrás de un puerto `Notificador` | Gratis (free tier; proveedor a confirmar) |
+| E-mail (SMTP o transaccional) | Recordatorios y confirmación (los envíos son de C-12; C-10 no envía e-mail) | MVP | SMTP/REST detrás de un puerto `Notificador` | Gratis (free tier; proveedor a confirmar) |
 | Enlace `wa.me` (click-to-chat) | Mensaje armado que envía la recepción | MVP | URL generada, sin API | Gratis |
 | Google Calendar | Sincronización opcional | Opcional | REST | Gratis dentro de cuotas |
 | WhatsApp Cloud API (Meta) | Recordatorios automáticos | Post-MVP | REST/webhook | Número de prueba gratis; cobro por mensaje con plantilla en producción (tarifas Argentina: ver `10_preguntas_abiertas.md`) |
 | Mercado Pago | Señas | Post-MVP | REST/webhook | Sandbox gratis; comisión por cobro en producción |
 
 ## API REST (opcional, Fastify)
+
+Nota (DD-13, 2026-11-21): C-10 no agrega Fastify; incluye solo un DTO y un validador puro de frontera en `src/adapters/http/`. Los endpoints públicos, el rate limit y los logs redactados quedan para C-14 o el change que integre HTTP.
 
 Resumen de recursos previstos (no obligatorios para el MVP del TP; los casos de uso se pueden ejercitar solo con tests):
 

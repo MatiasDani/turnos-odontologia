@@ -32,7 +32,7 @@
 | Alta | ¿Qué pasa con los turnos ya dados cuando se crea un bloqueo encima? (provisoria: rechazar y listar conflictos, DD-06) | Change de bloqueos | Equipo |
 | Resuelta | ¿La duración es fija por prestación o el profesional puede ajustarla en cada turno? | n/a | Resuelta el 2026-11-21: ajustable de forma opcional (DD-10, RN-06, RN-16) |
 | Resuelta | ¿Qué zona horaria se usa? ¿Una por consultorio? | n/a | Resuelta el 2026-11-21: IANA por consultorio (DD-09) |
-| Media | ¿El paciente necesita registrarse o alcanza con DNI y teléfono para reservar? | Change de reserva online | Equipo |
+| Resuelta | ¿El paciente necesita registrarse o alcanza con DNI y teléfono para reservar? | n/a | Resuelta el 2026-11-21 (explore de C-10): alta mínima sin cuenta con DNI, teléfono y consentimiento de contacto (DD-14, RN-22) |
 | Media | ¿Cuáles son las tarifas vigentes de WhatsApp Business Platform para Argentina? | Etapa WhatsApp Cloud API | Equipo (verificar en Meta) |
 | Baja | ¿Qué proveedor de e-mail (SMTP/transaccional) con free tier se usa? | Change de recordatorios | Equipo técnico |
 | Resuelta | ¿Qué stack tecnológico se usa? | n/a | Decidido: ver DD-01 |
@@ -63,11 +63,14 @@
 | Resuelta | ¿Hace falta el estado `reservado` además de `confirmado`? | n/a | Resuelta el 2026-11-21: se mantiene; alta interna nace `confirmado`, reserva online `reservado` (DD-11) |
 | Media | ¿El horario de atención se define por consultorio, por profesional o ambos? (SU-09). C-01 solo evalúa el horario del consultorio | C-05 | Equipo |
 | Media | ¿`AgendarTurno` debe validar que el paciente exista? En C-01 no se valida (no hay repositorio de pacientes) | C-05 | Equipo |
-| Media | ¿El alta (`AgendarTurno`) también debe exigir que el profesional realice la prestación? (posible RN-19). Desde el 2026-11-21 la disponibilidad (C-07) solo ofrece profesionales habilitados, pero el alta de C-01 no lo valida (DD-12) | C-05, C-10 | Equipo |
+| Media | ¿El alta (`AgendarTurno`) también debe exigir que el profesional realice la prestación? (RN-19). Desde el 2026-11-21 la disponibilidad (C-07) y la reserva online (RN-19) exigen profesional habilitado, pero el alta interna de C-01 no lo valida (DD-12, DD-14) | C-05 | Equipo |
 | Baja | ¿Se respeta `Prestacion.requiereSillonIds` (sillones compatibles con la prestación)? En C-07 no se considera: cualquier sillón activo sirve (DD-12) | C-05 | Equipo |
-| Parcial | ¿Se limita qué prestaciones puede realizar cada profesional y en qué sillones? | C-05 | Parcialmente resuelta el 2026-11-21 (DD-12): la disponibilidad usa `Profesional.prestacionIds`; siguen abiertas la exigencia en el alta (posible RN-19) y `requiereSillonIds` (ver las dos filas anteriores) |
+| Parcial | ¿Se limita qué prestaciones puede realizar cada profesional y en qué sillones? | C-05 | Parcialmente resuelta el 2026-11-21 (DD-12): la disponibilidad usa `Profesional.prestacionIds`; siguen abiertas la exigencia en el alta interna (RN-19 la fija solo para la reserva online) y `requiereSillonIds` (ver las dos filas anteriores) |
 | Baja | ¿Cómo se maneja el consentimiento de contacto y la eliminación de datos del paciente (Ley 25.326)? | Reserva online | Equipo |
-| Baja | ¿La API REST con Fastify se implementa dentro del TP o solo los casos de uso con tests? | Alcance del change | Equipo |
+| Parcial | ¿La API REST con Fastify se implementa dentro del TP o solo los casos de uso con tests? | Alcance del change | Parcialmente resuelta el 2026-11-21 (explore de C-10, DD-13): C-10 no agrega Fastify (solo DTO y validador puro en `src/adapters/http/`); endpoints, rate limit y logs redactados quedan para C-14 o el change que integre HTTP |
+| Media | ¿El alta online pide nombre y apellido? `Paciente` los requiere en el modelo, pero la KB solo menciona DNI + teléfono para la reserva | C-10 | Equipo |
+| Media | ¿La consulta pública expone nombres de profesionales? (`03_actores_y_roles.md` §Rutas públicas los lista) | C-10 | Equipo |
+| Media | Coordinación pendiente: ¿quién crea el puerto `Reloj` (`src/application/puertos/reloj.ts`) y con qué firma (con Franco Petri, C-02) y el puerto `PacienteRepositorio` (con Alejo Carabelli, C-05)? | C-10 | Matías Ibañez con Franco Petri y Alejo Carabelli |
 | Baja | Versión mínima de Node LTS y de Vitest a fijar | Inicialización del proyecto | Equipo técnico |
 
 ### Campos de discovery con baja confianza

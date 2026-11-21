@@ -32,6 +32,7 @@ Sillon      1 ──── * Turno
 Prestacion  1 ──── * Turno
 Paciente    1 ──── * Turno
 Turno       1 ──── * Recordatorio
+Turno       1 ──── 0..1 TokenGestion   (solo turnos online; se guarda el hash)
 Usuario     * ──── 1 Rol
 Usuario     0..1 ── 1 Profesional        (un usuario odontólogo se vincula a su profesional)
 ```
@@ -61,16 +62,22 @@ Usuario     0..1 ── 1 Profesional        (un usuario odontólogo se vincula 
 ### Paciente
 - `id`, `nombre`, `apellido`, `dni: string`, `telefono: string` (para `wa.me`), `email?: string`, `consentimientoContacto: boolean`.
 - Relaciones: 1 a N con Turno.
-- Constraint: **solo datos ficticios en el repositorio** (Ley 25.326). Datos de salud: sensibles; en el MVP no se almacenan datos clínicos. Si el paciente debe registrarse o alcanza con DNI y teléfono es una pregunta abierta.
+- Constraint: **solo datos ficticios en el repositorio** (Ley 25.326). Datos de salud: sensibles; en el MVP no se almacenan datos clínicos. La reserva online hace un alta mínima sin cuenta (DNI de 7-8 dígitos, teléfono normalizado y `consentimientoContacto` verdadero; e-mail opcional); si el DNI ya existe se reutiliza el paciente sin modificarlo (DD-14, RN-22). Si el alta online exige nombre y apellido es una pregunta abierta.
 - Índice: (`dni`) y (`telefono`) para búsqueda por recepción.
 
 ### Turno
-- `id`, `pacienteId`, `profesionalId`, `sillonId`, `prestacionId`, `inicio: Date`, `fin: Date`, `duracionMinutos: number` (duración efectiva; entero > 0 y múltiplo de 5), `estado: EstadoTurno`, `origen: 'recepcion' | 'online'`, `tokenGestion?: string` (turnos online), `creadoEn`, `actualizadoEn`, `canceladoEn?`, `canceladoPor?: Rol`.
+- `id`, `pacienteId`, `profesionalId`, `sillonId`, `prestacionId`, `inicio: Date`, `fin: Date`, `duracionMinutos: number` (duración efectiva; entero > 0 y múltiplo de 5), `estado: EstadoTurno`, `origen: 'recepcion' | 'online'`, `creadoEn`, `actualizadoEn`, `canceladoEn?`, `canceladoPor?: Rol`.
 - `EstadoTurno`: `reservado` (reserva online del paciente, aún sin confirmar; **Decisión DD-11**), `confirmado` (nace así el turno creado por recepción, odontólogo o administrador), `cancelado`, `ausente`, `atendido`. D.3 del informe lista confirmado, cancelado, ausente y atendido.
 - Estados **activos** (ocupan profesional y sillón): `reservado`, `confirmado`, `atendido`. Ver DD-05.
 - Constraints: `fin = inicio + duracionMinutos` efectiva, que por defecto es `prestacion.duracionMinutos` (RN-06, RN-16); profesional, sillón y prestación activos (RN-18); contenido en un único tramo de atención (RN-17); sin solapamiento activo por `profesionalId` (RN-02) ni por `sillonId` (RN-03); dentro de HorarioAtencion y fuera de BloqueoHorario de su profesional y de su sillón (RN-07).
-- Índices: (`profesionalId`, `inicio`), (`sillonId`, `inicio`), (`pacienteId`), (`tokenGestion`) único.
+- Índices: (`profesionalId`, `inicio`), (`sillonId`, `inicio`), (`pacienteId`).
 - Transiciones permitidas: `reservado → confirmado | cancelado`, `confirmado → atendido | ausente | cancelado`. Reprogramar conserva el `id` y cambia `inicio`/`fin`/recursos (ver flujo 3).
+
+### TokenGestion
+- `turnoId`, `hash: string` (SHA-256 del token), `creadoEn`.
+- El token son 32 bytes aleatorios en base64url; solo se persiste su hash, nunca el valor en claro (DD-15, RN-21). Un token por turno; vence al pasar el `fin` del turno o al cancelarse (sin TTL propio).
+- Relaciones: 1 a 1 con Turno. Índice: (`hash`) único.
+- Servicio reutilizable por C-11 y C-12: `emitir(turnoId)` y `resolver(tokenPlano)`.
 
 ### BloqueoHorario
 - `id`, `profesionalId?`, `sillonId?` (al menos uno de los dos), `inicio: Date`, `fin: Date`, `motivo?: string`, `creadoPor: usuarioId`.
@@ -82,7 +89,7 @@ Usuario     0..1 ── 1 Profesional        (un usuario odontólogo se vincula 
 
 ### Usuario
 - `id`, `consultorioId`, `email`, `hashClave: string` (nunca en texto plano), `rolId`, `profesionalId?`, `activo`.
-- Constraint: `email` único. Los pacientes no tienen usuario en el MVP: operan con el token de su turno (**Suposición**, ver pregunta abierta).
+- Constraint: `email` único. Los pacientes no tienen usuario en el MVP: operan con el token de su turno (**Suposición**; DD-15).
 
 ### Rol
 - `id`, `nombre: 'administrador' | 'odontologo' | 'recepcion' | 'paciente'`.

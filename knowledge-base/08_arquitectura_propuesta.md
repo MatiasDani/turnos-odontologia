@@ -30,7 +30,7 @@ Global-desarrollo/
 │   │   └── puertos/       # Repositorios, Notificador, Reloj
 │   └── adapters/
 │       ├── persistence/   # repos en memoria (PostgreSQL luego)
-│       ├── http/          # Fastify (opcional)
+│       ├── http/          # DTO y validador puro de frontera (C-10, sin framework); Fastify opcional después
 │       └── notifications/ # email, generador wa.me
 ├── tests/                 # Vitest: unit (dominio), use-cases, integración
 ├── docs/                  # fuentes (discovery)
@@ -56,9 +56,9 @@ Luego: cancelar, reprogramar, disponibilidad, reserva online, recordatorios.
 
 ## Seguridad
 
-- **Autenticación**: usuarios internos con e-mail y clave con hash (algoritmo adaptativo, p. ej. scrypt/argon2; a confirmar); sesión por token firmado (JWT) en la API. Pacientes: token de gestión no adivinable por turno.
+- **Autenticación**: usuarios internos con e-mail y clave con hash (algoritmo adaptativo, p. ej. scrypt/argon2; a confirmar); sesión por token firmado (JWT) en la API. Pacientes: token de gestión no adivinable por turno, de 32 bytes aleatorios, almacenado solo como hash SHA-256 en la entidad `TokenGestion` (DD-15, RN-21).
 - **Autorización**: RBAC según `03_actores_y_roles.md`, aplicado en los casos de uso (no solo en la capa HTTP).
-- **Validación de input**: esquemas en la frontera (Fastify schemas o validador equivalente); el dominio revalida invariantes.
+- **Validación de input**: esquemas en la frontera (validador puro en `src/adapters/http/` desde C-10, DD-13; Fastify schemas si se integra HTTP); el dominio revalida invariantes.
 - **Datos personales**: mínimo dato necesario; sin datos clínicos en el MVP; sin datos reales en el repositorio; Ley 25.326 y Ley 26.529 como restricciones (RN-D-02).
 - **Secrets**: variables de entorno; nunca en el repositorio; `.env` fuera del control de versiones; solo `.env.example` con valores ficticios.
 - **Concurrencia**: atomicidad de validación y escritura (RN-12).

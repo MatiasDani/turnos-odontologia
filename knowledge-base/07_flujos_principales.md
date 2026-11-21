@@ -36,13 +36,14 @@ Recepción → Caso de uso AgendarTurno → Dominio (reglas) → Repositorio (at
 **Pasos**:
 1. El paciente elige la prestación.
 2. `ConsultarDisponibilidad` calcula, a partir del instante actual y con paso de 15 min, los huecos donde existan a la vez un profesional habilitado y un sillón libres para la duración completa de la prestación (RN-13, DD-12). La consulta no reserva nada; los combos se agrupan por horario para mostrarlos al paciente.
-3. El paciente elige un horario e informa sus datos mínimos (DNI y teléfono; pregunta abierta) y consentimiento de contacto.
-4. `ReservarOnline` reutiliza `AgendarTurno` (mismas reglas, sin excepciones por canal) con el primer combo del horario elegido: así el sistema asigna profesional y sillón.
-5. Se genera `tokenGestion` y se envía e-mail de confirmación con el enlace.
+3. El paciente elige un horario e informa sus datos mínimos (DNI, teléfono y consentimiento de contacto; e-mail opcional). La frontera valida la forma del pedido (DD-13).
+4. `ReservarOnline` consulta `ConsultarDisponibilidad` para ese `inicio`, toma el primer combo (filtrado por `profesionalId` si viene), verifica RN-19 y RN-20 y llama a `AgendarTurno` (mismas reglas, sin excepciones por canal; estado `reservado`, origen `online`): así el sistema asigna profesional y sillón. Si el DNI ya existe se vincula el turno a ese paciente sin modificarlo (RN-22); se aplica RN-23.
+5. Se emite el token de gestión (se guarda solo su hash; RN-21) y se devuelve en claro una única vez en la respuesta. El e-mail con el enlace lo envía C-12, fuera de este flujo.
 
 **Casos de error**:
-- El hueco se ocupó entre la consulta y la reserva (carrera) → rechazo por RN-12 y se vuelve a ofrecer disponibilidad.
+- El hueco se ocupó entre la consulta y la reserva (carrera) → rechazo por RN-02/RN-03; se reintenta una vez con el siguiente combo del mismo horario; si falla, error público "horario no disponible" y nueva oferta de disponibilidad del día de `inicio` (RN-12, DD-14).
 - Datos inválidos → validación de entrada.
+- Cualquier rechazo de regla se informa con un error público genérico, sin datos de otros pacientes ni turnos (RN-22).
 
 ## Flujo 3: Reprogramar un turno
 

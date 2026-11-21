@@ -45,6 +45,16 @@ Definición operativa: un turno es **activo** si su estado es `reservado`, `conf
 | `ahora` = lunes 10:07 y consulta del lunes | No aparece ningún hueco con inicio anterior a 10:07 | RN-13 |
 | Disponibilidad del sábado 2026-11-28 | Lista vacía (sin tramos de atención) | RN-07, RN-13 |
 | Rango invertido, vacío o de más de 31 días; `pasoMinutos` 0, 7 o 12,5 | Rechazado como consulta inválida (validación de entrada, sin código RN) | RN-13 |
+| Reserva online de `pr2` el lunes 2026-11-23 09:00 con DNI ficticio 00000004: el primer combo es `p1`/`s1` y `p1` está habilitada | Turno `reservado`, `origen: 'online'`, con `p1`/`s1` | RN-19, RN-13 |
+| Reserva online donde el combo tomado es de un profesional cuyo `prestacionIds` no incluye la prestación | Rechazado (la verificación explícita no confía solo en el combo) | RN-19 |
+| Reserva online con `inicio` lunes 2026-11-23 09:00 y `ahora` lunes 10:07 | Rechazado | RN-20 |
+| Reserva online con `inicio` igual a `ahora` | Válido si hay hueco (solo se rechaza `inicio < ahora`, igual que RN-13) | RN-20 |
+| Reserva online exitosa para DNI 00000004 | Respuesta con el token en claro una sola vez; el repositorio guarda solo el hash SHA-256; dos reservas distintas generan tokens distintos | RN-21, RN-15 |
+| Token de un turno cancelado, o con `ahora` posterior al `fin` del turno | `resolver` no lo acepta (vencido) | RN-21 |
+| Reserva online con DNI 00000001 (existe: Carla Prueba) y teléfono distinto | Turno vinculado a `pa1`; el teléfono de `pa1` no se modifica; la respuesta es indistinguible de la de un DNI nuevo | RN-22 |
+| Reserva online que choca con un turno de otro paciente (carrera sin combo alternativo) | Error público genérico "horario no disponible", sin `turnoEnConflicto` ni datos del otro paciente | RN-22, RN-12 |
+| DNI 00000004 con 2 turnos online activos futuros intenta un tercero | Rechazado | RN-23 |
+| DNI 00000004 repite la misma reserva (misma prestación e `inicio`, turno activo) | No crea otro turno ni reentrega el token | RN-23 |
 
 ## Dominio: Cancelación y reprogramación
 
@@ -68,9 +78,14 @@ Definición operativa: un turno es **activo** si su estado es `reservado`, `conf
   - La duración sigue RN-06 y RN-16 (el paciente solo consulta con la duración de la prestación).
   - Rango invertido o vacío, rango de más de 31 días y `pasoMinutos` que no sea entero > 0 múltiplo de 5 son **validación de entrada** de la consulta (no son reglas de agenda y no llevan código RN propio).
   - Errores de la consulta, en orden fijo (se informa solo el primero): consulta inválida (rango, luego paso; `ConsultaInvalidaError`), prestación inexistente, profesional filtrado inexistente (`RecursoNoEncontradoError`), prestación inactiva (RN-18), RN-16 y RN-06. Un profesional filtrado que existe pero no está habilitado o está inactivo da lista vacía, no error. Los rechazos de un candidato puntual (turnos, bloqueos, tramo, recursos inactivos) solo descartan ese combo y nunca lanzan.
-  - `Prestacion.requiereSillonIds` no se considera todavía: cualquier sillón activo sirve (pregunta abierta, C-05). `AgendarTurno` (C-01) no exige la habilitación del profesional (pregunta abierta, posible RN-19).
+  - `Prestacion.requiereSillonIds` no se considera todavía: cualquier sillón activo sirve (pregunta abierta, C-05). `AgendarTurno` (C-01) no exige la habilitación del profesional (pregunta abierta, ver RN-19, que la exige solo en la reserva online).
 - **RN-14** *(derivada)*: el recordatorio por e-mail incluye el enlace de confirmación/cancelación; el enlace `wa.me` contiene el mensaje armado y lo envía manualmente la recepción (sin API, costo $0). Momento por defecto: 24 h antes (suposición).
 - **RN-15** *(derivada)*: el token de gestión del turno es de un solo turno, no adivinable y no revela datos de otros pacientes.
+- **RN-19** *(decisión de explore C-10, 2026-11-21, DD-14)*: en la reserva online solo un profesional **habilitado** (su `prestacionIds` incluye la prestación) puede recibir el turno. `ReservarOnline` lo verifica de forma explícita además de tomar el combo de C-07 (defensa en profundidad). El alta interna (`AgendarTurno`) no cambia; la pregunta abierta sobre exigirlo también en el alta queda referida a esta regla.
+- **RN-20** *(decisión de explore C-10, 2026-11-21, DD-14)*: la reserva online no admite un `inicio` anterior a `ahora` (instante dado por el `Reloj`).
+- **RN-21** *(decisión de explore C-10, 2026-11-21, DD-15)*: cada turno online tiene exactamente un token de gestión de alta entropía, almacenado solo como hash y válido hasta el `fin` del turno o su cancelación (sin TTL propio). El token en claro se devuelve una única vez en la respuesta de la reserva y nunca se expone en logs ni en listados. Concreta RN-15.
+- **RN-22** *(decisión de explore C-10, 2026-11-21, DD-14)*: la ruta pública no modifica los datos de un paciente existente (identificado por DNI), no revela que el DNI ya existía ni expone datos de otros pacientes o turnos (p. ej. nunca devuelve `turnoEnConflicto` ni `bloqueoEnConflicto`). Amplía RN-15 y RN-D-02; los `ReglaNegocioError` se mapean a un error público genérico.
+- **RN-23** *(decisión de explore C-10, 2026-11-21, DD-14)*: un DNI no puede tener más de 2 turnos online activos futuros (constante configurable). Una reserva repetida (mismo DNI, misma prestación y mismo `inicio` con turno activo) no crea otro turno ni reentrega el token.
 
 ## Dominio: Datos y cumplimiento (restricciones del checklist, punto 9)
 

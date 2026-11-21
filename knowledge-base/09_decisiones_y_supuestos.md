@@ -86,7 +86,36 @@
 **Contexto**: RN-13 y US-003 no definían formato de salida, granularidad, tratamiento del pasado ni límite del rango; C-10 necesita una salida estable para asignar el sillón.
 **Alternativas consideradas**: devolver solo horarios agregados (pierde el recurso a asignar); calcular huecos por resta de intervalos libres (duplica la lógica de C-01); leer el reloj dentro del caso de uso (no hay `Reloj` hasta C-02); granularidad fija en fixture.
 **Justificación**: una sola fuente de verdad garantiza que todo hueco ofrecido se pueda agendar; el orden determinista hace reproducibles los tests y la asignación de C-10; el tope de 31 días acota el costo de enumerar candidatos.
-**Trade-offs aceptados**: la enumeración por candidato es O(días × inicios × profesionales × sillones), aceptable para 1-5 profesionales y 1-3 sillones; la disponibilidad y el alta pueden discrepar en la habilitación del profesional hasta resolver la pregunta abierta (posible RN-19).
+**Trade-offs aceptados**: la enumeración por candidato es O(días × inicios × profesionales × sillones), aceptable para 1-5 profesionales y 1-3 sillones; la disponibilidad y el alta pueden discrepar en la habilitación del profesional hasta resolver la pregunta abierta (la reserva online lo cubre con RN-19, DD-14).
+
+### DD-13 — Capa HTTP de C-10: sin Fastify, solo DTO y validador puro de frontera
+**Decisión** (2026-11-21, explore de C-10, Matías Ibañez): C-10 no agrega Fastify ni dependencias. Incluye un DTO de entrada y un validador puro de frontera en `src/adapters/http/` (sin framework). Los endpoints (`POST /public/reservas`, `GET /public/disponibilidad`), el rate limit y los logs redactados quedan para un change posterior (C-14 o el que integre HTTP).
+**Contexto**: DD-01 deja Fastify como opcional y la pregunta abierta sobre la API REST seguía sin resolver; C-10 es de governance ALTO (datos personales en ruta pública) y conviene acotar su superficie.
+**Alternativas consideradas**: agregar Fastify en C-10 con `fastify.inject`; dejar toda la validación dentro del caso de uso.
+**Justificación**: costo $0 y cero dependencias nuevas; la frontera valida la forma del pedido y el dominio revalida invariantes; el cableado HTTP se decide una sola vez cuando haya UI (C-14).
+**Trade-offs aceptados**: C-10 no expone endpoints; rate limit y logs redactados quedan diferidos y deben retomarse antes de publicar la ruta.
+
+### DD-14 — `ReservarOnline`: pedido, paciente, carrera, error público y `Reloj`
+**Decisión** (2026-11-21, explore de C-10, Matías Ibañez):
+- **Pedido**: `{prestacionId, inicio, profesionalId?, paciente: {dni, telefono, email?, consentimientoContacto}}`; sin `duracionMinutos` ni `sillonId` (RN-16, SU-05). `ReservarOnline` consulta `ConsultarDisponibilidad` (C-07) con actor paciente y `ahora` para ese `inicio`, toma el primer combo (filtrado por `profesionalId` si viene), verifica RN-19 y RN-20 y llama a `AgendarTurno` con estado `reservado` y `origen: 'online'` (DD-11).
+- **Carrera**: si `AgendarTurno` rechaza por RN-02/RN-03, reintenta UNA vez con el siguiente combo del mismo horario; si falla, error público "horario no disponible" y nueva oferta de disponibilidad del día de `inicio` (RN-12).
+- **Paciente**: alta mínima con DNI (7-8 dígitos), teléfono argentino normalizado y `consentimientoContacto === true` obligatorio; e-mail opcional. Si el DNI ya existe, el turno se vincula al `pacienteId` existente sin modificar teléfono ni datos y la respuesta no revela que el DNI existía (RN-22). Puerto mínimo `PacienteRepositorio` (`obtenerPorDni`, `guardar`).
+- **Error público**: la ruta pública nunca devuelve `turnoEnConflicto`, `bloqueoEnConflicto` ni datos de otros pacientes; los `ReglaNegocioError` se mapean a un error público genérico (RN-22).
+- **Límites**: máximo 2 turnos online activos futuros por DNI y reserva repetida idempotente (RN-23).
+- **Mail de confirmación**: fuera de C-10; el token va en la respuesta y los envíos son de C-12.
+- **Ahora**: `ReservarOnline` obtiene `ahora` de un puerto `Reloj` (`ahora(): Date`).
+**Contexto**: US-009 y el flujo 2 no definían el pedido, el tratamiento de un DNI existente, la carrera ni qué se expone en la ruta pública; cierra la pregunta abierta sobre registro vs. DNI + teléfono (alta mínima sin cuenta).
+**Alternativas consideradas**: pedir `sillonId` al paciente (contradice SU-05); actualizar teléfono de un DNI existente (permitiría pisar datos ajenos desde una ruta pública); enviar el e-mail desde C-10 (acopla con el notificador de C-12); reintentar sin límite ante la carrera.
+**Justificación**: reutiliza la única fuente de verdad (C-07 y C-01); el vínculo por DNI sin revelar existencia evita enumeración de pacientes y modificación de datos ajenos (RN-D-02); un solo reintento acota el costo y mantiene el comportamiento determinista.
+**Trade-offs aceptados**: un paciente con DNI existente y teléfono desactualizado conserva el dato viejo hasta que lo corrija recepción; el segundo combo puede asignar otro profesional distinto al que vio el paciente.
+**Coordinación pendiente**: creador y firma de `src/application/puertos/reloj.ts` (con Franco Petri, C-02) y de `PacienteRepositorio` (con Alejo Carabelli, C-05).
+
+### DD-15 — Token de gestión: entidad `TokenGestion` con hash SHA-256
+**Decisión** (2026-11-21, explore de C-10, Matías Ibañez): el token son 32 bytes aleatorios (`node:crypto`) en base64url. Se almacena solo el hash SHA-256 en una entidad/repositorio propio `TokenGestion` (`turnoId`, `hash`, `creadoEn`), separado de `Turno`; un token por turno. El token en claro se devuelve una única vez en la respuesta de la reserva. Vence al pasar el `fin` del turno o al cancelarse (sin TTL propio). Servicio reutilizable por C-11 y C-12 con `emitir(turnoId)` y `resolver(tokenPlano)` (RN-21, RN-15).
+**Contexto**: el modelo tenía `Turno.tokenGestion` en claro con índice único; un volcado de datos habría expuesto todos los enlaces de gestión.
+**Alternativas consideradas**: guardar el token en claro dentro de `Turno`; token firmado (JWT) con TTL.
+**Justificación**: con 256 bits de entropía basta un hash rápido (SHA-256) sin sal; separar la entidad mantiene `Turno` libre de secretos y permite resolver por hash sin exponer el token.
+**Trade-offs aceptados**: un token perdido no se puede recuperar (hay que emitir otro); C-12 necesita que C-10 o C-11 expongan un modo de entregar el enlace sin guardar el token en claro (a coordinar en C-12).
 
 ## Supuestos inferidos
 

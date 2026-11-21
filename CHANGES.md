@@ -312,28 +312,30 @@ Carriles: **A** = núcleo y reserva online (Matías: C-01 → C-07 → C-10); **
 - **Owner**: Matías Ibañez (52006)
 - **Scope**:
   - Caso de uso `ReservarOnline` que **reutiliza** `AgendarTurno` (mismas reglas, sin excepciones por canal); el sistema asigna el sillón (RN-13, SU-05); `origen: 'online'`
-  - Alta mínima de `Paciente` (DNI + teléfono + consentimiento de contacto; pregunta abierta sobre registro) con validación de entrada en la frontera
-  - Generación de `tokenGestion` único, no adivinable y de un solo turno (RN-15); servicio de tokens reutilizable por C-11 y C-12
-  - Manejo de la carrera entre consulta y reserva: rechazo por RN-12 y nueva oferta de disponibilidad
-  - Endpoint público Fastify `POST /public/reservas` (+ `GET /public/disponibilidad` apoyado en C-07) si se implementa la capa HTTP; sin autenticación
-  - Tests: reserva exitosa, hueco ocupado entre consulta y reserva (carrera), mismas reglas que recepción, token único, datos inválidos, sin fuga de datos de otros pacientes
+  - Pedido `{prestacionId, inicio, profesionalId?, paciente}` sin `duracionMinutos` ni `sillonId`; consulta `ConsultarDisponibilidad` (C-07) y toma el primer combo del horario; reglas nuevas RN-19 a RN-23 (DD-14)
+  - Alta mínima de `Paciente` sin cuenta (DNI + teléfono + consentimiento de contacto; e-mail opcional); si el DNI existe se vincula sin modificarlo ni revelarlo (RN-22); puerto `PacienteRepositorio` a coordinar con C-05
+  - Token de gestión (RN-15, RN-21): 32 bytes aleatorios, solo el hash SHA-256 en la entidad `TokenGestion` separada de `Turno`; se devuelve en claro una única vez; servicio `emitir`/`resolver` reutilizable por C-11 y C-12 (DD-15)
+  - Manejo de la carrera: un reintento con el siguiente combo; si falla, error público "horario no disponible" y nueva oferta del día (RN-12); errores públicos genéricos sin datos de otros pacientes
+  - Capa HTTP sin Fastify ni dependencias: solo DTO de entrada y validador puro de frontera en `src/adapters/http/` (DD-13); endpoints, rate limit y logs redactados quedan para C-14 o el change que integre HTTP
+  - El e-mail de confirmación queda fuera de C-10 (el token va en la respuesta; envíos en C-12); `ahora` viene de un puerto `Reloj` a coordinar con C-02
+  - Tests: reserva exitosa, hueco ocupado entre consulta y reserva (carrera), mismas reglas que recepción, token único y solo hash almacenado, datos inválidos, DNI existente sin modificación, límite de 2 turnos y reserva repetida, sin fuga de datos de otros pacientes
   - Cubre US-009 (parte de dominio/API; la pantalla es C-14)
 - **Dependencias**: `C-07`
 - **Governance**: ALTO (datos personales sensibles en ruta pública)
 - **Leer antes**:
   - `knowledge-base/07_flujos_principales.md` §Flujo 2
-  - `knowledge-base/05_reglas_de_negocio.md` RN-12, RN-13, RN-15, RN-D-02
+  - `knowledge-base/05_reglas_de_negocio.md` RN-12, RN-13, RN-15, RN-19 a RN-23, RN-D-02
   - `knowledge-base/06_funcionalidades.md` §US-009
   - `knowledge-base/03_actores_y_roles.md` §Rutas públicas
-  - `knowledge-base/09_decisiones_y_supuestos.md` SU-05
+  - `knowledge-base/09_decisiones_y_supuestos.md` SU-05, DD-13, DD-14, DD-15
 
 ### [C-11] `gestionar-turno-online-por-token`
 - **Estado**: `[ ]` pendiente
 - **Owner**: Luka Garro (51988)
 - **Scope**:
-  - Casos de uso de paciente por `tokenGestion`: ver el propio turno, cancelar (reutiliza `CancelarTurno` de C-02) y reprogramar (reutiliza `ReprogramarTurno` de C-03)
+  - Casos de uso de paciente por token de gestión (resuelto por hash, DD-15): ver el propio turno, cancelar (reutiliza `CancelarTurno` de C-02) y reprogramar (reutiliza `ReprogramarTurno` de C-03)
   - Regla RN-08: con menos de 24 h el sistema indica que debe contactar al consultorio (sin cancelar ni mover)
-  - El token solo expone su propio turno (RN-15, RN-D-02); token inválido/ajeno devuelve error sin filtrar datos
+  - El token solo expone su propio turno (RN-15, RN-21, RN-D-02); se resuelve con el servicio de C-10 (`resolver`, DD-15); token inválido/ajeno devuelve error sin filtrar datos
   - Endpoints públicos `GET/POST /public/turnos/:token` (cancelar, reprogramar) si se implementa la capa HTTP
   - Tests: cancelar con >= 24 h, umbral exacto, < 24 h rechazado con mensaje de contacto, reprogramación atómica vía token, token de otro turno no accede
   - Cubre US-010
@@ -356,7 +358,7 @@ Carriles: **A** = núcleo y reserva online (Matías: C-01 → C-07 → C-10); **
   - Entidad `Recordatorio` (canal `email`, `programadoPara` = `inicio - RECORDATORIO_HORAS_ANTES`, por defecto 24 h, SU-07; estados `pendiente | enviado | fallido`)
   - Puerto `Notificador` + adaptador SMTP (`SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` por entorno) y adaptador falso para tests; free tier, costo $0
   - Caso de uso `GenerarRecordatorio` que programa/reprograma/cancela con alta, reprogramación y cancelación (completa los hooks de C-02 y C-03)
-  - E-mail con enlace de confirmación/cancelación basado en `tokenGestion` (C-10); confirmar desde el enlace pasa el turno a `confirmado` (usa C-04)
+  - E-mail con enlace de confirmación/cancelación basado en el token de gestión de C-10 (RN-21, DD-15: solo se guarda el hash; la entrega del enlace sin token en claro se coordina en C-12); confirmar desde el enlace pasa el turno a `confirmado` (usa C-04)
   - No envía a pacientes sin `consentimientoContacto`; fallo de envío → estado `fallido` y aviso a recepción
   - Tests: programación por defecto 24 h, reprogramación mueve el recordatorio, cancelación lo anula, confirmación cambia estado, sin consentimiento no envía, fallo registrado
   - Cubre US-011
@@ -437,7 +439,7 @@ Carriles: **A** = núcleo y reserva online (Matías: C-01 → C-07 → C-10); **
 |---|---|---|---|---|
 | R-1 | C-01 mal modelado (Intervalo, Turno, estados activos) obliga a reescribir los demás | Alto: todo el MVP depende de él | TDD estricto con la tabla de verificación de `05_reglas_de_negocio.md`; revisión de Franco y Luka antes de abrir el GATE 0; no abrir GATE 0 sin `verify` | C-01 y todos |
 | R-2 | Condiciones de carrera entre reserva online y recepción (RN-12) | Turnos solapados en producción | Sección crítica en repos en memoria; diseño que mapea a exclusión/transacción en PostgreSQL | C-01, C-03, C-10 |
-| R-3 | Preguntas abiertas sin resolver (bloqueo sobre turnos, registro del paciente; duración, zona horaria y estados resueltos el 2026-11-21) | Retrabajo de scope | Adoptar la suposición provisoria DD-06 (duración, estados y zona horaria ya resueltos: DD-09, DD-10, DD-11); resolverlas en `/opsx:explore` del change afectado | C-06, C-10, C-01 |
+| R-3 | Preguntas abiertas sin resolver (bloqueo sobre turnos, registro del paciente resuelto el 2026-11-21 en C-10 (DD-14); duración, zona horaria y estados resueltos el 2026-11-21) | Retrabajo de scope | Adoptar la suposición provisoria DD-06 (duración, estados y zona horaria ya resueltos: DD-09, DD-10, DD-11); resolverlas en `/opsx:explore` del change afectado | C-06, C-10, C-01 |
 | R-4 | Datos sensibles de salud y datos personales (Ley 25.326, Ley 26.529) | Incumplimiento normativo | Solo datos ficticios (RN-D-01), mínimo dato, consentimiento de contacto, RBAC en casos de uso; revisión de seguridad en C-09/C-10/C-11 | C-09, C-10, C-11, C-12, C-13 |
 | R-5 | C-09 (RBAC) llega tarde y deja casos de uso sin control de permisos | Brecha de seguridad temporal | C-01 define el tipo `Actor`; todos los casos de uso lo reciben desde el inicio; C-09 aplica y verifica la matriz completa | C-02..C-08, C-09 |
 | R-6 | Cuello de botella en el camino crítico (C-02, C-07, C-10, C-11 concentran 5 pasos) | Retraso del MVP | Matías concentra C-01, C-07 y C-10: Alejo y Mara actúan como pares/revisores de C-07 y C-10 y Franco y Luka cubren C-02/C-11; priorizar C-07 en el GATE 0 | C-02, C-07, C-10, C-11 |
