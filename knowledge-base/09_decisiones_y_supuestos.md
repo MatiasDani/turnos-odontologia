@@ -81,6 +81,7 @@
 - **Pasado y rango**: el input recibe `ahora: Date` (quien llama pasa `reloj.ahora()` cuando exista el `Reloj` de C-02); se excluyen huecos con `inicio < ahora`. Rango `{desde, hasta}` semiabierto, de hasta 31 días; rango invertido o vacío, o de más de 31 días, es error de validación.
 - **Duración**: `duracionMinutos` opcional más `actor`, reutilizando RN-06 y RN-16 (el paciente solo con la duración de la prestación).
 - **Granularidad**: `pasoMinutos` (entero > 0, múltiplo de 5, por defecto 15); los candidatos se alinean al inicio de cada tramo de atención.
+- **Errores** (implementado en C-07): validación de entrada con `ConsultaInvalidaError` (`campo: 'rango' | 'paso'`, sin ampliar `CodigoRN`); orden fijo rango → paso → prestación inexistente → profesional filtrado inexistente → RN-18 de la prestación → RN-16 → RN-06 (las validaciones de rango y paso ocurren antes de generar candidatos).
 - **Estrategia**: cada candidato (profesional habilitado × sillón × inicio) se evalúa con `validarAlta` de C-01, única fuente de verdad. La consulta es de solo lectura, no reserva el hueco y es idempotente.
 **Contexto**: RN-13 y US-003 no definían formato de salida, granularidad, tratamiento del pasado ni límite del rango; C-10 necesita una salida estable para asignar el sillón.
 **Alternativas consideradas**: devolver solo horarios agregados (pierde el recurso a asignar); calcular huecos por resta de intervalos libres (duplica la lógica de C-01); leer el reloj dentro del caso de uso (no hay `Reloj` hasta C-02); granularidad fija en fixture.

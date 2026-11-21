@@ -34,9 +34,9 @@
 
 ## 4. Verificación integral
 
-- [ ] 4.1 Verificar que cada `#### Scenario:` del spec tiene un test con el mismo nombre (`npx vitest list` comparado con el spec) y que `npm test`, `npm run typecheck` y `npm run coverage` pasan, incluidos los tests de C-01
-- [ ] 4.2 Verificar reglas duras con `grep`: sin `any`, sin `new Date()`/`Date.now()` sin argumentos en `src/domain`, sin imports de infraestructura en `src/domain`, sin flag de forzado, sin datos reales en fixtures
-- [ ] 4.3 CHECKPOINT: mostrar al usuario el resultado de 4.1 y 4.2; esperar OK antes de `openspec-verify`
+- [x] 4.1 Verificar que cada `#### Scenario:` del spec tiene un test con el mismo nombre (`npx vitest list` comparado con el spec) y que `npm test`, `npm run typecheck` y `npm run coverage` pasan, incluidos los tests de C-01
+- [x] 4.2 Verificar reglas duras con `grep`: sin `any`, sin `new Date()`/`Date.now()` sin argumentos en `src/domain`, sin imports de infraestructura en `src/domain`, sin flag de forzado, sin datos reales en fixtures
+- [x] 4.3 CHECKPOINT: mostrar al usuario el resultado de 4.1 y 4.2; esperar OK antes de `openspec-verify`
 
 ## Workflow follow-up
 

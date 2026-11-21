@@ -249,7 +249,7 @@ Carriles: **A** = núcleo y reserva online (Matías: C-01 → C-07 → C-10); **
 - **Estado**: `[ ]` pendiente
 - **Owner**: Matías Ibañez (52006)
 - **Scope**:
-  - Caso de uso `ConsultarDisponibilidad(prestacionId, rango)`: devuelve huecos donde existen a la vez un profesional habilitado (que realiza la prestación) y un sillón libres para toda la duración (RN-13)
+  - Caso de uso `ConsultarDisponibilidad({actor, prestacionId, rango, ahora, duracionMinutos?, pasoMinutos?, profesionalId?})`: devuelve huecos donde existen a la vez un profesional habilitado (que realiza la prestación) y un sillón libres para toda la duración (RN-13)
   - Respeta horario de atención, bloqueos y turnos activos; reutiliza las reglas de dominio de C-01 (sin duplicar lógica)
   - Granularidad de huecos configurable con el parámetro `pasoMinutos` (por defecto 15 min; DD-12)
   - Tests: hueco contiguo a un turno aparece (RN-05), hueco que excede el cierre no aparece, solo un recurso libre no basta, bloqueo excluye huecos
