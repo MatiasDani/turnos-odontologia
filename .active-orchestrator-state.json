@@ -1,6 +1,6 @@
 {
   "version": 5,
-  "step": "find-skill",
+  "step": "agents",
   "owner": "active-orchestrator",
   "discovery": {
     "created_by": "discovery-research",
@@ -164,5 +164,37 @@
       "C-14",
       "C-15"
     ]
+  },
+  "skills": {
+    "created_by": "find-skill",
+    "recommended": [
+      "antfu/skills@vitest",
+      "obra/superpowers@test-driven-development",
+      "cursor/plugins@typescript-best-practices",
+      "mcollina/skills@fastify-best-practices",
+      "wondelai/skills@domain-driven-design",
+      "affaan-m/ecc@hexagonal-architecture",
+      "wshobson/agents@nodejs-backend-patterns",
+      "wshobson/agents@postgresql-table-design"
+    ],
+    "installed": [
+      "antfu/skills@vitest"
+    ],
+    "decisions": {
+      "antfu/skills@vitest": "instalada: runner de tests del proyecto",
+      "obra/superpowers@test-driven-development": "no: el modo Strict TDD global ya cubre el ciclo rojo/verde/refactor",
+      "cursor/plugins@typescript-best-practices": "no: el equipo lo resuelve con tsconfig strict",
+      "mcollina/skills@fastify-best-practices": "no por ahora: API opcional, se instala con el primer change HTTP",
+      "wondelai/skills@domain-driven-design": "no: baja adopción y la KB ya define entidades e invariantes",
+      "affaan-m/ecc@hexagonal-architecture": "no: 08_arquitectura_propuesta.md ya fija la estructura",
+      "wshobson/agents@nodejs-backend-patterns": "no: genérica, el MVP no tiene servicio Node",
+      "wshobson/agents@postgresql-table-design": "más adelante: persistencia PostgreSQL es post-MVP"
+    }
+  },
+  "registry": {
+    "created_by": "skill-registry",
+    "path": ".atl/skill-registry.md",
+    "skills_count": 19,
+    "generated_at": "2026-11-21"
   }
 }
