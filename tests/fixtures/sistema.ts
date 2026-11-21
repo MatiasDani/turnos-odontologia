@@ -7,6 +7,16 @@ import {
   ProfesionalRepositorioEnMemoria,
   SillonRepositorioEnMemoria,
 } from '../../src/adapters/persistence/en-memoria/catalogos.js';
+import { HasherSha256 } from '../../src/adapters/crypto/hasher-sha256.js';
+import { GeneradorTokenCrypto } from '../../src/adapters/crypto/generador-token-crypto.js';
+import { PacienteRepositorioEnMemoria } from '../../src/adapters/persistence/en-memoria/paciente-repositorio.js';
+import { TokenGestionRepositorioEnMemoria } from '../../src/adapters/persistence/en-memoria/token-gestion-repositorio.js';
+import { reservarDesdePedido } from '../../src/adapters/http/pedido-reserva.js';
+import { ReservarOnline, type ReservaOnlineConfirmada } from '../../src/application/reservar-online.js';
+import { ErrorReservaPublica } from '../../src/application/errores-reserva-publica.js';
+import { ServicioTokens } from '../../src/application/servicio-tokens.js';
+import { RelojFijo } from './reloj-fijo.js';
+import { TurnoRepositorioDePrueba } from './turno-repositorio-de-prueba.js';
 import { TurnoRepositorioEnMemoria } from '../../src/adapters/persistence/en-memoria/turno-repositorio.js';
 import { AgendarTurno } from '../../src/application/agendar-turno.js';
 import { ConsultarDisponibilidad } from '../../src/application/consultar-disponibilidad.js';
@@ -105,4 +115,130 @@ export function consultar(sistema: Sistema, c: Consulta = {}): Promise<readonly 
     profesionalId: c.profesionalId,
   };
   return sistema.consultarDisponibilidad.ejecutar(input);
+}
+
+export { TurnoRepositorioDePrueba };
+
+/** Ids deterministas con prefijo: pn-1, pn-2, ... (evita choques con t-N y los ids del seed). */
+export class GeneradorIdConPrefijo implements GeneradorId {
+  private contador = 0;
+  constructor(private readonly prefijo: string) {}
+  siguiente(): string {
+    this.contador += 1;
+    return `${this.prefijo}${this.contador}`;
+  }
+}
+
+export type OpcionesSistemaReserva = Partial<Entorno> & {
+  /** Instante del reloj fijo; por defecto el domingo 2026-11-22 08:00 local. */
+  readonly ahora?: Date;
+  /** Doble de la fuente de disponibilidad de `ReservarOnline` (defensa RN-19). */
+  readonly consultar?: Pick<ConsultarDisponibilidad, 'ejecutar'>;
+  /** Doble del alta (para simular rechazos del alta). */
+  readonly agendar?: Pick<AgendarTurno, 'ejecutar'>;
+  readonly topeTurnosOnline?: number;
+};
+
+export interface SistemaReserva {
+  readonly datos: Entorno;
+  readonly reloj: RelojFijo;
+  readonly turnos: TurnoRepositorioDePrueba;
+  readonly pacientes: PacienteRepositorioEnMemoria;
+  readonly tokens: TokenGestionRepositorioEnMemoria;
+  readonly hasher: HasherSha256;
+  readonly agendarTurno: AgendarTurno;
+  readonly consultarDisponibilidad: ConsultarDisponibilidad;
+  readonly servicioTokens: ServicioTokens;
+  readonly reservarOnline: ReservarOnline;
+}
+
+/** Cableado de la reserva online: repos en memoria, reloj fijo y adaptadores crypto reales. */
+export function crearSistemaReserva(opciones: OpcionesSistemaReserva = {}): SistemaReserva {
+  const { ahora, consultar, agendar, topeTurnosOnline, ...overrides } = opciones;
+  const datos = crearEntorno(overrides);
+  const reloj = new RelojFijo(ahora ?? AHORA_POR_DEFECTO);
+  const turnos = new TurnoRepositorioDePrueba(datos.turnos);
+  const pacientes = new PacienteRepositorioEnMemoria(datos.pacientes);
+  const tokens = new TokenGestionRepositorioEnMemoria();
+  const hasher = new HasherSha256();
+  const repos = {
+    profesionales: new ProfesionalRepositorioEnMemoria(datos.profesionales),
+    sillones: new SillonRepositorioEnMemoria(datos.sillones),
+    prestaciones: new PrestacionRepositorioEnMemoria(datos.prestaciones),
+    consultorios: new ConsultorioRepositorioEnMemoria([datos.consultorio]),
+    horarios: new HorarioAtencionRepositorioEnMemoria(datos.horarios),
+    bloqueos: new BloqueoRepositorioEnMemoria(datos.bloqueos),
+    turnos,
+  };
+  const agendarTurno = new AgendarTurno({ ...repos, ids: new GeneradorIdConPrefijo('tu-') });
+  const consultarDisponibilidad = new ConsultarDisponibilidad(repos);
+  const servicioTokens = new ServicioTokens({
+    generador: new GeneradorTokenCrypto(),
+    hasher,
+    tokens,
+    turnos,
+    reloj,
+  });
+  const reservarOnline = new ReservarOnline({
+    reloj,
+    pacientes,
+    turnos,
+    ...(topeTurnosOnline === undefined ? {} : { topeTurnosOnline }),
+    profesionales: repos.profesionales,
+    prestaciones: repos.prestaciones,
+    consultorios: repos.consultorios,
+    ids: new GeneradorIdConPrefijo('pn-'),
+    consultar: consultar ?? consultarDisponibilidad,
+    agendar: agendar ?? agendarTurno,
+    tokens: servicioTokens,
+  });
+  return {
+    datos, reloj, turnos, pacientes, tokens, hasher, agendarTurno, consultarDisponibilidad, servicioTokens, reservarOnline,
+  };
+}
+
+/** Pedido base del spec como `unknown`; `undefined` en los cambios quita la clave. */
+export function pedidoBase(
+  cambios: Readonly<Record<string, unknown>> = {},
+  paciente: Readonly<Record<string, unknown>> = {},
+): unknown {
+  const pedido: Record<string, unknown> = {
+    prestacionId: 'pr2',
+    inicio: '2026-11-23T09:00:00-03:00',
+    paciente: {
+      dni: '00000004',
+      nombre: 'Paciente',
+      apellido: 'Ficticio 4',
+      telefono: '+54 9 11 0000-0004',
+      email: 'paciente4@ejemplo.test',
+      consentimientoContacto: true,
+      ...paciente,
+    },
+    ...cambios,
+  };
+  for (const [clave, valor] of Object.entries(pedido)) if (valor === undefined) delete pedido[clave];
+  const datosPaciente = pedido['paciente'];
+  if (typeof datosPaciente === 'object' && datosPaciente !== null) {
+    const copia: Record<string, unknown> = { ...datosPaciente };
+    for (const [clave, valor] of Object.entries(copia)) if (valor === undefined) delete copia[clave];
+    pedido['paciente'] = copia;
+  }
+  return pedido;
+}
+
+/** Reserva por el cuerpo `unknown`, como lo hará el borde HTTP. */
+export function reservar(sistema: SistemaReserva, cuerpo: unknown): Promise<ReservaOnlineConfirmada> {
+  return reservarDesdePedido(cuerpo, sistema.reservarOnline);
+}
+
+/** Espera un rechazo y devuelve el error público; falla si la promesa se resuelve o el error es de otro tipo. */
+export async function rechazoPublico(promesa: Promise<unknown>): Promise<ErrorReservaPublica> {
+  const error = await promesa.then(
+    () => undefined,
+    (e: unknown) => e,
+  );
+  if (!(error instanceof ErrorReservaPublica)) {
+    throw new Error(`Se esperaba un ErrorReservaPublica y llegó: ${String(error)}`);
+  }
+  return error;
 }

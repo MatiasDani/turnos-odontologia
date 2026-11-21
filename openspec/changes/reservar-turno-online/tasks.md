@@ -27,20 +27,20 @@
 
 ## 4. Fixtures del caso de uso
 
-- [ ] 4.1 Extender `tests/fixtures/sistema.ts` con `crearSistemaReserva({ ahora, ...overrides })` (repos en memoria, `RelojFijo`, `ConsultarDisponibilidad`, `AgendarTurno`, `ServicioTokens` con adaptadores crypto reales, `ReservarOnline`), `pedidoBase(overrides)` (pedido base del spec como `unknown`) y `reservar(sistema, cuerpo)` vía `reservarDesdePedido`; `TurnoRepositorioDePrueba` con `cambiarEstado` y gancho `antesDeAgregar` (design D12); verificar que `crearSistema` y las suites de C-01/C-07 siguen en verde
+- [x] 4.1 Extender `tests/fixtures/sistema.ts` con `crearSistemaReserva({ ahora, ...overrides })` (repos en memoria, `RelojFijo`, `ConsultarDisponibilidad`, `AgendarTurno`, `ServicioTokens` con adaptadores crypto reales, `ReservarOnline`), `pedidoBase(overrides)` (pedido base del spec como `unknown`) y `reservar(sistema, cuerpo)` vía `reservarDesdePedido`; `TurnoRepositorioDePrueba` con `cambiarEstado` y gancho `antesDeAgregar` (design D12); verificar que `crearSistema` y las suites de C-01/C-07 siguen en verde
 
 ## 5. Caso de uso `ReservarOnline`
 
-- [ ] 5.1 RED/GREEN escenarios de "Reserva online exitosa" y "Respuesta pública de la reserva" en `tests/application/reservar-online.test.ts` (`src/application/reservar-online.ts` + `reservar-online-input.ts`: actor paciente interno, primer combo, guardado del paciente nuevo, emisión del token, respuesta de 6 claves); verificar en verde
-- [ ] 5.2 RED/GREEN escenarios de "Validación estricta del pedido público", "Datos mínimos del paciente" (incluida la revalidación en el caso de uso) y "No existe opción de forzar" a nivel de `reservarDesdePedido`; verificar en verde
-- [ ] 5.3 RED/GREEN escenarios de "Sin reservas en el pasado" y "Prestación y profesional públicos válidos" (pasos 2-4 de design D5); verificar en verde
-- [ ] 5.4 RED/GREEN escenarios de "Mismas reglas de agenda que la recepción", "Nueva oferta ante horario no disponible" (design D8) y "Solo profesionales habilitados reciben el turno" (doble de `consultar`); verificar en verde
-- [ ] 5.5 RED/GREEN escenarios de "Carrera entre la consulta y el alta" con `TurnoRepositorioDePrueba.antesDeAgregar` (reconsulta y un solo reintento, design D7; contar dos intentos de alta); verificar en verde
-- [ ] 5.6 RED/GREEN escenarios de "Paciente existente por DNI" y "Sin pacientes huérfanos" (guardado posterior al alta, design D6); verificar en verde
-- [ ] 5.7 RED/GREEN escenarios de "Tope de turnos online por DNI", "Reserva duplicada" (con `cambiarEstado` para el cancelado) y "Orden de los errores públicos"; verificar en verde
-- [ ] 5.8 RED/GREEN escenarios de "Errores públicos sin datos de otros pacientes" (serialización del error sin ids ni conflictos) y de "Token de gestión de alta entropía", "Solo se almacena el hash del token", "Resolución del token de gestión" y "Rotación del token de gestión" a nivel de reserva; verificar en verde
-- [ ] 5.9 REFACTOR de `ReservarOnline` (extraer traducción de errores internos a públicos y armado de la respuesta) con todos los tests en verde y `npm run typecheck`
-- [ ] 5.10 CHECKPOINT (governance ALTO): revisar el caso de uso completo, el orden de errores, la política de paciente huérfano, la carrera y la cobertura de escenarios; aprobar antes de la verificación integral
+- [x] 5.1 RED/GREEN escenarios de "Reserva online exitosa" y "Respuesta pública de la reserva" en `tests/application/reservar-online.test.ts` (`src/application/reservar-online.ts` + `reservar-online-input.ts`: actor paciente interno, primer combo, guardado del paciente nuevo, emisión del token, respuesta de 6 claves); verificar en verde
+- [x] 5.2 RED/GREEN escenarios de "Validación estricta del pedido público", "Datos mínimos del paciente" (incluida la revalidación en el caso de uso) y "No existe opción de forzar" a nivel de `reservarDesdePedido`; verificar en verde
+- [x] 5.3 RED/GREEN escenarios de "Sin reservas en el pasado" y "Prestación y profesional públicos válidos" (pasos 2-4 de design D5); verificar en verde
+- [x] 5.4 RED/GREEN escenarios de "Mismas reglas de agenda que la recepción", "Nueva oferta ante horario no disponible" (design D8) y "Solo profesionales habilitados reciben el turno" (doble de `consultar`); verificar en verde
+- [x] 5.5 RED/GREEN escenarios de "Carrera entre la consulta y el alta" con `TurnoRepositorioDePrueba.antesDeAgregar` (reconsulta y un solo reintento, design D7; contar dos intentos de alta); verificar en verde
+- [x] 5.6 RED/GREEN escenarios de "Paciente existente por DNI" y "Sin pacientes huérfanos" (guardado posterior al alta, design D6); verificar en verde
+- [x] 5.7 RED/GREEN escenarios de "Tope de turnos online por DNI", "Reserva duplicada" (con `cambiarEstado` para el cancelado) y "Orden de los errores públicos"; verificar en verde
+- [x] 5.8 RED/GREEN escenarios de "Errores públicos sin datos de otros pacientes" (serialización del error sin ids ni conflictos) y de "Token de gestión de alta entropía", "Solo se almacena el hash del token", "Resolución del token de gestión" y "Rotación del token de gestión" a nivel de reserva; verificar en verde
+- [x] 5.9 REFACTOR de `ReservarOnline` (extraer traducción de errores internos a públicos y armado de la respuesta) con todos los tests en verde y `npm run typecheck`
+- [x] 5.10 CHECKPOINT (governance ALTO): revisar el caso de uso completo, el orden de errores, la política de paciente huérfano, la carrera y la cobertura de escenarios; aprobar antes de la verificación integral
 
 ## 6. Verificación integral
 

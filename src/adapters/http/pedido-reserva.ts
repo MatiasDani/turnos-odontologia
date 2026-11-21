@@ -1,5 +1,6 @@
 import { validarDatosPacienteOnline } from '../../domain/datos-paciente-online.js';
-import type { ReservarOnlineInput } from '../../application/reservar-online-input.js';
+import { ErrorReservaPublica } from '../../application/errores-reserva-publica.js';
+import type { ReservaOnlineConfirmada, ReservarOnlineInput } from '../../application/reservar-online-input.js';
 
 export type ResultadoPedidoReserva =
   | { readonly ok: true; readonly valor: ReservarOnlineInput }
@@ -107,4 +108,17 @@ export function validarPedidoReserva(cuerpo: unknown): ResultadoPedidoReserva {
       paciente: datosPaciente.datos,
     },
   };
+}
+
+/**
+ * Punto de entrada de la ruta pública (lo cableará C-14): valida el cuerpo `unknown` y, si es válido,
+ * delega en el caso de uso. Un pedido inválido se rechaza con `DATOS_INVALIDOS` y la lista de campos.
+ */
+export async function reservarDesdePedido(
+  cuerpo: unknown,
+  reservar: { ejecutar(input: ReservarOnlineInput): Promise<ReservaOnlineConfirmada> },
+): Promise<ReservaOnlineConfirmada> {
+  const validado = validarPedidoReserva(cuerpo);
+  if (!validado.ok) throw new ErrorReservaPublica('DATOS_INVALIDOS', { campos: validado.campos });
+  return reservar.ejecutar(validado.valor);
 }
