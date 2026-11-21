@@ -37,12 +37,13 @@ Recepción → Caso de uso AgendarTurno → Dominio (reglas) → Repositorio (at
 1. El paciente elige la prestación.
 2. `ConsultarDisponibilidad` calcula, a partir del instante actual y con paso de 15 min, los huecos donde existan a la vez un profesional habilitado y un sillón libres para la duración completa de la prestación (RN-13, DD-12). La consulta no reserva nada; los combos se agrupan por horario para mostrarlos al paciente.
 3. El paciente elige un horario e informa sus datos mínimos (DNI, nombre, apellido, teléfono y consentimiento de contacto; e-mail opcional; DD-17). La frontera valida la forma del pedido (DD-13).
-4. `ReservarOnline` consulta `ConsultarDisponibilidad` para ese `inicio`, toma el primer combo (filtrado por `profesionalId` si viene), verifica RN-19 y RN-20 y llama a `AgendarTurno` (mismas reglas, sin excepciones por canal; estado `reservado`, origen `online`): así el sistema asigna profesional y sillón. Si el DNI ya existe se vincula el turno a ese paciente sin modificarlo (RN-22); se aplica RN-23.
+4. `ReservarOnline` consulta `ConsultarDisponibilidad` para ese `inicio`, toma el primer combo (filtrado por `profesionalId` si viene), verifica RN-19 (profesional habilitado y activo) y RN-20 y llama a `AgendarTurno` (mismas reglas, sin excepciones por canal; estado `reservado`, origen `online`): así el sistema asigna profesional y sillón. Orden de validación (el primer error es el único que se informa): datos, pasado, prestación, profesional pedido, duplicado, tope y horario disponible. Si el DNI ya existe se vincula el turno a ese paciente sin modificarlo (RN-22) y se aplican el duplicado y luego el tope (RN-23); un paciente nuevo se guarda recién cuando el turno ya fue creado, por lo que ningún rechazo deja pacientes huérfanos.
 5. Se emite el token de gestión (se guarda solo su hash; RN-21) y se devuelve en claro una única vez en la respuesta, junto con `inicio`, `fin`, la prestación y el profesional asignado (DD-18). El e-mail con el enlace lo envía C-12, fuera de este flujo, rotando el token (DD-15).
 
 **Casos de error**:
 - El hueco se ocupó entre la consulta y la reserva (carrera) → rechazo por RN-02/RN-03; se reintenta una vez con el siguiente combo del mismo horario; si falla, error público "horario no disponible" y nueva oferta de disponibilidad del día de `inicio` (RN-12, DD-14).
-- Datos inválidos → validación de entrada.
+- Datos inválidos → `DATOS_INVALIDOS` con la lista de campos (la frontera rechaza además cualquier clave desconocida, como `duracionMinutos`, `sillonId` o `forzar`).
+- Prestación o profesional no disponibles, pasado, reserva duplicada o tope de turnos → el código público correspondiente (`PRESTACION_NO_DISPONIBLE`, `PROFESIONAL_NO_DISPONIBLE`, `RESERVA_EN_PASADO`, `RESERVA_DUPLICADA`, `LIMITE_DE_TURNOS`).
 - Cualquier rechazo de regla se informa con un error público genérico, sin datos de otros pacientes ni turnos (RN-22).
 
 ## Flujo 3: Reprogramar un turno

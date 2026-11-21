@@ -375,6 +375,12 @@ describe('Mismas reglas de agenda que la recepción', () => {
     expect(error.codigo).toBe('HORARIO_NO_DISPONIBLE');
   });
 
+  test('Un error inesperado de la consulta no se enmascara como error público', async () => {
+    const consultar = { ejecutar: () => Promise.reject(new TypeError('fallo de infraestructura')) };
+    const sistema = crearSistemaReserva({ consultar });
+    await expect(reservar(sistema, pedidoBase())).rejects.toBeInstanceOf(TypeError);
+  });
+
   test('Un error interno de la consulta se traduce a un error público sin propagarse', async () => {
     const consultar = {
       ejecutar: () =>

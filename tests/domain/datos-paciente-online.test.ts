@@ -24,13 +24,13 @@ function camposInvalidos(datos: DatosPacienteOnline): readonly string[] | 'ok' {
 
 describe('validarDatosPacienteOnline: DNI', () => {
   test('un DNI de 8 dígitos es válido', () => {
-    const r = validarDatosPacienteOnline(con({ dni: '12345678' }));
-    expect(r.ok && r.datos.dni).toBe('12345678');
+    const r = validarDatosPacienteOnline(con({ dni: '00000008' }));
+    expect(r.ok && r.datos.dni).toBe('00000008');
   });
 
   test('un DNI de 7 dígitos es válido', () => {
-    const r = validarDatosPacienteOnline(con({ dni: '1234567' }));
-    expect(r.ok && r.datos.dni).toBe('1234567');
+    const r = validarDatosPacienteOnline(con({ dni: '0000007' }));
+    expect(r.ok && r.datos.dni).toBe('0000007');
   });
 
   test('los puntos se quitan: 00.000.004 queda como 00000004', () => {

@@ -322,6 +322,7 @@ Carriles: **A** = núcleo y reserva online (Matías: C-01 → C-07 → C-10); **
   - El e-mail de confirmación queda fuera de C-10 (el token va en la respuesta; envíos en C-12); `ahora` viene del puerto `Reloj` que **crea** C-10 (con adaptador de sistema y reloj fijo de tests), que C-02 reutiliza (DD-16)
   - Tests: reserva exitosa, hueco ocupado entre consulta y reserva (carrera), mismas reglas que recepción, token único y solo hash almacenado, datos inválidos, DNI existente sin modificación, límite de 2 turnos y reserva repetida, sin fuga de datos de otros pacientes
   - Cubre US-009 (parte de dominio/API; la pantalla es C-14)
+  - **Implementado en el apply (2026-11-21)**: `ReservarOnline` y `reservarDesdePedido` (frontera pura), `ServicioTokens` (`emitir`/`resolver`/`rotar`), puertos `Reloj` y `PacienteRepositorio` con sus adaptadores, `TurnoRepositorio.obtenerPorId`/`listarPorPaciente` (aditivos), 55 escenarios con test de título idéntico. Disponible para C-02 (reutilizar `Reloj`), C-05 (extender `PacienteRepositorio`), C-11 (`resolver`) y C-12 (`rotar`). Pendiente para la integración HTTP (C-14): endpoints, rate limit, logs redactados, unicidad de DNI y atomicidad de RN-23 con persistencia real (ver `10_preguntas_abiertas.md`).
 - **Dependencias**: `C-07`
 - **Governance**: ALTO (datos personales sensibles en ruta pública)
 - **Leer antes**:

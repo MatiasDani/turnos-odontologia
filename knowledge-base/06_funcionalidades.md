@@ -120,12 +120,14 @@ Organizadas por épica e historia de usuario (US-NNN). Etapa: **MVP** (D.3 "Impr
 
 **Criterios de aceptación**:
 - [ ] Enlace público; el paciente elige prestación y horario entre la disponibilidad real.
-- [ ] Se aplican las mismas reglas que en recepción (sin excepciones por canal).
-- [ ] Recibe el token para gestionar su turno en la respuesta de la reserva (se entrega una única vez; el envío por e-mail es de C-12).
-- [ ] Identificación mínima sin cuenta: DNI, nombre, apellido, teléfono y consentimiento de contacto; e-mail opcional (DD-14, DD-17).
-- [ ] La respuesta informa horario, prestación y profesional asignado, nunca el sillón (DD-18).
-- [ ] Si el DNI ya existe, el turno se vincula al paciente existente sin modificarlo y sin revelar que existía (RN-22).
-- [ ] No admite `inicio` pasado (RN-20) ni más de 2 turnos online activos futuros por DNI (RN-23).
+- [x] Se aplican las mismas reglas que en recepción (sin excepciones por canal) (C-10).
+- [x] Recibe el token para gestionar su turno en la respuesta de la reserva (se entrega una única vez; el envío por e-mail es de C-12) (C-10).
+- [x] Identificación mínima sin cuenta: DNI, nombre, apellido, teléfono y consentimiento de contacto; e-mail opcional (DD-14, DD-17).
+- [x] La respuesta informa horario, prestación y profesional asignado, nunca el sillón (DD-18).
+- [x] Si el DNI ya existe, el turno se vincula al paciente existente sin modificarlo y sin revelar que existía (RN-22).
+- [x] No admite `inicio` pasado (RN-20) ni más de 2 turnos online activos futuros por DNI (RN-23).
+
+> Los criterios marcados `[x]` están cubiertos a nivel de caso de uso por C-10 (`ReservarOnline`, con tests por escenario). El primer criterio (enlace público y elección en pantalla) queda para C-14.
 
 **Reglas relacionadas**: RN-01 a RN-07, RN-13, RN-15, RN-19 a RN-23, RN-D-02
 

@@ -97,7 +97,12 @@ Sin campo `actor`: el caso de uso usa la constante interna `{ rol: 'paciente' }`
 9. Si el paciente es nuevo: `pacientes.guardar(...)` con los datos normalizados.
 10. `token = await tokens.emitir(turno.id)`; armar la respuesta con nombres de prestación y profesional.
 
-Cualquier `ReglaNegocioError` o `RecursoNoEncontradoError` que escape de C-07 o C-01 se traduce a un código público; nunca se propaga.
+Cualquier `ReglaNegocioError`, `RecursoNoEncontradoError` o `ConsultaInvalidaError` que escape de C-07 o C-01 se traduce a un código público; nunca se propaga.
+
+**Precisiones de implementación (apply):**
+- La verificación explícita de RN-19 (pasos 4 y 6) exige profesional **activo** y con la prestación en `prestacionIds`; la misma regla filtra la nueva oferta (D8).
+- Traducción de errores internos: un error de dominio de la consulta equivale a "sin combos" y uno del alta (distinto de RN-02/RN-03, o la falla del reintento) también; ambos terminan en `HORARIO_NO_DISPONIBLE` con nueva oferta (vacía si la propia consulta de oferta falla). Un error que no es de dominio (p. ej. `TypeError` de infraestructura) se propaga sin enmascarar.
+- El reintento descarta el combo fallido por `profesionalId` y `sillonId` además de reconsultar; el tope (RN-23) cuenta `origen: 'online'`, estado activo e `inicio >= ahora`.
 
 ### D6. Política de paciente huérfano
 

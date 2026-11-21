@@ -72,6 +72,8 @@
 | Resuelta | ¿La consulta pública expone nombres de profesionales? | n/a | Resuelta el 2026-11-21: sí, nombre y apellido del profesional (personal del consultorio); nunca el sillón ni datos de pacientes (DD-18) |
 | Resuelta | ¿Quién crea el puerto `Reloj` y el puerto `PacienteRepositorio`, y con qué firma? | n/a | Resuelta el 2026-11-21: los crea C-10 (`Reloj { ahora(): Date }`; `PacienteRepositorio { obtenerPorDni, guardar }`); C-02 reutiliza el `Reloj` y C-05 extiende el repositorio (DD-16) |
 | Resuelta | ¿Cómo entrega C-12 el enlace de gestión si solo se guarda el hash del token? | n/a | Resuelta el 2026-11-21: rotación; cada recordatorio llama a `rotar(turnoId)` del servicio de tokens de C-10, que emite uno nuevo e invalida el anterior (DD-15) |
+| Media | Riesgo documentado en C-10: dos reservas concurrentes del mismo DNI nuevo podrían crear dos pacientes y el duplicado/tope de RN-23 no es atómico en la implementación en memoria. ¿Cómo se garantiza? | Integración HTTP y persistencia real (C-14 o el change que integre PostgreSQL) | Equipo: índice único por DNI y transacción (paciente, turno y token en una sola unidad) |
+| Media | Riesgo documentado en C-10: `RESERVA_DUPLICADA` y `LIMITE_DE_TURNOS` permiten inferir que un DNI tiene reservas online (tensión con RN-22). ¿Qué mitigación definitiva se adopta? | Integración HTTP | Equipo: mensajes genéricos ya aplicados; falta rate limit y logs redactados en la capa HTTP (DD-13) |
 | Baja | Versión mínima de Node LTS y de Vitest a fijar | Inicialización del proyecto | Equipo técnico |
 
 ### Campos de discovery con baja confianza

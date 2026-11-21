@@ -74,7 +74,7 @@ Usuario     0..1 ── 1 Profesional        (un usuario odontólogo se vincula 
 - Transiciones permitidas: `reservado → confirmado | cancelado`, `confirmado → atendido | ausente | cancelado`. Reprogramar conserva el `id` y cambia `inicio`/`fin`/recursos (ver flujo 3).
 
 ### TokenGestion
-- `turnoId`, `hash: string` (SHA-256 del token), `creadoEn`.
+- `turnoId`, `hash: string` (SHA-256 del token, hexadecimal en minúsculas), `creadoEn`, `invalidadoEn?` (lo fija `rotar`; un token invalidado no resuelve).
 - El token son 32 bytes aleatorios en base64url; solo se persiste su hash, nunca el valor en claro (DD-15, RN-21). Un token por turno; vence al pasar el `fin` del turno o al cancelarse (sin TTL propio).
 - Relaciones: 1 a 1 con Turno. Índice: (`hash`) único.
 - Servicio reutilizable por C-11 y C-12: `emitir(turnoId)`, `resolver(tokenPlano)` y `rotar(turnoId)` (emite uno nuevo e invalida el anterior; C-12 lo usa en cada recordatorio, DD-15).

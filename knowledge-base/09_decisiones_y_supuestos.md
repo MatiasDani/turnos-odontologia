@@ -103,6 +103,7 @@
 - **Error público**: la ruta pública nunca devuelve `turnoEnConflicto`, `bloqueoEnConflicto` ni datos de otros pacientes; los `ReglaNegocioError` se mapean a un error público genérico (RN-22).
 - **Límites**: máximo 2 turnos online activos futuros por DNI y reserva repetida idempotente (RN-23).
 - **Mail de confirmación**: fuera de C-10; el token va en la respuesta y los envíos son de C-12.
+- **Detalles de implementación** *(apply de C-10, 2026-11-21; no cambian la decisión)*: (1) orden fijo de errores públicos: `DATOS_INVALIDOS`, `RESERVA_EN_PASADO`, `PRESTACION_NO_DISPONIBLE`, `PROFESIONAL_NO_DISPONIBLE`, `RESERVA_DUPLICADA`, `LIMITE_DE_TURNOS`, `HORARIO_NO_DISPONIBLE`; (2) la verificación explícita de RN-19 exige profesional **activo** y con la prestación en `prestacionIds`, tanto para los combos como para la nueva oferta; (3) los errores de dominio de C-01/C-07 que escapen de la consulta o del alta se traducen a `HORARIO_NO_DISPONIBLE` con nueva oferta (la oferta es vacía si falla), mientras que los errores inesperados (no de dominio) se propagan sin enmascarar; (4) el reintento ante carrera solo corresponde a RN-02/RN-03, reconsulta el mismo `inicio` y descarta el combo fallido; cualquier otro rechazo del alta (RN-07, RN-17, RN-18, recurso inexistente) no se reintenta; (5) el paciente nuevo se guarda después del alta del turno; (6) `RESERVA_DUPLICADA` se evalúa antes que `LIMITE_DE_TURNOS`.
 - **Ahora**: `ReservarOnline` obtiene `ahora` de un puerto `Reloj` (`ahora(): Date`), creado por C-10 (DD-16).
 **Contexto**: US-009 y el flujo 2 no definían el pedido, el tratamiento de un DNI existente, la carrera ni qué se expone en la ruta pública; cierra la pregunta abierta sobre registro vs. DNI + teléfono (alta mínima sin cuenta).
 **Alternativas consideradas**: pedir `sillonId` al paciente (contradice SU-05); actualizar teléfono de un DNI existente (permitiría pisar datos ajenos desde una ruta pública); enviar el e-mail desde C-10 (acopla con el notificador de C-12); reintentar sin límite ante la carrera.
@@ -132,7 +133,7 @@ C-02 **reutiliza** el `Reloj` (no lo redefine) y C-05 **extiende** `PacienteRepo
 **Decisión** (2026-11-21, Matías Ibañez): el alta online **sí pide nombre y apellido** (el modelo `Paciente` los requiere, `src/domain/paciente.ts`). Formatos:
 - `dni`: se quitan los puntos; deben quedar 7 u 8 dígitos.
 - `nombre` y `apellido`: texto con `trim`, no vacío, longitud máxima 80.
-- `telefono`: teléfono argentino normalizado a solo dígitos (formato preciso en el design de C-10).
+- `telefono`: teléfono argentino normalizado a solo dígitos: se quitan espacios, guiones, puntos y paréntesis; un prefijo `+` solo se admite como `+54` y debe quedar entre 10 y 13 dígitos (ej.: `+54 9 11 0000-0004` → `5491100000004`).
 - `email`: opcional; si viene, formato válido.
 - `consentimientoContacto`: debe ser exactamente `true`.
 **Contexto**: la KB solo mencionaba DNI y teléfono, pero `Paciente` exige nombre y apellido y la recepción los necesita para atender.

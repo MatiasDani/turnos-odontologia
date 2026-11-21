@@ -44,10 +44,10 @@
 
 ## 6. Verificación integral
 
-- [ ] 6.1 Verificar que cada `#### Scenario:` del spec tiene un test con el mismo nombre (`npx vitest list` comparado con el spec) y que `npm test`, `npm run typecheck` y `npm run coverage` pasan, incluidas las suites de C-01 y C-07 sin cambios
-- [ ] 6.2 Verificar reglas duras con `grep`: sin `any`; `new Date()` sin argumentos solo en `src/adapters/reloj/reloj-sistema.ts`; sin `Date.now()` ni imports de infraestructura (`node:crypto`, Fastify) en `src/domain`; sin campo de forzado; sin datos reales en fixtures
-- [ ] 6.3 Verificar privacidad: `grep` de que ningún adaptador ni test guarda o registra el token en claro (salvo la respuesta), y de que `ErrorReservaPublica` no recibe `turnoEnConflicto`, `bloqueoEnConflicto` ni `cause`
-- [ ] 6.4 CHECKPOINT (governance ALTO): revisar el resultado de 6.1-6.3 antes de `openspec-verify`
+- [x] 6.1 Verificar que cada `#### Scenario:` del spec tiene un test con el mismo nombre (`npx vitest list` comparado con el spec) y que `npm test`, `npm run typecheck` y `npm run coverage` pasan, incluidas las suites de C-01 y C-07 sin cambios
+- [x] 6.2 Verificar reglas duras con `grep`: sin `any`; `new Date()` sin argumentos solo en `src/adapters/reloj/reloj-sistema.ts`; sin `Date.now()` ni imports de infraestructura (`node:crypto`, Fastify) en `src/domain`; sin campo de forzado; sin datos reales en fixtures
+- [x] 6.3 Verificar privacidad: `grep` de que ningún adaptador ni test guarda o registra el token en claro (salvo la respuesta), y de que `ErrorReservaPublica` no recibe `turnoEnConflicto`, `bloqueoEnConflicto` ni `cause`
+- [x] 6.4 CHECKPOINT (governance ALTO): revisar el resultado de 6.1-6.3 antes de `openspec-verify`
 
 ## Workflow follow-up
 
