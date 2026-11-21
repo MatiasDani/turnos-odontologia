@@ -1,6 +1,6 @@
 {
   "version": 5,
-  "step": "visual-design",
+  "step": "roadmap",
   "owner": "active-orchestrator",
   "discovery": {
     "created_by": "discovery-research",
@@ -135,5 +135,12 @@
       "knowledge-base/10_preguntas_abiertas.md",
       "knowledge-base/README.md"
     ]
+  },
+  "visual_design": {
+    "created_by": "design-system",
+    "mode": "system-and-mockups",
+    "status": "approved",
+    "revision": 1,
+    "path": "design-system/README.md"
   }
 }
