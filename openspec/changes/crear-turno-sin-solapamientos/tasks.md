@@ -4,10 +4,10 @@
 
 ## 1. Scaffolding
 
-- [ ] 1.1 Crear `package.json` (`type: module`, `engines.node >= 20`, scripts `test`, `test:watch`, `typecheck`, `coverage`; devDeps `typescript`, `vitest`, `@types/node`, `@vitest/coverage-v8`) y verificar que `npm install` termina sin errores
-- [ ] 1.2 Crear `tsconfig.json` (`strict`, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, `NodeNext`, `ES2022`, `noEmit`) y `vitest.config.ts` (`include: tests/**/*.test.ts`, `environment: node`, coverage v8 sobre `src/**`); verificar con un test humo en `tests/humo.test.ts` que `npm test` y `npm run typecheck` pasan
-- [ ] 1.3 Crear la estructura `src/domain/reglas`, `src/application/puertos`, `src/adapters/persistence/en-memoria`, `tests/domain`, `tests/application`, `tests/adapters`, `tests/fixtures`; `.env.example` (solo valores ficticios, `TZ_CONSULTORIO=America/Argentina/Buenos_Aires`) y `.gitignore` (`node_modules`, `coverage`, `.env`); verificar con `git status` que `.env` no aparece y que no hay datos reales
-- [ ] 1.4 CHECKPOINT: mostrar scaffolding al usuario y esperar OK antes de seguir
+- [x] 1.1 Crear `package.json` (`type: module`, `engines.node >= 20`, scripts `test`, `test:watch`, `typecheck`, `coverage`; devDeps `typescript`, `vitest`, `@types/node`, `@vitest/coverage-v8`) y verificar que `npm install` termina sin errores
+- [x] 1.2 Crear `tsconfig.json` (`strict`, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, `NodeNext`, `ES2022`, `noEmit`) y `vitest.config.ts` (`include: tests/**/*.test.ts`, `environment: node`, coverage v8 sobre `src/**`); verificar con un test humo en `tests/humo.test.ts` que `npm test` y `npm run typecheck` pasan
+- [x] 1.3 Crear la estructura `src/domain/reglas`, `src/application/puertos`, `src/adapters/persistence/en-memoria`, `tests/domain`, `tests/application`, `tests/adapters`, `tests/fixtures`; `.env.example` (solo valores ficticios, `TZ_CONSULTORIO=America/Argentina/Buenos_Aires`) y `.gitignore` (`node_modules`, `coverage`, `.env`); verificar con `git status` que `.env` no aparece y que no hay datos reales
+- [x] 1.4 CHECKPOINT: mostrar scaffolding al usuario y esperar OK antes de seguir
 
 ## 2. Intervalo y tiempo
 

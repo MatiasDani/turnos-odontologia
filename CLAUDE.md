@@ -11,11 +11,11 @@
 
 | Capa | Tecnología | Versión mínima |
 |------|------------|----------------|
-| Lenguaje | TypeScript | 5.x |
+| Lenguaje | TypeScript | 7.x (fijado por package-lock, C-01) |
 | Runtime | Node.js (LTS) | 20 LTS o superior (a confirmar al inicializar) |
 | Gestor de paquetes | npm | el de la LTS |
 | Lógica de dominio | Módulos TypeScript puros (sin framework) | n/a |
-| Tests | Vitest | 1.x o superior |
+| Tests | Vitest | 5.x (fijado por package-lock, C-01) |
 | API REST (opcional) | Fastify | 4.x o superior |
 | Persistencia MVP | Repositorios en memoria (adaptadores) | n/a |
 | Persistencia futura | PostgreSQL (free tier) | a definir |

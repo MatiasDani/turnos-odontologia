@@ -1,0 +1,22 @@
+{
+  "name": "turnos-odontologia",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Gestión de turnos para consultorios odontológicos (datos ficticios, TP Metodología I)",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "coverage": "vitest run --coverage"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "@vitest/coverage-v8": "^5.1.1",
+    "typescript": "^7.0.2",
+    "vitest": "^5.1.1"
+  }
+}
