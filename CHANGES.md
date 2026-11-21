@@ -309,7 +309,7 @@ Carriles: **A** = núcleo y reserva online (Matías: C-01 → C-07 → C-10); **
 ## FASE 4 — Reserva online del paciente
 
 ### [C-10] `reservar-turno-online`
-- **Estado**: `[ ]` pendiente
+- **Estado**: `[x]` completado (archivado 2026-11-21)
 - **Owner**: Matías Ibañez (52006)
 - **Scope**:
   - Caso de uso `ReservarOnline` que **reutiliza** `AgendarTurno` (mismas reglas, sin excepciones por canal); el sistema asigna el sillón (RN-13, SU-05); `origen: 'online'`
