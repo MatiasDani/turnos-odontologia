@@ -61,7 +61,8 @@
 | Prioridad | Pregunta | Bloquea | Decisor |
 |---|---|---|---|
 | Resuelta | ¿Hace falta el estado `reservado` además de `confirmado`? | n/a | Resuelta el 2026-11-21: se mantiene; alta interna nace `confirmado`, reserva online `reservado` (DD-11) |
-| Media | ¿El horario de atención se define por consultorio, por profesional o ambos? (SU-09) | Primer change | Equipo |
+| Media | ¿El horario de atención se define por consultorio, por profesional o ambos? (SU-09). C-01 solo evalúa el horario del consultorio | C-05 | Equipo |
+| Media | ¿`AgendarTurno` debe validar que el paciente exista? En C-01 no se valida (no hay repositorio de pacientes) | C-05 | Equipo |
 | Media | ¿Se limita qué prestaciones puede realizar cada profesional y en qué sillones? | Primer change | Equipo |
 | Baja | ¿Cómo se maneja el consentimiento de contacto y la eliminación de datos del paciente (Ley 25.326)? | Reserva online | Equipo |
 | Baja | ¿La API REST con Fastify se implementa dentro del TP o solo los casos de uso con tests? | Alcance del change | Equipo |

@@ -25,8 +25,8 @@ Consultorio 1 ──── * HorarioAtencion
 Consultorio 1 ──── * Usuario
 Profesional * ──── * Prestacion          (qué prestaciones realiza cada profesional)
 Profesional 1 ──── * HorarioAtencion     (horario propio, opcional)
-Profesional 1 ──── * BloqueoHorario
-Sillon      1 ──── * BloqueoHorario      (opcional: bloqueo de un sillón)
+Profesional 1 ──── * BloqueoHorario      (opcional: bloqueo de un profesional)
+Sillon      1 ──── * BloqueoHorario      (opcional: bloqueo de un sillón; al menos uno de los dos)
 Profesional 1 ──── * Turno
 Sillon      1 ──── * Turno
 Prestacion  1 ──── * Turno
@@ -73,8 +73,8 @@ Usuario     0..1 ── 1 Profesional        (un usuario odontólogo se vincula 
 - Transiciones permitidas: `reservado → confirmado | cancelado`, `confirmado → atendido | ausente | cancelado`. Reprogramar conserva el `id` y cambia `inicio`/`fin`/recursos (ver flujo 3).
 
 ### BloqueoHorario
-- `id`, `profesionalId`, `sillonId?` (opcional), `inicio: Date`, `fin: Date`, `motivo?: string`, `creadoPor: usuarioId`.
-- Constraint: intervalo semiabierto; un bloqueo impide turnos nuevos que lo toquen: con `profesionalId`, los de ese profesional; con `sillonId`, los de ese sillón (RN-07). Qué pasa con turnos existentes bajo un bloqueo nuevo: pregunta abierta (por defecto, rechazar el bloqueo si hay turnos activos debajo y listar los conflictos; **Suposición**).
+- `id`, `profesionalId?`, `sillonId?` (al menos uno de los dos), `inicio: Date`, `fin: Date`, `motivo?: string`, `creadoPor: usuarioId`.
+- Constraint: al menos uno de `profesionalId` / `sillonId` (cada campo se evalúa por separado; decisión de diseño de C-01); intervalo semiabierto; un bloqueo impide turnos nuevos que lo toquen: con `profesionalId`, los de ese profesional; con `sillonId`, los de ese sillón (RN-07). Qué pasa con turnos existentes bajo un bloqueo nuevo: pregunta abierta (por defecto, rechazar el bloqueo si hay turnos activos debajo y listar los conflictos; **Suposición**).
 
 ### HorarioAtencion
 - `id`, `consultorioId`, `profesionalId?` (si es nulo, aplica al consultorio), `diaSemana: 0..6`, `desde: 'HH:mm'`, `hasta: 'HH:mm'`.

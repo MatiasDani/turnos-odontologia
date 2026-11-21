@@ -23,7 +23,7 @@ Recepción → Caso de uso AgendarTurno → Dominio (reglas) → Repositorio (at
 **Casos de error**:
 - Solapamiento por profesional o sillón → rechazo con `RN-02`/`RN-03` y turno en conflicto.
 - Fuera de horario o sobre bloqueo → rechazo con `RN-07`.
-- Intento de forzar (sobreturno) → rechazo con `RN-04`.
+- Intento de forzar un solapamiento (sobreturno) → rechazo con `RN-02`/`RN-03` igual que para cualquier rol; no existe ninguna opción de forzar (RN-04 se cumple por diseño, no es un código de error).
 - Recurso inactivo → rechazo con `RN-18`.
 - Turno que cruza el corte entre tramos → rechazo con `RN-17`.
 - Duración informada inválida (no entera, <= 0 o no múltiplo de 5) o informada por el paciente → rechazo con `RN-06`/`RN-16`.

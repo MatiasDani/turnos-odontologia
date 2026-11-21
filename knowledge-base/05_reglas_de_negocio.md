@@ -26,7 +26,7 @@ Definición operativa: un turno es **activo** si su estado es `reservado`, `conf
 | A 09:00-10:00 en `s1` con `p1`; B 09:30-10:00 en `s1` con `p2` | Rechazado (mismo sillón) | RN-03 |
 | A en `s1` con `p1`; B mismo horario en `s2` con `p1` | Rechazado (mismo profesional) | RN-02 |
 | A en `s1` con `p1`; B mismo horario en `s2` con `p2` | Válido | RN-01 |
-| Turno de 60 min que termina después del cierre | Rechazado | RN-07, RN-06 |
+| Turno de 60 min que termina después del cierre | Rechazado (se informa solo RN-07) | RN-07 |
 | Turno sobre un bloqueo del profesional (p1, miércoles 15:00-17:00) | Rechazado | RN-07 |
 | Turno de `p2` en `s1` sobre un bloqueo de sillón `s1` (mismo intervalo) | Rechazado (bloqueo de sillón) | RN-07 |
 | Turno con `pr1` (30 min) sin `duracionMinutos`, inicio 09:00 | `fin` 09:30 | RN-06 |
@@ -36,7 +36,7 @@ Definición operativa: un turno es **activo** si su estado es `reservado`, `conf
 | Turno 12:30-13:00 (termina justo al cierre del tramo de la mañana) | Válido | RN-17, RN-05 |
 | Turno 12:45-13:15 (cruza el corte 13:00-15:00) | Rechazado | RN-17 |
 | Turno con profesional, sillón o prestación inactivos | Rechazado | RN-18 |
-| Intento del administrador de forzar un solapamiento | Rechazado | RN-04 |
+| Intento del administrador de forzar un solapamiento | Rechazado con RN-02/RN-03 (no existe opción de forzar) | RN-04, RN-02, RN-03 |
 
 ## Dominio: Cancelación y reprogramación
 

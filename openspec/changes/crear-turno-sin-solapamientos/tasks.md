@@ -49,8 +49,8 @@
 
 ## 7. Verificación integral
 
-- [ ] 7.1 Verificar que cada escenario del spec tiene un test con el mismo nombre (listar con `npx vitest list` y comparar con los `#### Scenario:`) y que `npm test`, `npm run typecheck` y `npm run coverage` pasan
-- [ ] 7.2 Verificar reglas duras: `grep` sin `any`, sin `new Date()`/`Date.now()` sin argumentos en `src/domain`, sin imports de infraestructura en `src/domain`, sin datos reales en fixtures
+- [x] 7.1 Verificar que cada escenario del spec tiene un test con el mismo nombre (listar con `npx vitest list` y comparar con los `#### Scenario:`) y que `npm test`, `npm run typecheck` y `npm run coverage` pasan
+- [x] 7.2 Verificar reglas duras: `grep` sin `any`, sin `new Date()`/`Date.now()` sin argumentos en `src/domain`, sin imports de infraestructura en `src/domain`, sin datos reales en fixtures
 
 ## Workflow follow-up
 
