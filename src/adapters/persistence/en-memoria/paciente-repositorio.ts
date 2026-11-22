@@ -12,6 +12,10 @@ export class PacienteRepositorioEnMemoria implements PacienteRepositorio {
     return Promise.resolve(this.pacientes.find((p) => p.dni === dni));
   }
 
+  obtenerPorId(id: string): Promise<Paciente | undefined> {
+    return Promise.resolve(this.pacientes.find((p) => p.id === id));
+  }
+
   guardar(paciente: Paciente): Promise<void> {
     const indice = this.pacientes.findIndex((p) => p.id === paciente.id);
     if (indice >= 0) this.pacientes[indice] = paciente;

@@ -21,7 +21,7 @@
 | API REST (opcional) | Fastify | 4.x o superior |
 | Persistencia MVP | Repositorios en memoria (adaptadores) | n/a |
 | Persistencia futura | PostgreSQL (free tier) | a definir |
-| E-mail | Proveedor SMTP/transaccional con free tier (a confirmar) | n/a |
+| E-mail | SMTP con `nodemailer` (adaptador del puerto `Notificador`, C-12); Ethereal para desarrollo y demo; proveedor de producción con free tier a confirmar | 10.x (fijado por package-lock, C-12) |
 
 Estructura de repositorio según el TP: `src/` para la implementación y `tests/` para las pruebas, en la raíz.
 
@@ -51,7 +51,7 @@ Justificación: el valor diferencial es la **regla de agenda por recursos**; ais
 
 | Servicio | Propósito | Etapa | Tipo | Costo |
 |---|---|---|---|---|
-| E-mail (SMTP o transaccional) | Recordatorios y confirmación (los envíos son de C-12; C-10 no envía e-mail) | MVP | SMTP/REST detrás de un puerto `Notificador` | Gratis (free tier; proveedor a confirmar) |
+| E-mail (SMTP o transaccional) | Recordatorios y confirmación (los envíos son de C-12; C-10 no envía e-mail) | MVP | SMTP con `nodemailer` detrás del puerto `Notificador` (DD-21); Ethereal en desarrollo | Gratis (Ethereal; proveedor de producción con free tier a confirmar) |
 | Enlace `wa.me` (click-to-chat) | Mensaje armado que envía la recepción | MVP | URL generada, sin API | Gratis |
 | Google Calendar | Sincronización opcional | Opcional | REST | Gratis dentro de cuotas |
 | WhatsApp Cloud API (Meta) | Recordatorios automáticos | Post-MVP | REST/webhook | Número de prueba gratis; cobro por mensaje con plantilla en producción (tarifas Argentina: ver `10_preguntas_abiertas.md`) |

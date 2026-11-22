@@ -98,7 +98,8 @@ Usuario     0..1 ── 1 Profesional        (un usuario odontólogo se vincula 
 - Los permisos están en `03_actores_y_roles.md`.
 
 ### Recordatorio
-- `id`, `turnoId`, `canal: 'email' | 'wa_me'`, `programadoPara: Date` (por defecto 24 h antes, **Suposición**), `estado: 'pendiente' | 'enviado' | 'fallido'`, `enlaceWaMe?: string`, `enviadoEn?`.
+- `id`, `turnoId`, `canal: 'email' | 'wa_me'`, `programadoPara: Date` (por defecto 24 h antes, **Suposición**), `estado: 'pendiente' | 'enviado' | 'fallido' | 'cancelado'`, `enlaceWaMe?: string`, `enviadoEn?`, `motivoFallo?: string`.
+- Precisión *(explore C-12, 2026-11-22, DD-21)*: `programadoPara = inicio - RECORDATORIO_HORAS_ANTES` (24 por defecto, SU-07). Un turno tiene a lo sumo un recordatorio `email` `pendiente`: reprogramar el turno reemplaza el pendiente. `cancelado` registra un recordatorio anulado (turno cancelado, ya no activo o ya iniciado al momento del envío). `motivoFallo` describe el error de envío sin datos personales ni token. El recordatorio nunca guarda el token de gestión (ni en claro ni su hash).
 - Para `wa_me`, no hay envío automático: el sistema genera la URL `https://wa.me/<telefono>?text=<mensaje>` y la recepción la abre y envía.
 
 ## Seed data inicial (100 % ficticia)
