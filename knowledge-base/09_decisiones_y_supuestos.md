@@ -148,6 +148,23 @@ C-02 **reutiliza** el `Reloj` (no lo redefine) y C-05 **extiende** `PacienteRepo
 **Justificación**: el paciente necesita saber con quién se atiende; el nombre del profesional es información que el consultorio ya publica. El sillón es un recurso interno (SU-05).
 **Trade-offs aceptados**: ante una carrera, el reintento puede asignar otro profesional; la respuesta lo informa.
 
+### DD-19 — `CancelarTurno`: estados cancelables, errores, atomicidad, campos, roles y recordatorios
+**Decisión** (2026-11-22, explore de C-02, Franco Petri):
+- **Estados cancelables**: solo `reservado → cancelado` y `confirmado → cancelado` (transiciones de `04_modelo_de_datos.md`). Un turno `cancelado`, `atendido` o `ausente` no se cancela. La transición no depende de la hora: recepción, odontólogo y administrador pueden cancelar un turno `confirmado` cuyo `inicio` ya pasó (todavía no marcado `atendido` ni `ausente`); el paciente nunca llega a ese caso porque RN-08 lo rechaza antes.
+- **Orden de evaluación**: turno inexistente (`RecursoNoEncontradoError`, sin código RN), luego transición de estado (`RN-10`), luego anticipación del paciente (`RN-08`). Un paciente que cancela un turno ya cancelado recibe `RN-10`, no `RN-08`.
+- **Errores**: la transición inválida se rechaza con `ReglaNegocioError` de código `RN-10` e informa el `estadoActual` del turno; la falta de anticipación, con código `RN-08`. `CodigoRN` suma `RN-08` y `RN-10`. No se crea una clase de error nueva.
+- **Anticipación (RN-08)**: el paciente cancela solo si `inicio - reloj.ahora() >= 24 h`, medido como diferencia absoluta en milisegundos (`>= 86 400 000`; Argentina no tiene horario de verano). `ahora` sale del puerto `Reloj` de DD-16.
+- **Atomicidad**: `TurnoRepositorio` suma `actualizarSi(id, cambio)`, donde `cambio(actual)` devuelve el turno modificado o una `Violacion`. Es una sección crítica sin `await` (como `agregarSiDisponible`, RN-12): lee el turno actual, ejecuta `cambio` y, solo si no hay violación, lo reemplaza; si hay violación rechaza con `ReglaNegocioError` y no persiste nada. RN-10 y RN-08 se evalúan dentro de `cambio`, con el `ahora` leído antes de entrar. C-03 y C-04 reutilizan la misma operación.
+- **Campos**: `Turno` suma solo `canceladoEn?: Date` y `canceladoPor?: Rol`. `creadoEn` y `actualizadoEn` de `04_modelo_de_datos.md` siguen pendientes (ver `10_preguntas_abiertas.md`).
+- **Roles**: C-02 no hace control de acceso. El odontólogo se trata como la recepción (sin restricción de anticipación) aunque la matriz RBAC de `03_actores_y_roles.md` no le permite cancelar; lo resuelve C-09. Tampoco verifica que el turno sea del paciente (el `Actor` no tiene identidad): lo hace C-11 con el token de gestión.
+- **Recordatorios**: puerto `Recordatorios { cancelarPendientes(turnoId): Promise<void> }` con un adaptador no-op. `CancelarTurno` lo llama solo si la cancelación se concretó, después de `actualizarSi` y fuera de la sección crítica; si falla, el error se propaga y la cancelación persistida no se deshace. C-12 implementa el adaptador real sin modificar `CancelarTurno`.
+- **Token de gestión**: no se invalida al cancelar; `ServicioTokens.resolver` ya rechaza los turnos cancelados (RN-21).
+- **Liberación (RN-09)**: no requiere lógica propia; `esActivo()` ya excluye `cancelado` del alta, de la disponibilidad y del tope de RN-23.
+**Contexto**: el código de C-01/C-10 no tenía campos de cancelación, ni operación de modificación en `TurnoRepositorio`, ni los códigos RN-08/RN-10, ni puerto de recordatorios; la matriz RBAC y el scope de C-02 no coincidían para el odontólogo.
+**Alternativas consideradas**: clase `TransicionInvalidaError` sin código RN; `guardar(turno)` simple (la última escritura pisa a la anterior); agregar también `creadoEn`/`actualizadoEn` (obliga a inyectar el `Reloj` en `AgendarTurno` y tocar tests de C-01 y C-10); rechazar al odontólogo en C-02; no crear el puerto de recordatorios o usar eventos de dominio.
+**Justificación**: reusa el contrato de errores RN de C-01 sin crear reglas nuevas; la sección crítica evita que una cancelación y una reprogramación concurrentes se pisen; mantiene el alcance de C-02 sin modificar código de otros changes ni invadir el dominio CRÍTICO de C-09.
+**Trade-offs aceptados**: hasta C-09 un odontólogo puede cancelar desde el caso de uso; un fallo del adaptador real de recordatorios (C-12) deja la cancelación hecha y el error a cargo de quien llama.
+
 ## Supuestos inferidos
 
 ### SU-01 — E-mail + `wa.me` es suficiente frente a WhatsApp automático

@@ -11,6 +11,8 @@
 | Objeto valor `Intervalo` | `src/domain` | Encapsula `[inicio, fin)` y la prueba de solapamiento |
 | Inyección de dependencias manual | Composición en la raíz | Sin framework de DI; costo $0 y simplicidad |
 | Reloj inyectable (`Reloj`) | Puerto | Probar RN-08 (24 h) y RN-20 de forma determinista; lo crea C-10 y lo reutiliza C-02 (DD-16) |
+| Modificación atómica (`TurnoRepositorio.actualizarSi`) | Puerto + adaptador en memoria | Sección crítica sin `await` para cambiar un turno existente sin que dos operaciones se pisen (RN-12); la crea C-02 y la reutilizan C-03 y C-04 (DD-19) |
+| Puerto de recordatorios (`Recordatorios`) | `src/application/puertos/recordatorios.ts` + `src/adapters/recordatorios/` | C-02 lo crea con un adaptador no-op y cancela los pendientes al cancelar; C-12 implementa el adaptador real (DD-19) |
 
 ## Estructura de directorios (layout según el TP: `src/` y `tests/` en la raíz)
 
@@ -27,9 +29,10 @@ Global-desarrollo/
 │   │   ├── agendar-turno.ts, reprogramar-turno.ts, cancelar-turno.ts
 │   │   ├── reservar-online.ts, consultar-disponibilidad.ts, bloquear-horario.ts
 │   │   ├── generar-recordatorio.ts
-│   │   └── puertos/       # Repositorios, Notificador, Reloj
+│   │   └── puertos/       # Repositorios, Notificador, Reloj, Recordatorios
 │   └── adapters/
 │       ├── persistence/   # repos en memoria (PostgreSQL luego)
+│       ├── recordatorios/ # no-op hasta C-12 (C-02)
 │       ├── http/          # DTO y validador puro de frontera (C-10, sin framework); Fastify opcional después
 │       └── notifications/ # email, generador wa.me
 ├── tests/                 # Vitest: unit (dominio), use-cases, integración

@@ -67,11 +67,13 @@ Usuario     0..1 ── 1 Profesional        (un usuario odontólogo se vincula 
 
 ### Turno
 - `id`, `pacienteId`, `profesionalId`, `sillonId`, `prestacionId`, `inicio: Date`, `fin: Date`, `duracionMinutos: number` (duración efectiva; entero > 0 y múltiplo de 5), `estado: EstadoTurno`, `origen: 'recepcion' | 'online'`, `creadoEn`, `actualizadoEn`, `canceladoEn?`, `canceladoPor?: Rol`.
+  - Implementado (C-02, DD-19): `canceladoEn?: Date` y `canceladoPor?: Rol`, que solo tienen valor en los turnos `cancelado`; un turno cancelado no se borra. `creadoEn` y `actualizadoEn` todavía no existen en el código (pendiente para C-04, ver `10_preguntas_abiertas.md`).
 - `EstadoTurno`: `reservado` (reserva online del paciente, aún sin confirmar; **Decisión DD-11**), `confirmado` (nace así el turno creado por recepción, odontólogo o administrador), `cancelado`, `ausente`, `atendido`. D.3 del informe lista confirmado, cancelado, ausente y atendido.
 - Estados **activos** (ocupan profesional y sillón): `reservado`, `confirmado`, `atendido`. Ver DD-05.
 - Constraints: `fin = inicio + duracionMinutos` efectiva, que por defecto es `prestacion.duracionMinutos` (RN-06, RN-16); profesional, sillón y prestación activos (RN-18); contenido en un único tramo de atención (RN-17); sin solapamiento activo por `profesionalId` (RN-02) ni por `sillonId` (RN-03); dentro de HorarioAtencion y fuera de BloqueoHorario de su profesional y de su sillón (RN-07).
 - Índices: (`profesionalId`, `inicio`), (`sillonId`, `inicio`), (`pacienteId`).
-- Transiciones permitidas: `reservado → confirmado | cancelado`, `confirmado → atendido | ausente | cancelado`. Reprogramar conserva el `id` y cambia `inicio`/`fin`/recursos (ver flujo 3).
+- Transiciones permitidas: `reservado → confirmado | cancelado`, `confirmado → atendido | ausente | cancelado`. Reprogramar conserva el `id` y cambia `inicio`/`fin`/recursos (ver flujo 3). Una transición no permitida hacia `cancelado` se rechaza con `RN-10` informando el estado actual (C-02, DD-19).
+- Modificación atómica: `TurnoRepositorio.actualizarSi(id, cambio)` lee el turno, aplica `cambio` y lo reemplaza sin intercalar otra operación (RN-12); `cambio` devuelve el turno nuevo (con el mismo `id`) o una violación. La usa la cancelación (C-02) y la reutilizan C-03 y C-04.
 
 ### TokenGestion
 - `turnoId`, `hash: string` (SHA-256 del token, hexadecimal en minúsculas), `creadoEn`, `invalidadoEn?` (lo fija `rotar`; un token invalidado no resuelve).

@@ -19,13 +19,15 @@ import { RelojFijo } from './reloj-fijo.js';
 import { TurnoRepositorioDePrueba } from './turno-repositorio-de-prueba.js';
 import { TurnoRepositorioEnMemoria } from '../../src/adapters/persistence/en-memoria/turno-repositorio.js';
 import { AgendarTurno } from '../../src/application/agendar-turno.js';
+import { CancelarTurno } from '../../src/application/cancelar-turno.js';
+import { RecordatoriosEspia } from './recordatorios-espia.js';
 import { ConsultarDisponibilidad } from '../../src/application/consultar-disponibilidad.js';
 import type { ConsultarDisponibilidadInput } from '../../src/application/consultar-disponibilidad-input.js';
 import type { GeneradorId } from '../../src/application/puertos/generador-id.js';
 import type { Rol } from '../../src/domain/actor.js';
 import type { Hueco } from '../../src/domain/disponibilidad/hueco.js';
 import type { Turno } from '../../src/domain/turno.js';
-import { crearEntorno, type Entorno, LUNES, local } from './seed.js';
+import { crearEntorno, crearTurno, type Entorno, LUNES, local } from './seed.js';
 
 /** Ids deterministas: t-1, t-2, ... */
 export class GeneradorIdSecuencial implements GeneradorId {
@@ -241,4 +243,71 @@ export async function rechazoPublico(promesa: Promise<unknown>): Promise<ErrorRe
     throw new Error(`Se esperaba un ErrorReservaPublica y llegó: ${String(error)}`);
   }
   return error;
+}
+
+// ---------------------------------------------------------------------------------------------
+// Cancelación (C-02)
+
+/** Turno base del spec de cancelación: confirmado, pa1, p1, s1, pr1, lunes 09:00-09:30. */
+export function turnoBaseCancelacion(overrides: Partial<Turno> = {}): Turno {
+  return crearTurno({
+    id: 't-base',
+    prestacionId: 'pr1',
+    inicio: local(LUNES, '09:00'),
+    fin: local(LUNES, '09:30'),
+    duracionMinutos: 30,
+    ...overrides,
+  });
+}
+
+export type OpcionesSistemaCancelacion = Partial<Entorno> & {
+  /** Instante del reloj fijo; por defecto el domingo 2026-11-22 08:00 local. */
+  readonly ahora?: Date;
+};
+
+export interface SistemaCancelacion {
+  readonly datos: Entorno;
+  readonly reloj: RelojFijo;
+  readonly turnos: TurnoRepositorioDePrueba;
+  readonly recordatorios: RecordatoriosEspia;
+  readonly agendarTurno: AgendarTurno;
+  readonly consultarDisponibilidad: ConsultarDisponibilidad;
+  readonly cancelarTurno: CancelarTurno;
+}
+
+/** Cableado de la cancelación: repos en memoria, reloj fijo y espía de recordatorios. */
+export function crearSistemaCancelacion(opciones: OpcionesSistemaCancelacion = {}): SistemaCancelacion {
+  const { ahora, ...overrides } = opciones;
+  const datos = crearEntorno(overrides);
+  const reloj = new RelojFijo(ahora ?? AHORA_POR_DEFECTO);
+  const turnos = new TurnoRepositorioDePrueba(datos.turnos);
+  const recordatorios = new RecordatoriosEspia();
+  const repos = {
+    profesionales: new ProfesionalRepositorioEnMemoria(datos.profesionales),
+    sillones: new SillonRepositorioEnMemoria(datos.sillones),
+    prestaciones: new PrestacionRepositorioEnMemoria(datos.prestaciones),
+    consultorios: new ConsultorioRepositorioEnMemoria([datos.consultorio]),
+    horarios: new HorarioAtencionRepositorioEnMemoria(datos.horarios),
+    bloqueos: new BloqueoRepositorioEnMemoria(datos.bloqueos),
+    turnos,
+  };
+  const agendarTurno = new AgendarTurno({ ...repos, ids: new GeneradorIdSecuencial() });
+  const consultarDisponibilidad = new ConsultarDisponibilidad(repos);
+  const cancelarTurno = new CancelarTurno({ turnos, reloj, recordatorios });
+  return { datos, reloj, turnos, recordatorios, agendarTurno, consultarDisponibilidad, cancelarTurno };
+}
+
+/** Cancela con el rol indicado (por defecto recepción). */
+export function cancelar(sistema: SistemaCancelacion, c: { turnoId: string; rol?: Rol }): Promise<Turno> {
+  return sistema.cancelarTurno.ejecutar({ turnoId: c.turnoId, actor: { rol: c.rol ?? 'recepcion' } });
+}
+
+/** Espera un rechazo y devuelve el error; falla si la promesa se resuelve. */
+export async function rechazo(promesa: Promise<unknown>): Promise<unknown> {
+  const resultado = await promesa.then(
+    () => ({ resuelta: true as const }),
+    (error: unknown) => ({ resuelta: false as const, error }),
+  );
+  if (resultado.resuelta) throw new Error('Se esperaba un rechazo y la promesa se resolvió');
+  return resultado.error;
 }

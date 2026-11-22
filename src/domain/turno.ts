@@ -15,6 +15,10 @@ export interface Turno {
   readonly duracionMinutos: number;
   readonly estado: EstadoTurno;
   readonly origen: OrigenTurno;
+  /** Instante en que se canceló (solo en turnos `cancelado`, DD-19). */
+  readonly canceladoEn?: Date;
+  /** Rol del actor que canceló (solo en turnos `cancelado`, DD-19). */
+  readonly canceladoPor?: Rol;
 }
 
 /** Estados que ocupan profesional y sillón (DD-05). Único predicado de ocupación. */

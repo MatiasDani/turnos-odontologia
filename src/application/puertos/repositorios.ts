@@ -43,6 +43,11 @@ export interface BloqueoRepositorio {
   ): Promise<readonly BloqueoHorario[]>;
 }
 
+/** Resultado de un cambio sobre un turno: el turno nuevo o la regla que lo impide (C-02, DD-19). */
+export type ResultadoCambio =
+  | { readonly ok: true; readonly turno: Turno }
+  | { readonly ok: false; readonly violacion: Violacion };
+
 export interface TurnoRepositorio {
   /**
    * Operación atómica (RN-12): lee los turnos del profesional y del sillón del candidato,
@@ -62,6 +67,14 @@ export interface TurnoRepositorio {
 
   /** Turnos del paciente, de cualquier estado. */
   listarPorPaciente(pacienteId: string): Promise<readonly Turno[]>;
+
+  /**
+   * Operación atómica de modificación (RN-12, DD-19): lee el turno actual, ejecuta `cambio` con él
+   * y, si el resultado es `ok`, lo reemplaza y resuelve con el turno nuevo. Si `cambio` informa una
+   * violación rechaza con `ReglaNegocioError` y no modifica nada. Un id inexistente rechaza con
+   * `RecursoNoEncontradoError('turno', id)`. El turno devuelto por `cambio` debe conservar el `id`.
+   */
+  actualizarSi(id: string, cambio: (actual: Turno) => ResultadoCambio): Promise<Turno>;
 }
 
 export interface PacienteRepositorio {

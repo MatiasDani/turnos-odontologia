@@ -71,7 +71,7 @@ Recepción → Caso de uso AgendarTurno → Dominio (reglas) → Repositorio (at
 4. Se cancelan los recordatorios pendientes.
 5. (DIF, fuera de MVP) Se ofrecería el hueco a la lista de espera.
 
-**Casos de error**: turno ya cancelado o atendido → rechazo; paciente con menos de 24 h → `RN-08`.
+**Casos de error** (en este orden, DD-19): turno inexistente → no encontrado; turno `cancelado`, `atendido` o `ausente` → `RN-10`; paciente con menos de 24 h → `RN-08`.
 
 ## Flujo 5: Bloquear horarios
 
