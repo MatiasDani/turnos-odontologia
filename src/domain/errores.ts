@@ -10,7 +10,8 @@ export type CodigoRN =
   | 'RN-10'
   | 'RN-16'
   | 'RN-17'
-  | 'RN-18';
+  | 'RN-18'
+  | 'RN-24';
 export type RecursoBloqueado = 'profesional' | 'sillon';
 
 /** Resultado de una regla pura que no se cumple. */

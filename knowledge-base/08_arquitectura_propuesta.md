@@ -24,9 +24,10 @@ Global-desarrollo/
 │   │   ├── turno.ts
 │   │   ├── profesional.ts, sillon.ts, prestacion.ts, paciente.ts
 │   │   ├── bloqueo-horario.ts, horario-atencion.ts
-│   │   └── reglas/        # validaciones RN-01..RN-07
+│   │   └── reglas/        # validaciones RN-01..RN-07; transiciones.ts (tabla única de estados, DD-20), cancelacion.ts, estados.ts (RN-10, RN-24)
 │   ├── application/       # casos de uso y puertos
 │   │   ├── agendar-turno.ts, reprogramar-turno.ts, cancelar-turno.ts
+│   │   ├── confirmar-turno.ts, marcar-atendido.ts, marcar-ausente.ts (C-04, sobre cambiar-estado-turno.ts)
 │   │   ├── reservar-online.ts, consultar-disponibilidad.ts, bloquear-horario.ts
 │   │   ├── generar-recordatorio.ts
 │   │   └── puertos/       # Repositorios, Notificador, Reloj, Recordatorios

@@ -20,6 +20,9 @@ import { TurnoRepositorioDePrueba } from './turno-repositorio-de-prueba.js';
 import { TurnoRepositorioEnMemoria } from '../../src/adapters/persistence/en-memoria/turno-repositorio.js';
 import { AgendarTurno } from '../../src/application/agendar-turno.js';
 import { CancelarTurno } from '../../src/application/cancelar-turno.js';
+import { ConfirmarTurno } from '../../src/application/confirmar-turno.js';
+import { MarcarAtendido } from '../../src/application/marcar-atendido.js';
+import { MarcarAusente } from '../../src/application/marcar-ausente.js';
 import { RecordatoriosEspia } from './recordatorios-espia.js';
 import { ConsultarDisponibilidad } from '../../src/application/consultar-disponibilidad.js';
 import type { ConsultarDisponibilidadInput } from '../../src/application/consultar-disponibilidad-input.js';
@@ -273,9 +276,13 @@ export interface SistemaCancelacion {
   readonly agendarTurno: AgendarTurno;
   readonly consultarDisponibilidad: ConsultarDisponibilidad;
   readonly cancelarTurno: CancelarTurno;
+  /** Casos de uso de estado (C-04), sobre los mismos repos y reloj. */
+  readonly confirmarTurno: ConfirmarTurno;
+  readonly marcarAtendido: MarcarAtendido;
+  readonly marcarAusente: MarcarAusente;
 }
 
-/** Cableado de la cancelación: repos en memoria, reloj fijo y espía de recordatorios. */
+/** Cableado de la cancelación y los estados: repos en memoria, reloj fijo y espía de recordatorios. */
 export function crearSistemaCancelacion(opciones: OpcionesSistemaCancelacion = {}): SistemaCancelacion {
   const { ahora, ...overrides } = opciones;
   const datos = crearEntorno(overrides);
@@ -294,12 +301,46 @@ export function crearSistemaCancelacion(opciones: OpcionesSistemaCancelacion = {
   const agendarTurno = new AgendarTurno({ ...repos, ids: new GeneradorIdSecuencial() });
   const consultarDisponibilidad = new ConsultarDisponibilidad(repos);
   const cancelarTurno = new CancelarTurno({ turnos, reloj, recordatorios });
-  return { datos, reloj, turnos, recordatorios, agendarTurno, consultarDisponibilidad, cancelarTurno };
+  const confirmarTurno = new ConfirmarTurno({ turnos, reloj });
+  const marcarAtendido = new MarcarAtendido({ turnos, reloj });
+  const marcarAusente = new MarcarAusente({ turnos, reloj });
+  return {
+    datos,
+    reloj,
+    turnos,
+    recordatorios,
+    agendarTurno,
+    consultarDisponibilidad,
+    cancelarTurno,
+    confirmarTurno,
+    marcarAtendido,
+    marcarAusente,
+  };
 }
 
 /** Cancela con el rol indicado (por defecto recepción). */
 export function cancelar(sistema: SistemaCancelacion, c: { turnoId: string; rol?: Rol }): Promise<Turno> {
   return sistema.cancelarTurno.ejecutar({ turnoId: c.turnoId, actor: { rol: c.rol ?? 'recepcion' } });
+}
+
+// ---------------------------------------------------------------------------------------------
+// Estados del turno (C-04)
+
+type CambioDeEstado = { turnoId: string; rol?: Rol };
+
+/** Confirma con el rol indicado (por defecto recepción). */
+export function confirmar(sistema: SistemaCancelacion, c: CambioDeEstado): Promise<Turno> {
+  return sistema.confirmarTurno.ejecutar({ turnoId: c.turnoId, actor: { rol: c.rol ?? 'recepcion' } });
+}
+
+/** Marca atendido con el rol indicado (por defecto recepción). */
+export function marcarAtendido(sistema: SistemaCancelacion, c: CambioDeEstado): Promise<Turno> {
+  return sistema.marcarAtendido.ejecutar({ turnoId: c.turnoId, actor: { rol: c.rol ?? 'recepcion' } });
+}
+
+/** Marca ausente con el rol indicado (por defecto recepción). */
+export function marcarAusente(sistema: SistemaCancelacion, c: CambioDeEstado): Promise<Turno> {
+  return sistema.marcarAusente.ejecutar({ turnoId: c.turnoId, actor: { rol: c.rol ?? 'recepcion' } });
 }
 
 /** Espera un rechazo y devuelve el error; falla si la promesa se resuelve. */
