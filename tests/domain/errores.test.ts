@@ -40,6 +40,23 @@ describe('ReglaNegocioError', () => {
     expect(e.bloqueoEnConflicto).toBe(bloqueo);
     expect(e.recursoBloqueado).toBe('sillon');
   });
+
+  test('RN-10 preserva el estado actual del turno', () => {
+    const e = new ReglaNegocioError({ codigo: 'RN-10', estadoActual: 'atendido' });
+    expect(e.codigo).toBe('RN-10');
+    expect(e.estadoActual).toBe('atendido');
+  });
+
+  test('RN-10 con otro estado actual', () => {
+    const e = new ReglaNegocioError({ codigo: 'RN-10', estadoActual: 'cancelado' });
+    expect(e.estadoActual).toBe('cancelado');
+  });
+
+  test('RN-08 sin estado actual', () => {
+    const e = new ReglaNegocioError({ codigo: 'RN-08' });
+    expect(e.codigo).toBe('RN-08');
+    expect(e.estadoActual).toBeUndefined();
+  });
 });
 
 describe('RecursoNoEncontradoError', () => {

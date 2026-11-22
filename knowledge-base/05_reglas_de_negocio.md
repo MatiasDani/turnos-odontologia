@@ -59,11 +59,14 @@ Definición operativa: un turno es **activo** si su estado es `reservado`, `conf
 ## Dominio: Cancelación y reprogramación
 
 - **RN-08**: el paciente puede cancelar o reprogramar online solo con 24 h o más de anticipación respecto de `inicio`. Con menos de 24 h, solo puede hacerlo la recepción. (Con exactamente 24 h se permite: umbral `>= 24 h`.)
+  - Precisión *(explore C-02, 2026-11-22, DD-19)*: la anticipación es `inicio - ahora >= 24 h` medida en milisegundos, con `ahora` del puerto `Reloj`. El rechazo lleva el código `RN-08` y se evalúa después de la transición de estado (RN-10).
 - **RN-09**: cancelar un turno libera el horario del profesional y del sillón.
+  - Precisión *(explore C-02, 2026-11-22, DD-19)*: se cumple porque un turno `cancelado` no es activo (DD-05); el turno no se borra y registra `canceladoPor` (rol) y `canceladoEn`.
 
 ## Dominio: Ciclo de vida del turno (derivadas de D.3, no del checklist)
 
 - **RN-10** *(derivada de D.3)*: todo turno tiene un estado entre `reservado`, `confirmado`, `cancelado`, `ausente` y `atendido`. D.3 lista confirmado, cancelado, ausente y atendido; `reservado` es el estado inicial de la reserva online del paciente; el alta interna nace `confirmado` (DD-11).
+  - Precisión *(explore C-02, 2026-11-22, DD-19)*: solo se cancela desde `reservado` o `confirmado`, sin importar si el `inicio` ya pasó; cancelar un turno `cancelado`, `atendido` o `ausente` se rechaza con el código `RN-10`, informando el estado actual del turno.
 - **RN-11** *(derivada, suposición)*: reprogramar es atómico: el turno nuevo se valida contra RN-01 a RN-07 ignorando el propio turno; si falla, el turno original queda intacto. Cumple RN-09 al liberar el horario original solo si la reprogramación se concreta.
 - **RN-12** *(derivada de RN-04, suposición)*: la validación de solapamiento y la persistencia deben ser atómicas para evitar condiciones de carrera entre dos reservas simultáneas (reserva online más recepción). En memoria: sección crítica; en PostgreSQL: restricción de exclusión o transacción serializable.
 
@@ -96,5 +99,5 @@ Definición operativa: un turno es **activo** si su estado es `reservado`, `conf
 ## Dominio: Excepciones globales
 
 - Ninguna regla de agenda (RN-01 a RN-07, RN-17, RN-18) admite excepción por rol ni por canal (RN-04).
-- RN-08 se aplica solo al paciente; la recepción y el administrador pueden cancelar o reprogramar con cualquier anticipación, siempre respetando RN-01 a RN-07, RN-17 y RN-18.
+- RN-08 se aplica solo al paciente; la recepción y el administrador pueden cancelar o reprogramar con cualquier anticipación, siempre respetando RN-01 a RN-07, RN-17 y RN-18. Hasta C-09, el caso de uso de cancelación trata al odontólogo como a la recepción (DD-19).
 - Bloqueo creado sobre turnos existentes: sin regla confirmada (pregunta abierta; ver DD-06 como suposición provisoria).

@@ -152,7 +152,7 @@ Carriles: **A** = núcleo y reserva online (Matías: C-01 → C-07 → C-10); **
   - `knowledge-base/08_arquitectura_propuesta.md` §Orden de implementación sugerido, §Estrategia de pruebas
 
 ### [C-02] `cancelar-turno-liberando-horario`
-- **Estado**: `[ ]` pendiente
+- **Estado**: `[x]` completado (archivado 2026-11-22)
 - **Owner**: Franco Petri (52080)
 - **Scope**:
   - Caso de uso `CancelarTurno`: estado → `cancelado`, registra `canceladoPor` (Rol) y `canceladoEn`; rechaza si ya está cancelado o atendido (transiciones de `04_modelo_de_datos.md`)
