@@ -32,6 +32,14 @@
       "sessions": 1,
       "memories": 5,
       "prompts": 0
+    },
+    {
+      "id": "8e63eec3",
+      "created_by": "franq",
+      "created_at": "2026-11-22T18:09:40.0192119Z",
+      "sessions": 1,
+      "memories": 4,
+      "prompts": 0
     }
   ]
 }

@@ -57,6 +57,13 @@ describe('ReglaNegocioError', () => {
     expect(e.codigo).toBe('RN-08');
     expect(e.estadoActual).toBeUndefined();
   });
+
+  test('RN-24 (cierre antes del inicio) sin estado actual', () => {
+    const e = new ReglaNegocioError({ codigo: 'RN-24' });
+    expect(e.codigo).toBe('RN-24');
+    expect(e.message).toBe('Regla de negocio violada: RN-24');
+    expect(e.estadoActual).toBeUndefined();
+  });
 });
 
 describe('RecursoNoEncontradoError', () => {

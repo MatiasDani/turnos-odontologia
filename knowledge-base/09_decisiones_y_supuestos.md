@@ -165,6 +165,23 @@ C-02 **reutiliza** el `Reloj` (no lo redefine) y C-05 **extiende** `PacienteRepo
 **Justificación**: reusa el contrato de errores RN de C-01 sin crear reglas nuevas; la sección crítica evita que una cancelación y una reprogramación concurrentes se pisen; mantiene el alcance de C-02 sin modificar código de otros changes ni invadir el dominio CRÍTICO de C-09.
 **Trade-offs aceptados**: hasta C-09 un odontólogo puede cancelar desde el caso de uso; un fallo del adaptador real de recordatorios (C-12) deja la cancelación hecha y el error a cargo de quien llama.
 
+### DD-20 — Estados del turno: transiciones, RN-24, campos, roles y errores
+**Decisión** (2026-11-22, explore de C-04, Franco Petri):
+- **Casos de uso**: `ConfirmarTurno` (`reservado → confirmado`), `MarcarAtendido` y `MarcarAusente` (`confirmado → atendido | ausente`). Entrada `{ turnoId, actor }`, igual que `CancelarTurno`; devuelven el turno modificado.
+- **Tabla única de transiciones**: el dominio define una sola tabla de transiciones permitidas (`reservado → confirmado | cancelado`, `confirmado → atendido | ausente | cancelado`) con un predicado `puedeTransicionar(desde, hacia)`. La cancelación (C-02) pasa a usarla en lugar de su lista propia, sin cambiar su comportamiento.
+- **Errores**: una transición no permitida, incluida repetir la misma (confirmar un `confirmado`), se rechaza con `ReglaNegocioError` de código `RN-10` y `estadoActual`. No se crea una clase de error nueva.
+- **Restricción horaria (RN-24)**: `atendido` y `ausente` solo con `ahora >= inicio` (inclusivo); antes, `RN-24`. Confirmar no tiene restricción horaria: un turno `reservado` cuyo `inicio` ya pasó se puede confirmar (el paciente por token no llega a ese caso porque el token vence en el `fin`, RN-21).
+- **Orden de evaluación**: turno inexistente (`RecursoNoEncontradoError`), luego transición (`RN-10`), luego hora (`RN-24`).
+- **Atomicidad**: reutiliza `TurnoRepositorio.actualizarSi` (DD-19); las reglas se evalúan dentro de `cambio` con el `ahora` leído una sola vez antes de entrar.
+- **Campos**: C-04 no agrega campos a `Turno`. `creadoEn`/`actualizadoEn` se posponen al change que integre la persistencia real; tampoco se agregan `confirmadoEn`, `atendidoEn` ni `ausenteEn`.
+- **Roles**: C-04 no hace control de acceso; el `actor` viaja en la entrada por contrato, pero ninguna regla lo usa. Quién puede confirmar o cerrar un turno lo resuelve C-09 (pregunta abierta).
+- **Recordatorios**: sin hook. Al cerrar un turno su hora ya pasó; la confirmación desde el recordatorio la cablea C-12 llamando a `ConfirmarTurno`.
+- **Liberación**: `ausente` libera profesional y sillón sin lógica nueva porque `esActivo()` ya lo excluye (DD-05); `atendido` sigue ocupando.
+**Contexto**: el scope de C-04 no menciona timestamps ni horarios; el Flujo 7 dice que el cierre se hace "después de la hora del turno"; la matriz RBAC no tiene fila para cambiar el estado.
+**Alternativas consideradas**: agregar `creadoEn`/`actualizadoEn` obligatorios (toca C-01, C-10 y unos 55 asserts de tests); campos por transición (`confirmadoEn`, `atendidoEn`, `ausenteEn`); permitir el cierre sin restricción horaria; un único caso de uso `CambiarEstado(hacia)`; una lista de estados por caso de uso.
+**Justificación**: mantiene C-04 acotado a su scope sin modificar código de otros changes; RN-24 evita liberar un horario por un `ausente` marcado por error antes del turno; una sola tabla evita que cancelación y estados diverjan.
+**Trade-offs aceptados**: el modelo de la KB sigue teniendo `creadoEn`/`actualizadoEn` sin implementar; hasta C-09 cualquier rol (incluido el paciente) puede cerrar un turno desde el caso de uso, aunque ninguna ruta pública lo expone.
+
 ## Supuestos inferidos
 
 ### SU-01 — E-mail + `wa.me` es suficiente frente a WhatsApp automático

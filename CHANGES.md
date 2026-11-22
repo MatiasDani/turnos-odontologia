@@ -187,7 +187,7 @@ Carriles: **A** = núcleo y reserva online (Matías: C-01 → C-07 → C-10); **
   - `knowledge-base/08_arquitectura_propuesta.md` §Estrategia de pruebas (reprogramación atómica)
 
 ### [C-04] `gestionar-estados-turno`
-- **Estado**: `[ ]` pendiente
+- **Estado**: `[x]` completado (archivado 2026-11-22)
 - **Owner**: Franco Petri (52080)
 - **Scope**:
   - Casos de uso `ConfirmarTurno`, `MarcarAtendido`, `MarcarAusente` con transiciones válidas únicamente: `reservado → confirmado`, `confirmado → atendido | ausente` (cancelación en C-02)
