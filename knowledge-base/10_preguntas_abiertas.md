@@ -34,7 +34,7 @@
 | Resuelta | ¿Qué zona horaria se usa? ¿Una por consultorio? | n/a | Resuelta el 2026-11-21: IANA por consultorio (DD-09) |
 | Resuelta | ¿El paciente necesita registrarse o alcanza con DNI y teléfono para reservar? | n/a | Resuelta el 2026-11-21 (explore de C-10): alta mínima sin cuenta con DNI, nombre, apellido, teléfono y consentimiento de contacto (DD-14, DD-17, RN-22) |
 | Media | ¿Cuáles son las tarifas vigentes de WhatsApp Business Platform para Argentina? | Etapa WhatsApp Cloud API | Equipo (verificar en Meta) |
-| Baja | ¿Qué proveedor de e-mail (SMTP/transaccional) con free tier se usa? | Change de recordatorios | Equipo técnico |
+| Baja | ¿Qué proveedor de e-mail (SMTP/transaccional) con free tier se usa en producción? Para desarrollo y demo se decidió Ethereal con `nodemailer` (DD-21, 2026-11-22) | Post-MVP | Equipo técnico |
 | Resuelta | ¿Qué stack tecnológico se usa? | n/a | Decidido: ver DD-01 |
 
 ### Datos "No evidenciado" o no verificables del informe
@@ -79,7 +79,10 @@
 | Resuelta | ¿Qué transiciones cubre C-04, con qué error se rechazan y si el cierre del turno tiene restricción horaria? | n/a | Resuelta el 2026-11-22 (explore de C-04): `reservado → confirmado` y `confirmado → atendido / ausente`; transición inválida o repetida `RN-10`; `atendido`/`ausente` solo con `ahora >= inicio` (RN-24) (DD-20) |
 | Media | La matriz RBAC no tiene fila para cambiar el estado del turno (confirmar, marcar atendido o ausente). C-04 no controla roles: ¿quién puede confirmar (paciente por token, recepción, administrador) y quién puede cerrar el turno (recepción, odontólogo, administrador)? | C-09 | Lautaro Medina (C-09) |
 | Media | La matriz RBAC no permite cancelar ni reprogramar al odontólogo, pero `CancelarTurno` (C-02) no controla roles y lo trata como a la recepción. C-09 debe cubrir cancelar y reprogramar en el control de acceso | C-09 | Lautaro Medina (C-09) |
-| Baja | Si el adaptador real de recordatorios (C-12) falla al cancelar, la cancelación ya quedó persistida y el error se propaga (DD-19). ¿Se reintenta o se registra para un proceso posterior? | C-12 | Franco Petri (C-12) |
+| Resuelta | Si el adaptador real de recordatorios (C-12) falla al cancelar, la cancelación ya quedó persistida y el error se propaga (DD-19). ¿Se reintenta o se registra para un proceso posterior? | n/a | Resuelta el 2026-11-22 (explore de C-12): sin reintento; el barrido revalida el estado del turno antes de enviar y marca `cancelado` el pendiente de un turno que ya no está activo (RN-25, DD-21) |
+| Media | ¿Qué proceso ejecuta periódicamente `EnviarRecordatoriosPendientes` (cron, `setInterval`) y cada cuánto? | C-14 o el change que integre HTTP | Equipo (C-14) |
+| Media | C-03 debe llamar a `Recordatorios.programar(turnoId)` después de reprogramar el turno para mover el recordatorio (DD-21) | C-03 | Luka Garro (C-03) |
+| Baja | El token de la respuesta de la reserva deja de valer cuando sale el recordatorio (rotación, RN-21). C-11 resuelve con `resolver` y no necesita cambios, pero la pantalla de C-14 debería avisar que el enlace vigente es el del último e-mail | C-11, C-14 | Luka Garro (C-11), Alejo Carabelli (C-14) |
 | Baja | Versión mínima de Node LTS y de Vitest a fijar | Inicialización del proyecto | Equipo técnico |
 
 ### Campos de discovery con baja confianza

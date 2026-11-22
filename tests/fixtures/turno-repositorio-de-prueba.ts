@@ -22,6 +22,18 @@ export class TurnoRepositorioDePrueba extends TurnoRepositorioEnMemoria {
     this.turnos[indice] = { ...actual, estado };
   }
 
+  /**
+   * Mueve un turno a otro `inicio` conservando su duración, sin reglas (C-12: simula lo que hará
+   * `ReprogramarTurno` de C-03, que todavía no existe).
+   */
+  moverTurno(id: string, inicio: Date): void {
+    const indice = this.turnos.findIndex((t) => t.id === id);
+    const actual = this.turnos[indice];
+    if (actual === undefined) throw new Error(`Turno de prueba inexistente: ${id}`);
+    const fin = new Date(inicio.getTime() + (actual.fin.getTime() - actual.inicio.getTime()));
+    this.turnos[indice] = { ...actual, inicio, fin };
+  }
+
   /** Inserta un turno sin validar (lo que haría recepción por otro canal). */
   insertar(turno: Turno): void {
     this.turnos.push(turno);

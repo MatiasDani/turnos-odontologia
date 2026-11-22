@@ -52,3 +52,22 @@ export function deHoraLocal(fecha: string, minutos: number, zona: string): Date 
   instante = pared - (paredComoUtc(new Date(instante), zona) - instante);
   return new Date(instante);
 }
+
+/**
+ * Fecha y hora de pared de `instante` en `zona` para mostrar al paciente: `"lunes 23/11/2026 09:00"`
+ * (DD-09, RN-25).
+ */
+export function formatearFechaHoraLocal(instante: Date, zona: string): string {
+  const partes = new Intl.DateTimeFormat('es-AR', {
+    timeZone: zona,
+    hourCycle: 'h23',
+    weekday: 'long',
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).formatToParts(instante);
+  const valor = (tipo: string): string => partes.find((p) => p.type === tipo)?.value ?? '';
+  return `${valor('weekday')} ${valor('day')}/${valor('month')}/${valor('year')} ${valor('hour')}:${valor('minute')}`;
+}

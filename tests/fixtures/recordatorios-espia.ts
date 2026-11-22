@@ -3,6 +3,7 @@ import type { Recordatorios } from '../../src/application/puertos/recordatorios.
 /** Doble de prueba: registra cada pedido de cancelación y puede configurarse para rechazar. */
 export class RecordatoriosEspia implements Recordatorios {
   private readonly pedidos: string[] = [];
+  private readonly pedidosProgramar: string[] = [];
   private error: Error | undefined;
 
   /** Turnos para los que se pidió cancelar recordatorios, en orden. */
@@ -18,5 +19,15 @@ export class RecordatoriosEspia implements Recordatorios {
   cancelarPendientes(turnoId: string): Promise<void> {
     this.pedidos.push(turnoId);
     return this.error === undefined ? Promise.resolve() : Promise.reject(this.error);
+  }
+
+  /** Turnos para los que se pidió programar recordatorio, en orden (C-12). */
+  get programados(): readonly string[] {
+    return [...this.pedidosProgramar];
+  }
+
+  programar(turnoId: string): Promise<void> {
+    this.pedidosProgramar.push(turnoId);
+    return Promise.resolve();
   }
 }

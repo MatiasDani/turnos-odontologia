@@ -24,18 +24,21 @@ Global-desarrollo/
 │   │   ├── turno.ts
 │   │   ├── profesional.ts, sillon.ts, prestacion.ts, paciente.ts
 │   │   ├── bloqueo-horario.ts, horario-atencion.ts
-│   │   └── reglas/        # validaciones RN-01..RN-07; transiciones.ts (tabla única de estados, DD-20), cancelacion.ts, estados.ts (RN-10, RN-24)
+│   │   ├── recordatorio.ts (C-12)
+│   │   └── reglas/        # validaciones RN-01..RN-07; transiciones.ts (tabla única de estados, DD-20), cancelacion.ts, estados.ts (RN-10, RN-24), recordatorios.ts (RN-25)
 │   ├── application/       # casos de uso y puertos
 │   │   ├── agendar-turno.ts, reprogramar-turno.ts, cancelar-turno.ts
 │   │   ├── confirmar-turno.ts, marcar-atendido.ts, marcar-ausente.ts (C-04, sobre cambiar-estado-turno.ts)
 │   │   ├── reservar-online.ts, consultar-disponibilidad.ts, bloquear-horario.ts
-│   │   ├── generar-recordatorio.ts
+│   │   ├── recordatorios-email.ts, agendar-turno-con-recordatorio.ts, enviar-recordatorios-pendientes.ts,
+│   │   │   confirmar-desde-enlace.ts, listar-recordatorios-fallidos.ts (C-12, DD-21)
 │   │   └── puertos/       # Repositorios, Notificador, Reloj, Recordatorios
 │   └── adapters/
 │       ├── persistence/   # repos en memoria (PostgreSQL luego)
-│       ├── recordatorios/ # no-op hasta C-12 (C-02)
+│       ├── recordatorios/ # no-op para cableados sin recordatorios (C-02, C-12)
 │       ├── http/          # DTO y validador puro de frontera (C-10, sin framework); Fastify opcional después
-│       └── notifications/ # email, generador wa.me
+│       ├── notificador/   # SMTP con nodemailer (C-12); generador wa.me (C-13)
+│       └── config/        # lectura y validación de variables de entorno (C-12)
 ├── tests/                 # Vitest: unit (dominio), use-cases, integración
 ├── docs/                  # fuentes (discovery)
 ├── knowledge-base/
@@ -75,8 +78,8 @@ Luego: cancelar, reprogramar, disponibilidad, reserva online, recordatorios.
 | `PORT` | Puerto de la API | `3000` | N |
 | `TZ_CONSULTORIO` | Zona horaria por defecto | `America/Argentina/Buenos_Aires` | N |
 | `JWT_SECRET` | Secreto de firma de sesiones | `cambiar-en-local` | Y |
-| `SMTP_HOST` / `SMTP_PORT` | Servidor de e-mail (free tier) | `smtp.ejemplo.test` / `587` | N |
-| `SMTP_USER` / `SMTP_PASS` | Credenciales del e-mail | (vacío en ejemplo) | Y |
+| `SMTP_HOST` / `SMTP_PORT` | Servidor de e-mail (free tier); TLS directo solo con el puerto 465 | `smtp.ethereal.email` / `587` | N |
+| `SMTP_USER` / `SMTP_PASS` | Credenciales del e-mail; `SMTP_USER` es también el remitente. Obligatorias al usar SMTP | (vacío en ejemplo) | Y |
 | `BASE_URL_PUBLICA` | Base para enlaces de reserva y gestión | `http://localhost:3000` | N |
-| `RECORDATORIO_HORAS_ANTES` | Anticipación del recordatorio | `24` | N |
+| `RECORDATORIO_HORAS_ANTES` | Anticipación del recordatorio en horas (entero de 1 a 720; 24 si falta) | `24` | N |
 | `DATABASE_URL` | PostgreSQL (post-MVP) | `postgres://usuario:clave@localhost:5432/turnos` | Y |

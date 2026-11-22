@@ -43,4 +43,16 @@ describe('PacienteRepositorioEnMemoria', () => {
     await expect(repo.obtenerPorDni('00000004')).resolves.toMatchObject({ telefono: '5491100000099' });
     expect(repo.todos()).toHaveLength(1);
   });
+
+  test('obtenerPorId devuelve el paciente con ese id (C-12)', async () => {
+    const { pacientes } = crearEntorno();
+    const repo = new PacienteRepositorioEnMemoria([...pacientes, pacienteFicticio4]);
+    await expect(repo.obtenerPorId('pa2')).resolves.toMatchObject({ id: 'pa2', nombre: 'Diego' });
+    await expect(repo.obtenerPorId('pa4')).resolves.toEqual(pacienteFicticio4);
+  });
+
+  test('obtenerPorId con un id desconocido devuelve undefined', async () => {
+    const repo = new PacienteRepositorioEnMemoria([pacienteFicticio4]);
+    await expect(repo.obtenerPorId('pa9')).resolves.toBeUndefined();
+  });
 });

@@ -6,6 +6,7 @@ import type { Intervalo } from '../../domain/intervalo.js';
 import type { Paciente } from '../../domain/paciente.js';
 import type { Prestacion } from '../../domain/prestacion.js';
 import type { Profesional } from '../../domain/profesional.js';
+import type { EstadoRecordatorio, Recordatorio } from '../../domain/recordatorio.js';
 import type { Sillon } from '../../domain/sillon.js';
 import type { TokenGestion } from '../../domain/token-gestion.js';
 import type { Turno } from '../../domain/turno.js';
@@ -80,6 +81,8 @@ export interface TurnoRepositorio {
 export interface PacienteRepositorio {
   /** Paciente con ese DNI normalizado, o `undefined` si no existe. */
   obtenerPorDni(dni: string): Promise<Paciente | undefined>;
+  /** Paciente por id, o `undefined` si no existe (C-12: e-mail y consentimiento del turno). */
+  obtenerPorId(id: string): Promise<Paciente | undefined>;
   /** Persiste el paciente (alta; si el id ya existe reemplaza el registro). */
   guardar(paciente: Paciente): Promise<void>;
 }
@@ -93,4 +96,16 @@ export interface TokenGestionRepositorio {
   obtenerPorTurno(turnoId: string): Promise<TokenGestion | undefined>;
   /** Invalida los registros vigentes del turno; sin registros vigentes no hace nada. */
   invalidar(turnoId: string, en: Date): Promise<void>;
+}
+
+/** Recordatorios de turnos (C-12, DD-21). Nunca guarda tokens. */
+export interface RecordatorioRepositorio {
+  /** Alta o reemplazo por `id`. */
+  guardar(recordatorio: Recordatorio): Promise<void>;
+  /** Recordatorios del turno, de cualquier estado. */
+  listarPorTurno(turnoId: string): Promise<readonly Recordatorio[]>;
+  /** Recordatorios `pendiente` con `programadoPara <= hasta`, por `programadoPara` ascendente. */
+  listarPendientesHasta(hasta: Date): Promise<readonly Recordatorio[]>;
+  /** Recordatorios en ese estado. */
+  listarPorEstado(estado: EstadoRecordatorio): Promise<readonly Recordatorio[]>;
 }

@@ -175,7 +175,7 @@ Carriles: **A** = núcleo y reserva online (Matías: C-01 → C-07 → C-10); **
   - Caso de uso `ReprogramarTurno`: conserva el `id`; nuevo `inicio`/`fin` y recursos validados con RN-01..RN-07 **excluyendo el propio turno** (RN-11)
   - Atomicidad: si la validación falla el turno original queda intacto; el horario original solo se libera si la reprogramación se concreta (RN-09, RN-11, RN-12)
   - Reutiliza la política de 24 h de C-02 para el actor paciente (RN-08); sin excepciones por rol para el solapamiento (RN-04)
-  - Reprograma el recordatorio asociado si existe (hook no-op hasta C-12)
+  - Reprograma el recordatorio asociado si existe: después de concretar el cambio llama a `Recordatorios.programar(turnoId)`, que es idempotente y reemplaza el pendiente con el nuevo `programadoPara` (puerto ampliado por C-12, DD-21, RN-25; con el no-op o el adaptador real según el cableado)
   - Tests: mover a un hueco libre, mover sobre sí mismo parcialmente solapado (permitido), mover sobre otro turno (rechazado y original intacto), cambio de sillón/profesional, paciente < 24 h rechazado
   - Cubre US-005
 - **Dependencias**: `C-01`, `C-02`
@@ -339,6 +339,7 @@ Carriles: **A** = núcleo y reserva online (Matías: C-01 → C-07 → C-10); **
   - Casos de uso de paciente por token de gestión (resuelto por hash, DD-15): ver el propio turno, cancelar (reutiliza `CancelarTurno` de C-02) y reprogramar (reutiliza `ReprogramarTurno` de C-03)
   - Regla RN-08: con menos de 24 h el sistema indica que debe contactar al consultorio (sin cancelar ni mover)
   - El token solo expone su propio turno (RN-15, RN-21, RN-D-02); se resuelve con el servicio de C-10 (`resolver`, DD-15); token inválido/ajeno devuelve error sin filtrar datos
+  - El token vigente es el del último recordatorio: cada envío de C-12 rota el token e invalida el de la reserva (RN-21, DD-21); los turnos internos también tienen token desde su primer recordatorio
   - Endpoints públicos `GET/POST /public/turnos/:token` (cancelar, reprogramar) si se implementa la capa HTTP
   - Tests: cancelar con >= 24 h, umbral exacto, < 24 h rechazado con mensaje de contacto, reprogramación atómica vía token, token de otro turno no accede
   - Cubre US-010
@@ -355,7 +356,7 @@ Carriles: **A** = núcleo y reserva online (Matías: C-01 → C-07 → C-10); **
 ## FASE 5 — Recordatorios y confirmación
 
 ### [C-12] `recordatorio-email-confirmacion`
-- **Estado**: `[ ]` pendiente
+- **Estado**: `[x]` completado (archivado 2026-11-22)
 - **Owner**: Franco Petri (52080)
 - **Scope**:
   - Entidad `Recordatorio` (canal `email`, `programadoPara` = `inicio - RECORDATORIO_HORAS_ANTES`, por defecto 24 h, SU-07; estados `pendiente | enviado | fallido`)
@@ -365,11 +366,14 @@ Carriles: **A** = núcleo y reserva online (Matías: C-01 → C-07 → C-10); **
   - No envía a pacientes sin `consentimientoContacto`; fallo de envío → estado `fallido` y aviso a recepción
   - Tests: programación por defecto 24 h, reprogramación mueve el recordatorio, cancelación lo anula, confirmación cambia estado, sin consentimiento no envía, fallo registrado
   - Cubre US-011
+  - **Decisiones del explore (2026-11-22, DD-21, RN-25)**: estado `cancelado` en `Recordatorio`; puerto `Recordatorios.programar(turnoId)` idempotente (C-03 lo llama); decorador `AgendarTurnoConRecordatorio` inyectado en `ReservarOnline` y en el alta de recepción, sin modificar C-01 ni C-10; barrido `EnviarRecordatoriosPendientes` (revalida el estado del turno, rota el token y envía); `ConfirmarDesdeEnlace(token)` sobre `ConfirmarTurno` (ya confirmado = éxito sin cambios); `ListarRecordatoriosFallidos` como aviso a recepción; sin e-mail o sin consentimiento no se programa; `Notificador` con adaptador falso y SMTP con `nodemailer` (Ethereal para demo). Fuera de alcance: el proceso que ejecuta el barrido periódicamente (C-14), cancelar desde el enlace (C-11) y el canal `wa_me` (C-13)
+  - **Implementado en el apply (2026-11-22)**: modelo `Recordatorio` y reglas puras (`src/domain/reglas/recordatorios.ts`), `RecordatoriosEmail` (adaptador real del puerto `Recordatorios`), decorador `AgendarTurnoConRecordatorio`, `EnviarRecordatoriosPendientes`, `ConfirmarDesdeEnlace` con `ErrorEnlacePublico` (`ENLACE_INVALIDO`), `ListarRecordatoriosFallidos`, `RecordatorioRepositorio` en memoria, `PacienteRepositorio.obtenerPorId` (aditivo), `NotificadorSmtp` con `nodemailer` y lectura validada de variables de entorno; spec `openspec/specs/recordatorios-turno` (15 requisitos, 35 escenarios con test de título idéntico), 690 tests. Disponible para C-03 (`Recordatorios.programar`), C-11 (token vigente = el del último e-mail), C-13 (puerto `Recordatorios`, `CanalRecordatorio` a extender con `wa_me`) y C-14 (cablear el decorador y `RecordatoriosEmail`, ejecutar el barrido periódicamente, endpoint de confirmación).
 - **Dependencias**: `C-04`, `C-10`
 - **Governance**: ALTO (notificaciones con datos personales)
 - **Leer antes**:
   - `knowledge-base/07_flujos_principales.md` §Flujo 6
-  - `knowledge-base/05_reglas_de_negocio.md` RN-14, RN-15, RN-10, RN-D-02
+  - `knowledge-base/05_reglas_de_negocio.md` RN-14, RN-15, RN-10, RN-21, RN-25, RN-D-02
+  - `knowledge-base/09_decisiones_y_supuestos.md` DD-15, DD-19, DD-20, DD-21, SU-07
   - `knowledge-base/04_modelo_de_datos.md` §Recordatorio
   - `knowledge-base/06_funcionalidades.md` §US-011
   - `knowledge-base/08_arquitectura_propuesta.md` §Variables de entorno

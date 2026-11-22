@@ -12,6 +12,12 @@ describe('RecordatoriosNoOp', () => {
     await expect(recordatorios.cancelarPendientes('t2')).resolves.toBeUndefined();
     await expect(recordatorios.cancelarPendientes('inexistente')).resolves.toBeUndefined();
   });
+
+  test('programar resuelve sin error con cualquier turno (C-12)', async () => {
+    const recordatorios = new RecordatoriosNoOp();
+    await expect(recordatorios.programar('t1')).resolves.toBeUndefined();
+    await expect(recordatorios.programar('inexistente')).resolves.toBeUndefined();
+  });
 });
 
 describe('RecordatoriosEspia', () => {
@@ -31,5 +37,14 @@ describe('RecordatoriosEspia', () => {
     espia.fallarCon(new Error('servicio de recordatorios caído'));
     await expect(espia.cancelarPendientes('t1')).rejects.toThrow('servicio de recordatorios caído');
     expect(espia.cancelados).toEqual(['t1']);
+  });
+
+  test('registra los pedidos de programar aparte de las cancelaciones (C-12)', async () => {
+    const espia = new RecordatoriosEspia();
+    await espia.programar('t1');
+    await espia.cancelarPendientes('t2');
+    await espia.programar('t3');
+    expect(espia.programados).toEqual(['t1', 't3']);
+    expect(espia.cancelados).toEqual(['t2']);
   });
 });

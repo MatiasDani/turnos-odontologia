@@ -19,7 +19,7 @@
 | API REST (opcional) | Fastify | 4.x o superior |
 | Persistencia MVP | Repositorios en memoria (adaptadores) | n/a |
 | Persistencia futura | PostgreSQL (free tier) | a definir |
-| E-mail | SMTP/transaccional con free tier | a confirmar |
+| E-mail | SMTP con `nodemailer` (Ethereal en desarrollo; proveedor de producción a confirmar) | 10.x (fijado por package-lock, C-12) |
 
 Estructura según el TP: `src/` (implementación) y `tests/` (pruebas) en la raíz. Arquitectura hexagonal / clean.
 
