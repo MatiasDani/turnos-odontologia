@@ -237,3 +237,29 @@ a:hover { color: var(--color-accent-hover); }
 }
 .aside.always { display: block; }
 .nowrap { white-space: nowrap; }
+
+/* C-14: ajustes de la implementación sobre el mockup aprobado */
+.sprite { position: absolute; width: 0; height: 0; }
+.mt-2 { margin-top: var(--space-2); }
+.mt-4 { margin-top: var(--space-4); }
+.panel-narrow { max-width: 560px; margin: 0 auto; width: 100%; }
+.success-mark.is-danger { background: var(--color-danger-soft); color: var(--color-danger); }
+button.alert-action { margin-top: var(--space-3); }
+.link-copy-status { margin-top: var(--space-2); }
+[hidden] { display: none !important; }
+
+/* Diálogo nativo (equivale al `.backdrop > .dialog` del mockup) */
+dialog.dialog { border: 0; margin: auto auto var(--space-4); padding: var(--space-5); background: var(--color-surface); color: var(--color-text); max-width: min(440px, calc(100vw - 2 * var(--space-4))); width: 100%; }
+dialog.dialog::backdrop { background: rgba(23, 33, 31, 0.45); }
+dialog.dialog:focus-visible { outline: none; }
+@media (min-width: 720px) { dialog.dialog { margin: auto; } }
+
+/* Sin movimiento con prefers-reduced-motion: los indicadores de carga quedan estáticos */
+@media (prefers-reduced-motion: reduce) {
+  .spinner { animation: none; border-top-color: var(--color-accent); }
+  .skeleton { animation: none; }
+  .dialog { animation: none; }
+}
+
+/* Destinos de foco programático (títulos y avisos): reciben foco para lectores de pantalla, sin anillo */
+h1[tabindex="-1"]:focus, main[tabindex="-1"]:focus, .alert[tabindex="-1"]:focus { outline: none; }

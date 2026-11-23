@@ -31,11 +31,11 @@
 
 ## 4. Interfaz del paciente (sobre el mockup aprobado)
 
-- [ ] 4.1 Llevar `mockups/paciente.css` a `src/adapters/http/web/paciente.css` y crear `reserva.html`, `gestion.html` y los módulos `api.js`, `formato.js`, `dialogo.js` con `// @ts-check`; crear el arnés `tests/ui/arnes.ts` (app en puerto efímero, Chromium, `page.route` para demoras y fallos); verificar con `npm run typecheck` y un test de humo de UI que carga ambas páginas sin errores de consola (rojo → verde)
-- [ ] 4.2 Implementar `reserva.js` (cuatro pasos, "Cualquiera", días reservables del servidor, horarios, formulario, confirmación con enlace y copia); verificar los escenarios de "Reserva guiada en pasos", "Validación del formulario de datos" y "Confirmación con enlace de gestión" en `tests/ui/reserva.ui.test.ts` (rojo → verde)
-- [ ] 4.3 Estados de carga, vacío y error de la reserva; verificar los escenarios de "Estados de carga, vacío y error en la reserva" (rojo → verde)
-- [ ] 4.4 Implementar `gestion.js` (vista, confirmar, cancelar con `<dialog>`, reprogramar, menos de 24 h, enlace inválido, foco en confirmar al venir de `/confirmar`); verificar los escenarios de "Página de gestión del turno", "Gestión con menos de 24 horas" y "Enlace inválido o vencido" en `tests/ui/gestion.ui.test.ts` (rojo → verde)
-- [ ] 4.5 Accesibilidad y responsive: verificar los escenarios de "Accesibilidad y diseño adaptable" (teclado, foco visible, 44 px, sin scroll horizontal a 390 px) y, con `reducedMotion: 'reduce'`, que no hay transiciones activas (rojo → verde)
+- [x] 4.1 Llevar `mockups/paciente.css` a `src/adapters/http/web/paciente.css` y crear `reserva.html`, `gestion.html` y los módulos `api.js`, `formato.js`, `dialogo.js` con `// @ts-check`; crear el arnés `tests/ui/arnes.ts` (app en puerto efímero, Chromium, `page.route` para demoras y fallos); verificar con `npm run typecheck` y un test de humo de UI que carga ambas páginas sin errores de consola (rojo → verde)
+- [x] 4.2 Implementar `reserva.js` (cuatro pasos, "Cualquiera", días reservables del servidor, horarios, formulario, confirmación con enlace y copia); verificar los escenarios de "Reserva guiada en pasos", "Validación del formulario de datos" y "Confirmación con enlace de gestión" en `tests/ui/reserva.ui.test.ts` (rojo → verde)
+- [x] 4.3 Estados de carga, vacío y error de la reserva; verificar los escenarios de "Estados de carga, vacío y error en la reserva" (rojo → verde)
+- [x] 4.4 Implementar `gestion.js` (vista, confirmar, cancelar con `<dialog>`, reprogramar, menos de 24 h, enlace inválido, foco en confirmar al venir de `/confirmar`); verificar los escenarios de "Página de gestión del turno", "Gestión con menos de 24 horas" y "Enlace inválido o vencido" en `tests/ui/gestion.ui.test.ts` (rojo → verde)
+- [x] 4.5 Accesibilidad y responsive: verificar los escenarios de "Accesibilidad y diseño adaptable" (teclado, foco visible, 44 px, sin scroll horizontal a 390 px) y, con `reducedMotion: 'reduce'`, que no hay transiciones activas (rojo → verde)
 
 ## 5. Integración y verificación
 

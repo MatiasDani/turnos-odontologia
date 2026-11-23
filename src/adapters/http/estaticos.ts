@@ -9,6 +9,8 @@ export const ARCHIVOS_WEB: readonly string[] = [
   'api.js',
   'formato.js',
   'dialogo.js',
+  'dom.js',
+  'selector.js',
   'reserva.js',
   'gestion.js',
 ];
