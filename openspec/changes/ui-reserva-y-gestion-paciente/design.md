@@ -22,7 +22,7 @@ Ver `proposal.md` (Why) y los specs `api-publica-paciente` e `interfaz-paciente`
 
 **Non-Goals:**
 - Rate limit (pregunta abierta, ver Risks), CAPTCHA, sesiones o cuentas de paciente.
-- Proceso periódico de `EnviarRecordatoriosPendientes` (DD-21 lo había dejado "para C-14"): se excluye de C-14 por requerir SMTP y operación; queda como pregunta abierta para el change que integre la operación (ver `10_preguntas_abiertas.md`). **Decisión del propose, a confirmar por el owner.**
+- Proceso periódico de `EnviarRecordatoriosPendientes` (DD-21 lo había dejado "para C-14"): se excluye de C-14 por requerir SMTP y operación; queda como pregunta abierta para el change que integre la operación (ver `10_preguntas_abiertas.md`). **Decisión del propose, confirmada por el owner (2026-11-23).**
 - Cambiar profesional o prestación al reprogramar online (solo cambia el horario, ver D7).
 - Persistencia real, RBAC (C-09) y rutas internas (C-15).
 
@@ -63,9 +63,9 @@ Ver `proposal.md` (Why) y los specs `api-publica-paciente` e `interfaz-paciente`
 - `ReprogramarDesdeTokenPublica` → verifica RN-30 sobre el nuevo `inicio` (fuera del horizonte: `HORARIO_NO_DISPONIBLE`) y delega en `ReprogramarTurnoDesdeToken` sin modificarlo; el orden token → RN-08 de C-11 se conserva porque la verificación del horizonte ocurre después de resolver el token y comprobar la anticipación.
 - La regla pura de RN-30 (`diasReservables(ahora, zona)` y `dentroDelHorizonte(inicio, ahora, zona)`) vive en `src/domain/reglas/horizonte-reserva.ts`.
 
-**D6 — Vista de gestión (DD-31).** `GET /public/turnos/:token` (JSON) devuelve `{ inicio, fin, prestacion: {nombre}, profesional: {nombre, apellido}, asistenciaConfirmada, gestionOnline, consultorio: {nombre, telefono, email, zonaHoraria}, diasReservables }`. Se omite `turnoId` (la UI no lo necesita). `asistenciaConfirmada` revela `reservado` vs. `confirmado` del propio turno, coherente con la respuesta de `ConfirmarDesdeEnlace` (C-12), y evita mostrar "Confirmar" a quien ya confirmó; no se expone ningún otro estado (los demás ya dan `ENLACE_INVALIDO`). `gestionOnline` se calcula en el servidor con `evaluarAnticipacionPaciente` y el `Reloj`: la UI nunca usa el reloj del navegador para RN-08 ni RN-30. **Supuesto a confirmar por el owner:** DD-23 excluía el estado de `TurnoPublico`; este campo booleano se agrega solo en la vista HTTP.
+**D6 — Vista de gestión (DD-31).** `GET /public/turnos/:token` (JSON) devuelve `{ inicio, fin, prestacion: {nombre}, profesional: {nombre, apellido}, asistenciaConfirmada, gestionOnline, consultorio: {nombre, telefono, email, zonaHoraria}, diasReservables }`. Se omite `turnoId` (la UI no lo necesita). `asistenciaConfirmada` revela `reservado` vs. `confirmado` del propio turno, coherente con la respuesta de `ConfirmarDesdeEnlace` (C-12), y evita mostrar "Confirmar" a quien ya confirmó; no se expone ningún otro estado (los demás ya dan `ENLACE_INVALIDO`). `gestionOnline` se calcula en el servidor con `evaluarAnticipacionPaciente` y el `Reloj`: la UI nunca usa el reloj del navegador para RN-08 ni RN-30. **Supuesto confirmado por el owner (2026-11-23):** DD-23 excluía el estado de `TurnoPublico`; este campo booleano se agrega solo en la vista HTTP.
 
-**D7 — Reprogramación online solo de horario (DD-31).** Como C-03 conserva el sillón y la entrada pública no lo acepta, ofrecer horarios de otro sillón haría fallar la reprogramación. Por eso la disponibilidad para reprogramar filtra el mismo profesional y el mismo sillón, y el cuerpo admite solo `inicio` (`profesionalId`, `prestacionId`, `sillonId` → `DATOS_INVALIDOS`). Limitación aceptada: los horarios que se solapan con el propio turno actual no se ofrecen, porque C-07 lo cuenta como ocupado. *Alternativa:* aceptar `profesionalId` y elegir sillón en el servidor (requiere cambiar C-11/C-03).
+**D7 — Reprogramación online solo de horario (DD-31).** Como C-03 conserva el sillón y la entrada pública no lo acepta, ofrecer horarios de otro sillón haría fallar la reprogramación. Por eso la disponibilidad para reprogramar filtra el mismo profesional y el mismo sillón, y el cuerpo admite solo `inicio` (`profesionalId`, `prestacionId`, `sillonId` → `DATOS_INVALIDOS`). Limitación aceptada: los horarios que se solapan con el propio turno actual no se ofrecen, porque C-07 lo cuenta como ocupado. *Alternativa:* aceptar `profesionalId` y elegir sillón en el servidor (requiere cambiar C-11/C-03). **Confirmado por el owner (2026-11-23).**
 
 **D8 — Horizonte de 30 días en el servidor (RN-30, DD-30).** El límite se valida en disponibilidad pública, reserva y disponibilidad para reprogramar; la reprogramación misma (`POST`) también lo verifica antes de delegar. Días locales de la zona del consultorio, `hoy` a `hoy + 30` inclusive (31 días, dentro del máximo de 31 de C-07 porque cada consulta es de un día). Constante de dominio, no variable de entorno. *Alternativa:* solo en la UI (un cliente podría reservar a un año).
 
@@ -92,6 +92,13 @@ Ver `proposal.md` (Why) y los specs `api-publica-paciente` e `interfaz-paciente`
 ## Migration Plan
 
 Change aditivo: nuevas rutas, dependencias y scripts; no se migran datos ni cambian contratos existentes. Despliegue local con `npm run build && npm start` y `BASE_URL_PUBLICA` apuntando al servidor. Rollback: revertir el commit del change (los casos de uso de C-10..C-12 siguen funcionando sin HTTP).
+
+## Confirmaciones del owner (tarea 0.2, 2026-11-23, Alejo Carabelli)
+
+1. `GET /public/turnos/:token/confirmar` nunca cambia el estado: la confirmación es por el botón (`POST`).
+2. La reprogramación online solo cambia el horario (mismo profesional y mismo sillón).
+3. El barrido periódico de recordatorios queda fuera de C-14.
+4. El rate limit queda fuera de C-14; los logs redactados están dentro.
 
 ## Open Questions
 

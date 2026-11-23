@@ -10,17 +10,22 @@
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit",
-    "coverage": "vitest run --coverage"
+    "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.web.json",
+    "coverage": "vitest run --coverage",
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/src/main.js",
+    "test:ui": "vitest run --config vitest.ui.config.ts"
   },
   "devDependencies": {
     "@types/node": "^26.6.6",
     "@types/nodemailer": "^8.0.2",
     "@vitest/coverage-v8": "^5.1.1",
+    "playwright": "^1.63.0",
     "typescript": "^7.0.2",
     "vitest": "^5.1.1"
   },
   "dependencies": {
+    "fastify": "^5.12.8",
     "nodemailer": "^10.6.1"
   }
 }

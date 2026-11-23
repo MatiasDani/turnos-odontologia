@@ -2,23 +2,23 @@
 
 ## 0. Gate de mockup (bloqueante)
 
-- [ ] 0.1 Esperar la aprobación explícita del mockup por el owner (Alejo Carabelli): no escribir código hasta que `design.md` § UI Mockups diga `Approval: approved (<fecha>, <quién>)`; verificar con `grep -n "Approval: approved" openspec/changes/ui-reserva-y-gestion-paciente/design.md`
-- [ ] 0.2 Confirmar con el owner los supuestos marcados en `design.md` (campo `asistenciaConfirmada` en la vista HTTP, D6; reprogramación online solo de horario, D7; barrido periódico de recordatorios fuera de C-14, Non-Goals) y registrar la respuesta en `design.md`; verificar que no queda ningún "a confirmar" sin respuesta
+- [x] 0.1 Esperar la aprobación explícita del mockup por el owner (Alejo Carabelli): no escribir código hasta que `design.md` § UI Mockups diga `Approval: approved (<fecha>, <quién>)`; verificar con `grep -n "Approval: approved" openspec/changes/ui-reserva-y-gestion-paciente/design.md`
+- [x] 0.2 Confirmar con el owner los supuestos marcados en `design.md` (campo `asistenciaConfirmada` en la vista HTTP, D6; reprogramación online solo de horario, D7; barrido periódico de recordatorios fuera de C-14, Non-Goals) y registrar la respuesta en `design.md`; verificar que no queda ningún "a confirmar" sin respuesta
 
 ## 1. Preparación, KB y dependencias
 
-- [ ] 1.1 Verificar la baseline: `npm run typecheck` y `npm test` en verde antes de tocar código; anotar la cantidad de tests
-- [ ] 1.2 Revisar que RN-30 (`05`), DD-29..DD-31 (`09`), la sección HTTP/UI de `08`, las rutas de `03` y las preguntas de `10` del propose siguen vigentes (rebase sobre C-05 si ya se archivó: numeración y `PrestacionRepositorio`); verificar con `grep -n "RN-30\|DD-29\|DD-30\|DD-31" knowledge-base/*.md`
-- [ ] 1.3 Agregar `fastify` 5.x a `dependencies` y `playwright` a `devDependencies` (versiones fijadas por `package-lock`), scripts `build`, `start`, `test:ui` y `typecheck` (que cubra `tsconfig.web.json`); crear `tsconfig.build.json` (emite `src/` a `dist/`), `tsconfig.web.json` (`checkJs`, `lib: DOM`) y `vitest.ui.config.ts`; excluir `tests/ui/**` de `vitest.config.ts` y agregar `dist/` a `.gitignore`; verificar con `npm ci`, `npm run typecheck` y `npm test` (mismo conteo que 1.1)
+- [x] 1.1 Verificar la baseline: `npm run typecheck` y `npm test` en verde antes de tocar código; anotar la cantidad de tests
+- [x] 1.2 Revisar que RN-30 (`05`), DD-29..DD-31 (`09`), la sección HTTP/UI de `08`, las rutas de `03` y las preguntas de `10` del propose siguen vigentes (rebase sobre C-05 si ya se archivó: numeración y `PrestacionRepositorio`); verificar con `grep -n "RN-30\|DD-29\|DD-30\|DD-31" knowledge-base/*.md`
+- [x] 1.3 Agregar `fastify` 5.x a `dependencies` y `playwright` a `devDependencies` (versiones fijadas por `package-lock`), scripts `build`, `start`, `test:ui` y `typecheck` (que cubra `tsconfig.web.json`); crear `tsconfig.build.json` (emite `src/` a `dist/`), `tsconfig.web.json` (`checkJs`, `lib: DOM`) y `vitest.ui.config.ts`; excluir `tests/ui/**` de `vitest.config.ts` y agregar `dist/` a `.gitignore`; verificar con `npm ci`, `npm run typecheck` y `npm test` (mismo conteo que 1.1)
 
 ## 2. Dominio y aplicación públicos (TDD con repos en memoria)
 
-- [ ] 2.1 Regla pura RN-30 en `src/domain/reglas/horizonte-reserva.ts` (`diasReservables`, `dentroDelHorizonte`, días locales de hoy a hoy + 30 inclusive): tests de borde (último día, día 31, cambio de mes, `ahora` cerca de medianoche local) en `tests/domain/reglas/horizonte-reserva.test.ts` (rojo → verde)
-- [ ] 2.2 Extender `PrestacionRepositorio` con `listarPorConsultorio` y su adaptador en memoria; implementar `ListarCatalogoPublico` y `ListarProfesionalesPublicos` (solo activos/habilitados, campos mínimos, `PRESTACION_NO_DISPONIBLE`); verificar con tests de aplicación que fallan si aparece un campo no público (rojo → verde)
-- [ ] 2.3 Implementar `ConsultarDisponibilidadPublica` (día local → rango, actor paciente, filtro RN-19, agrupado `{inicio, fin}`, RN-30 y validación de `fecha`); verificar con tests de aplicación de horario cubierto por otro profesional, filtro por profesional, día sin atención y fuera de horizonte (rojo → verde)
-- [ ] 2.4 Implementar `ReservarOnlinePublica` (RN-30 antes de delegar en `ReservarOnline`, `HORARIO_NO_DISPONIBLE` con `nuevaOferta` vacía, sin crear turno ni paciente); verificar con tests y con la suite de C-10 intacta (rojo → verde)
-- [ ] 2.5 Implementar `ConsultarGestionDesdeToken` (vista D6 con `asistenciaConfirmada`, `gestionOnline` por `evaluarAnticipacionPaciente`, contacto del consultorio, `diasReservables`, sin `turnoId`); verificar umbral de 24 h exacto e inválido con tests (rojo → verde)
-- [ ] 2.6 Implementar `ConsultarDisponibilidadParaReprogramar` (mismo profesional y sillón, RN-08, RN-30) y `ReprogramarDesdeTokenPublica` (token → RN-08 → RN-30 → delegación en C-11); verificar con tests que el sillón nunca sale en la respuesta y que la suite de C-11 sigue en verde (rojo → verde)
+- [x] 2.1 Regla pura RN-30 en `src/domain/reglas/horizonte-reserva.ts` (`diasReservables`, `dentroDelHorizonte`, días locales de hoy a hoy + 30 inclusive): tests de borde (último día, día 31, cambio de mes, `ahora` cerca de medianoche local) en `tests/domain/reglas/horizonte-reserva.test.ts` (rojo → verde)
+- [x] 2.2 Extender `PrestacionRepositorio` con `listarPorConsultorio` y su adaptador en memoria; implementar `ListarCatalogoPublico` y `ListarProfesionalesPublicos` (solo activos/habilitados, campos mínimos, `PRESTACION_NO_DISPONIBLE`); verificar con tests de aplicación que fallan si aparece un campo no público (rojo → verde)
+- [x] 2.3 Implementar `ConsultarDisponibilidadPublica` (día local → rango, actor paciente, filtro RN-19, agrupado `{inicio, fin}`, RN-30 y validación de `fecha`); verificar con tests de aplicación de horario cubierto por otro profesional, filtro por profesional, día sin atención y fuera de horizonte (rojo → verde)
+- [x] 2.4 Implementar `ReservarOnlinePublica` (RN-30 antes de delegar en `ReservarOnline`, `HORARIO_NO_DISPONIBLE` con `nuevaOferta` vacía, sin crear turno ni paciente); verificar con tests y con la suite de C-10 intacta (rojo → verde)
+- [x] 2.5 Implementar `ConsultarGestionDesdeToken` (vista D6 con `asistenciaConfirmada`, `gestionOnline` por `evaluarAnticipacionPaciente`, contacto del consultorio, `diasReservables`, sin `turnoId`); verificar umbral de 24 h exacto e inválido con tests (rojo → verde)
+- [x] 2.6 Implementar `ConsultarDisponibilidadParaReprogramar` (mismo profesional y sillón, RN-08, RN-30) y `ReprogramarDesdeTokenPublica` (token → RN-08 → RN-30 → delegación en C-11); verificar con tests que el sillón nunca sale en la respuesta y que la suite de C-11 sigue en verde (rojo → verde)
 
 ## 3. Servidor HTTP y contrato de la API
 
