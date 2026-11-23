@@ -14,23 +14,31 @@ import type { Prestacion } from '../../../domain/prestacion.js';
 import type { Profesional } from '../../../domain/profesional.js';
 import type { Sillon } from '../../../domain/sillon.js';
 
-/** Base común: búsqueda por id sobre una colección en memoria. */
+/** Base común: colección mutable en memoria con búsqueda por id y alta o reemplazo (patrón de Paciente). */
 class PorId<T extends { readonly id: string }> {
-  constructor(private readonly items: readonly T[]) {}
+  protected readonly items: T[];
+
+  constructor(iniciales: readonly T[]) {
+    this.items = [...iniciales];
+  }
 
   obtenerPorId(id: string): Promise<T | undefined> {
     return Promise.resolve(this.items.find((item) => item.id === id));
+  }
+
+  /** Alta al final o reemplazo por `id` conservando la posición (C-05, DD-28). */
+  guardar(item: T): Promise<void> {
+    const indice = this.items.findIndex((existente) => existente.id === item.id);
+    if (indice >= 0) this.items[indice] = item;
+    else this.items.push(item);
+    return Promise.resolve();
   }
 }
 
 /** Base con además listado por consultorio, conservando el orden de carga. */
 class PorIdYConsultorio<T extends { readonly id: string; readonly consultorioId: string }> extends PorId<T> {
-  constructor(private readonly coleccion: readonly T[]) {
-    super(coleccion);
-  }
-
   listarPorConsultorio(consultorioId: string): Promise<readonly T[]> {
-    return Promise.resolve(this.coleccion.filter((item) => item.consultorioId === consultorioId));
+    return Promise.resolve(this.items.filter((item) => item.consultorioId === consultorioId));
   }
 }
 
@@ -38,14 +46,20 @@ export class ProfesionalRepositorioEnMemoria
   extends PorIdYConsultorio<Profesional>
   implements ProfesionalRepositorio {}
 export class SillonRepositorioEnMemoria extends PorIdYConsultorio<Sillon> implements SillonRepositorio {}
-export class PrestacionRepositorioEnMemoria extends PorId<Prestacion> implements PrestacionRepositorio {}
+export class PrestacionRepositorioEnMemoria
+  extends PorIdYConsultorio<Prestacion>
+  implements PrestacionRepositorio {}
 export class ConsultorioRepositorioEnMemoria extends PorId<Consultorio> implements ConsultorioRepositorio {}
 
-export class HorarioAtencionRepositorioEnMemoria implements HorarioAtencionRepositorio {
-  constructor(private readonly horarios: readonly HorarioAtencion[]) {}
-
-  listarPorConsultorio(consultorioId: string): Promise<readonly HorarioAtencion[]> {
-    return Promise.resolve(this.horarios.filter((h) => h.consultorioId === consultorioId));
+export class HorarioAtencionRepositorioEnMemoria
+  extends PorIdYConsultorio<HorarioAtencion>
+  implements HorarioAtencionRepositorio
+{
+  /** Un id inexistente no hace nada: el caso de uso ya verificó la existencia. */
+  eliminar(id: string): Promise<void> {
+    const indice = this.items.findIndex((h) => h.id === id);
+    if (indice >= 0) this.items.splice(indice, 1);
+    return Promise.resolve();
   }
 }
 

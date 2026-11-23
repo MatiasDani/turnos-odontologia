@@ -25,14 +25,16 @@ Global-desarrollo/
 │   │   ├── profesional.ts, sillon.ts, prestacion.ts, paciente.ts
 │   │   ├── bloqueo-horario.ts, horario-atencion.ts
 │   │   ├── recordatorio.ts (C-12)
-│   │   └── reglas/        # validaciones RN-01..RN-07; transiciones.ts (tabla única de estados, DD-20), cancelacion.ts, estados.ts (RN-10, RN-24), recordatorios.ts (RN-25)
+│   │   └── reglas/        # validaciones RN-01..RN-07; transiciones.ts (tabla única de estados, DD-20), cancelacion.ts, estados.ts (RN-10, RN-24), recordatorios.ts (RN-25), horario.ts (RN-07, RN-17, tramosDelDia RN-28), configuracion.ts (RN-29), desactivacion.ts (RN-27)
 │   ├── application/       # casos de uso y puertos
 │   │   ├── agendar-turno.ts, reprogramar-turno.ts, cancelar-turno.ts
 │   │   ├── confirmar-turno.ts, marcar-atendido.ts, marcar-ausente.ts (C-04, sobre cambiar-estado-turno.ts)
 │   │   ├── reservar-online.ts, consultar-disponibilidad.ts, bloquear-horario.ts
 │   │   ├── recordatorios-email.ts, agendar-turno-con-recordatorio.ts, enviar-recordatorios-pendientes.ts,
 │   │   │   confirmar-desde-enlace.ts, listar-recordatorios-fallidos.ts (C-12, DD-21)
-│   │   └── puertos/       # Repositorios, Notificador, Reloj, Recordatorios
+│   │   ├── configurar-profesionales.ts, configurar-sillones.ts, configurar-prestaciones.ts,
+│   │   │   configurar-horarios.ts, control-acceso.ts (C-05, DD-25..DD-28; solo administrador)
+│   │   └── puertos/       # Repositorios (con escrituras de catálogo, C-05), Notificador, Reloj, Recordatorios
 │   └── adapters/
 │       ├── persistence/   # repos en memoria (PostgreSQL luego)
 │       ├── recordatorios/ # no-op para cableados sin recordatorios (C-02, C-12)

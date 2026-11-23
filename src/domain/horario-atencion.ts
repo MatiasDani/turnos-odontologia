@@ -1,7 +1,10 @@
 export interface HorarioAtencion {
   readonly id: string;
   readonly consultorioId: string;
-  /** C-01 solo evalúa el horario del consultorio (sin profesionalId). */
+  /**
+   * Sin `profesionalId`: tramo del consultorio. Con `profesionalId`: tramo propio del profesional, que
+   * prevalece por día de la semana sobre el del consultorio (RN-28, C-05).
+   */
   readonly profesionalId?: string;
   /** 0 = domingo .. 6 = sábado */
   readonly diaSemana: number;

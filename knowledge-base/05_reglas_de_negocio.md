@@ -55,6 +55,16 @@ Definición operativa: un turno es **activo** si su estado es `reservado`, `conf
 | Reserva online que choca con un turno de otro paciente (carrera sin combo alternativo) | Error público genérico "horario no disponible", sin `turnoEnConflicto` ni datos del otro paciente | RN-22, RN-12 |
 | DNI 00000004 con 2 turnos online activos futuros intenta un tercero | Rechazado | RN-23 |
 | DNI 00000004 repite la misma reserva (misma prestación e `inicio`, turno activo) | No crea otro turno ni reentrega el token | RN-23 |
+| Desactivar `p1` con un turno `confirmado` de `p1` el martes 09:00 y `ahora` lunes 10:00 | Rechazado; informa el turno en conflicto; `p1` sigue activa | RN-27 |
+| Desactivar `s2` cuyo único turno es `cancelado`, `ausente` o `atendido`, o empezó antes de `ahora` | Válido; `s2` queda inactivo | RN-27 |
+| Turno `reservado` de `pr2` con `inicio` igual a `ahora` y desactivación de `pr2` | Rechazado (umbral inclusivo `inicio >= ahora`) | RN-27 |
+| `p2` con tramo propio lunes 14:00-18:00; turno de `p2` lunes 14:00 | Válido (prevalece el horario propio del día) | RN-28 |
+| Mismo caso; turno de `p2` lunes 09:00 | Rechazado: el tramo del consultorio no aplica a `p2` ese día | RN-28, RN-07 |
+| Mismo caso; turno de `p2` martes 09:00 o de `p1` lunes 09:00 | Válido (sin horario propio ese día: rige el del consultorio) | RN-28 |
+| Prestación con `duracionMinutos` 0, -15, 32 o 12,5 | Rechazada como configuración inválida | RN-29 |
+| Tramo con `desde` 13:00 y `hasta` 09:00, `diaSemana` 7 u hora `9:00` | Rechazado como configuración inválida | RN-29 |
+| Tramo del consultorio lunes 12:00-14:00 con el existente 09:00-13:00 | Rechazado (solapa en el mismo ámbito); 13:00-15:00 es válido (contiguo, RN-05) | RN-29 |
+| Tramo de `p2` lunes 09:00-13:00 junto al tramo del consultorio lunes 09:00-13:00 | Válido (ámbitos distintos) | RN-29 |
 
 ## Dominio: Cancelación y reprogramación
 
@@ -109,6 +119,12 @@ Definición operativa: un turno es **activo** si su estado es `reservado`, `conf
   - No hay envío automático ni API: la recepción ve todos los `wa_me` `pendientes` ordenados por `programadoPara` (`id`, `turnoId`, `enlaceWaMe`, `programadoPara`), abre el enlace y marca el recordatorio como enviado por `id`. La marca es idempotente sobre `enviado` (conserva `enviadoEn`), asienta `enviadoEn` desde el `Reloj` sobre `pendiente`, y rechaza con error tipado un id inexistente o un estado `cancelado`/`fallido`.
   - Los canales son independientes: programar el e-mail no reemplaza el `wa_me` pendiente, el barrido de e-mail no envía los `wa_me`, y cancelar el turno anula los pendientes de ambos canales (RN-25). Costo $0 (DD-03, SU-01).
 - **RN-30** *(decisión del propose de C-14, 2026-11-23, DD-30; numeración desde RN-30 porque C-05 reserva RN-27 a RN-29)*: horizonte de la reserva online. Por las rutas públicas solo se ofrecen y admiten horarios cuyo día local (zona del consultorio) esté entre hoy y hoy + 30 días, ambos inclusive, según el `Reloj`. Se valida en el servidor (disponibilidad pública, reserva y reprogramación por token), no solo en la pantalla. Fuera del horizonte: la disponibilidad responde `DATOS_INVALIDOS` (`fecha`) y la reserva o reprogramación `HORARIO_NO_DISPONIBLE`, sin crear ni mover turnos. No aplica a la recepción ni al administrador.
+
+## Dominio: Configuración del consultorio (US-008)
+
+- **RN-27** *(decisión de explore C-05, 2026-11-23, DD-25)*: un profesional, un sillón o una prestación no se pueden desactivar mientras tengan **turnos activos futuros**: turnos con ese recurso en estado `reservado` o `confirmado` e `inicio >= ahora` (umbral inclusivo, con `ahora` del puerto `Reloj`). El rechazo lleva el código `RN-27` y lista todos los turnos en conflicto ordenados por `inicio`, sin modificar el recurso. La desactivación es lógica (`activo`/`activa` en `false`; nunca se borra) y se puede revertir (reactivación). Los turnos `cancelado`, `ausente` o `atendido`, y los que empezaron antes de `ahora`, no impiden desactivar. Que un recurso inactivo no reciba turnos nuevos ya lo garantiza RN-18.
+- **RN-28** *(decisión de explore C-05, 2026-11-23, DD-26; resuelve SU-09)*: el horario propio del profesional prevalece **por día de la semana**: si el profesional tiene al menos un tramo propio para el `diaSemana` del turno, ese día solo valen sus tramos; si no tiene, valen los tramos del consultorio. Rige en todo lugar donde se evalúa el horario (alta, disponibilidad y reprogramación), con RN-07 y RN-17 aplicados sobre los tramos resultantes. Un profesional sin horario propio se comporta exactamente como antes de C-05.
+- **RN-29** *(decisión de explore C-05, 2026-11-23, DD-27)*: validez de la configuración. Una prestación tiene `duracionMinutos` entero > 0 y múltiplo de 5 (alineado con RN-06). Un tramo de `HorarioAtencion` tiene `diaSemana` entero de 0 a 6, `desde` y `hasta` con formato `HH:mm` de 24 h (00:00 a 23:59) y `desde < hasta`, y no puede solaparse (intervalo semiabierto, RN-05) con otro tramo del mismo día y del mismo ámbito (el del consultorio, o el del mismo profesional); tramos contiguos son válidos. Los nombres (y el apellido del profesional) son obligatorios: se recortan los espacios de los extremos y el resultado no puede quedar vacío ni superar 80 caracteres; la matrícula es opcional, pero si se informa sigue la misma regla. Igual que en RN-13, estas comprobaciones son validación de entrada: se informan con un error de configuración inválida que indica el campo, sin ampliar `CodigoRN`.
 
 ## Dominio: Datos y cumplimiento (restricciones del checklist, punto 9)
 

@@ -1,5 +1,11 @@
 import { describe, expect, test } from 'vitest';
-import { ConsultaInvalidaError, RecursoNoEncontradoError, ReglaNegocioError } from '../../src/domain/errores.js';
+import {
+  AccesoDenegadoError,
+  ConfiguracionInvalidaError,
+  ConsultaInvalidaError,
+  RecursoNoEncontradoError,
+  ReglaNegocioError,
+} from '../../src/domain/errores.js';
 import type { Turno } from '../../src/domain/turno.js';
 
 const turno: Turno = {
@@ -93,5 +99,62 @@ describe('ConsultaInvalidaError', () => {
     expect(e.campo).toBe('paso');
     expect(e.motivo).toBe('debe ser entero positivo');
     expect(e.message).toContain('paso');
+  });
+});
+
+describe('RN-27 (desactivación con turnos activos futuros)', () => {
+  const otro: Turno = { ...turno, id: 't2', inicio: new Date('2026-11-24T12:00:00Z') };
+
+  test('conserva la lista completa y no tiene turnoEnConflicto', () => {
+    const e = new ReglaNegocioError({ codigo: 'RN-27', turnosEnConflicto: [turno, otro] });
+    expect(e.codigo).toBe('RN-27');
+    expect(e.message).toBe('Regla de negocio violada: RN-27');
+    expect(e.turnosEnConflicto).toEqual([turno, otro]);
+    expect(e.turnoEnConflicto).toBeUndefined();
+  });
+
+  test('un código sin lista no define turnosEnConflicto', () => {
+    const e = new ReglaNegocioError({ codigo: 'RN-18' });
+    expect(e.turnosEnConflicto).toBeUndefined();
+  });
+});
+
+describe('AccesoDenegadoError', () => {
+  test('preserva instanceof, name, rol y operación, y no es ReglaNegocioError', () => {
+    const e = new AccesoDenegadoError('recepcion', 'configurar-sillon');
+    expect(e).toBeInstanceOf(AccesoDenegadoError);
+    expect(e).toBeInstanceOf(Error);
+    expect(e).not.toBeInstanceOf(ReglaNegocioError);
+    expect(e.name).toBe('AccesoDenegadoError');
+    expect(e.rol).toBe('recepcion');
+    expect(e.operacion).toBe('configurar-sillon');
+    expect(e.message).toContain('recepcion');
+  });
+
+  test('con otro rol y operación', () => {
+    const e = new AccesoDenegadoError('paciente', 'configurar-prestacion');
+    expect(e.rol).toBe('paciente');
+    expect(e.operacion).toBe('configurar-prestacion');
+  });
+});
+
+describe('ConfiguracionInvalidaError', () => {
+  test('preserva instanceof, name, campo y motivo, y no es ReglaNegocioError', () => {
+    const e = new ConfiguracionInvalidaError('duracionMinutos', 'debe ser múltiplo de 5');
+    expect(e).toBeInstanceOf(ConfiguracionInvalidaError);
+    expect(e).toBeInstanceOf(Error);
+    expect(e).not.toBeInstanceOf(ReglaNegocioError);
+    expect(e.name).toBe('ConfiguracionInvalidaError');
+    expect(e.campo).toBe('duracionMinutos');
+    expect(e.motivo).toBe('debe ser múltiplo de 5');
+    expect(e.tramoEnConflicto).toBeUndefined();
+    expect(e.message).toContain('duracionMinutos');
+  });
+
+  test('preserva el tramo en conflicto', () => {
+    const tramo = { id: 'h1m', consultorioId: 'c1', diaSemana: 1, desde: '09:00', hasta: '13:00' };
+    const e = new ConfiguracionInvalidaError('tramo', 'se solapa con otro tramo', tramo);
+    expect(e.campo).toBe('tramo');
+    expect(e.tramoEnConflicto).toBe(tramo);
   });
 });

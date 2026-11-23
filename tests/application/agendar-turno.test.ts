@@ -382,3 +382,58 @@ describe('Validación y persistencia atómicas', () => {
     expect(await sistema.turnos.listarPorRecursos('p1', 's1')).toEqual([original]);
   });
 });
+
+describe('Horario propio del profesional por día', () => {
+  const propio = (id: string, desde: string, hasta: string) => ({
+    id,
+    consultorioId: 'c1',
+    profesionalId: 'p2',
+    diaSemana: 1,
+    desde,
+    hasta,
+  });
+  const conTramoPropio = (...tramos: ReturnType<typeof propio>[]) =>
+    crearSistema({ horarios: [...crearEntorno().horarios, ...tramos] });
+  const sistemaBase = () => conTramoPropio(propio('hp1', '14:00', '18:00'));
+
+  test('Turno dentro del horario propio del profesional', async () => {
+    const turno = await agendar(sistemaBase(), { profesionalId: 'p2', hora: '14:00' });
+    expect(turno).toMatchObject({ inicio: local(LUNES, '14:00'), fin: local(LUNES, '14:30') });
+  });
+
+  test('El horario del consultorio no aplica el día con horario propio', async () => {
+    const error = await agendar(sistemaBase(), { profesionalId: 'p2', hora: '09:00' }).catch((e: unknown) => e);
+    expect(error).toBeInstanceOf(ReglaNegocioError);
+    expect(error).toMatchObject({ codigo: 'RN-07' });
+  });
+
+  test('Día sin horario propio usa el del consultorio', async () => {
+    const turno = await agendar(sistemaBase(), { profesionalId: 'p2', dia: '2026-11-24', hora: '09:00' });
+    expect(turno).toMatchObject({ inicio: local('2026-11-24', '09:00'), fin: local('2026-11-24', '09:30') });
+  });
+
+  test('El horario propio de otro profesional no cambia la agenda', async () => {
+    const sistema = sistemaBase();
+    const manana = await agendar(sistema, { profesionalId: 'p1', hora: '09:00' });
+    expect(manana.inicio).toEqual(local(LUNES, '09:00'));
+    const tarde = await agendar(sistema, { profesionalId: 'p1', sillonId: 's2', hora: '14:00' }).catch(
+      (e: unknown) => e,
+    );
+    expect(tarde).toBeInstanceOf(ReglaNegocioError);
+    expect(tarde).toMatchObject({ codigo: 'RN-07' });
+  });
+
+  test('Turno que excede el último tramo propio del día', async () => {
+    const error = await agendar(sistemaBase(), { profesionalId: 'p2', prestacionId: 'pr3', hora: '17:30' }).catch(
+      (e: unknown) => e,
+    );
+    expect(error).toMatchObject({ codigo: 'RN-07' });
+  });
+
+  test('Turno que cruza el corte entre tramos propios', async () => {
+    const sistema = conTramoPropio(propio('hp2', '08:00', '10:00'), propio('hp3', '16:00', '18:00'));
+    const error = await agendar(sistema, { profesionalId: 'p2', hora: '09:45' }).catch((e: unknown) => e);
+    expect(error).toBeInstanceOf(ReglaNegocioError);
+    expect(error).toMatchObject({ codigo: 'RN-17' });
+  });
+});

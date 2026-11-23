@@ -1,4 +1,5 @@
 import type { HorarioAtencion } from '../horario-atencion.js';
+import { tramosDelDia } from '../reglas/horario.js';
 import { deHoraLocal } from '../tiempo.js';
 
 export interface GenerarIniciosEntrada {
@@ -9,11 +10,8 @@ export interface GenerarIniciosEntrada {
   readonly zona: string;
   readonly horarios: readonly HorarioAtencion[];
   readonly pasoMinutos: number;
-}
-
-function aMinutos(hhmm: string): number {
-  const [h, m] = hhmm.split(':');
-  return Number(h) * 60 + Number(m);
+  /** Si se informa, la grilla sigue el horario efectivo de ese profesional (RN-28). */
+  readonly profesionalId?: string;
 }
 
 /** Fecha local 'YYYY-MM-DD' del instante en la zona. */
@@ -46,19 +44,15 @@ function diaSemanaDe(fecha: string): number {
 
 /**
  * Inicios candidatos ordenados: por cada día local del rango, la grilla `tramo.desde + k·paso` de cada
- * tramo del consultorio, acotada a `desde <= inicio < hasta` e `inicio >= ahora`. El ajuste del fin al
+ * tramo del horario efectivo (RN-28; el del consultorio si no hay `profesionalId`), acotada a `desde <= inicio < hasta` e `inicio >= ahora`. El ajuste del fin al
  * tramo no se resuelve acá: lo decide `validarAlta` (D1).
  */
 export function generarInicios(entrada: GenerarIniciosEntrada): Date[] {
-  const { rango, ahora, zona, horarios, pasoMinutos } = entrada;
+  const { rango, ahora, zona, horarios, pasoMinutos, profesionalId } = entrada;
   const inicios: Date[] = [];
   for (const fecha of fechasEntre(fechaLocal(rango.desde, zona), fechaLocal(rango.hasta, zona))) {
     const diaSemana = diaSemanaDe(fecha);
-    const tramos = horarios
-      .filter((h) => h.profesionalId === undefined && h.diaSemana === diaSemana)
-      .map((h) => ({ desde: aMinutos(h.desde), hasta: aMinutos(h.hasta) }))
-      .sort((a, b) => a.desde - b.desde);
-    for (const tramo of tramos) {
+    for (const tramo of tramosDelDia(horarios, diaSemana, profesionalId)) {
       for (let minutos = tramo.desde; minutos < tramo.hasta; minutos += pasoMinutos) {
         const inicio = deHoraLocal(fecha, minutos, zona);
         if (inicio >= rango.desde && inicio < rango.hasta && inicio >= ahora) inicios.push(inicio);
