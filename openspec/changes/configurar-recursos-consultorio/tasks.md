@@ -4,9 +4,9 @@
 
 ## 1. Safety net y errores
 
-- [ ] 1.1 SAFETY NET: instalar dependencias si faltan (`npm ci`), ejecutar `npm test` y `npm run typecheck` y registrar el baseline de tests en verde; si algo falla, detenerse y reportarlo como falla preexistente
-- [ ] 1.2 RED/GREEN/TRIANGULATE `'RN-27'` en `CodigoRN` y `turnosEnConflicto` en `Violacion` y `ReglaNegocioError` (`src/domain/errores.ts`, design D4): el error conserva la lista completa y no tiene `turnoEnConflicto`; verificar `tests/domain/errores.test.ts` en verde
-- [ ] 1.3 RED/GREEN/TRIANGULATE `AccesoDenegadoError` (`rol`, `operacion`) y `ConfiguracionInvalidaError` (`campo`, `motivo`, `tramoEnConflicto?`) sin código RN (design D4); verificar `tests/domain/errores.test.ts` en verde
+- [x] 1.1 SAFETY NET: instalar dependencias si faltan (`npm ci`), ejecutar `npm test` y `npm run typecheck` y registrar el baseline de tests en verde; si algo falla, detenerse y reportarlo como falla preexistente
+- [x] 1.2 RED/GREEN/TRIANGULATE `'RN-27'` en `CodigoRN` y `turnosEnConflicto` en `Violacion` y `ReglaNegocioError` (`src/domain/errores.ts`, design D4): el error conserva la lista completa y no tiene `turnoEnConflicto`; verificar `tests/domain/errores.test.ts` en verde
+- [x] 1.3 RED/GREEN/TRIANGULATE `AccesoDenegadoError` (`rol`, `operacion`) y `ConfiguracionInvalidaError` (`campo`, `motivo`, `tramoEnConflicto?`) sin código RN (design D4); verificar `tests/domain/errores.test.ts` en verde
 
 ## 2. Horario efectivo por día (RN-28)
 
