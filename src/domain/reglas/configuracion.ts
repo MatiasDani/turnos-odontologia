@@ -31,8 +31,16 @@ export interface DatosProfesional {
   readonly prestacionIds: readonly string[];
 }
 
+/** Datos normalizados: la matrícula, si no se informó, no existe. */
+export interface ProfesionalValidado {
+  readonly nombre: string;
+  readonly apellido: string;
+  readonly matricula?: string;
+  readonly prestacionIds: readonly string[];
+}
+
 /** RN-29: orden de comprobación nombre → apellido → matrícula → prestacionIds. */
-export function validarProfesional(datos: DatosProfesional): ResultadoConfiguracion<DatosProfesional> {
+export function validarProfesional(datos: DatosProfesional): ResultadoConfiguracion<ProfesionalValidado> {
   const nombre = normalizarNombre(datos.nombre);
   if (nombre === null) return invalido('nombre', MOTIVO_NOMBRE);
   const apellido = normalizarNombre(datos.apellido);
