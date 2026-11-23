@@ -3,7 +3,7 @@
 ## ADDED Requirements
 
 ### Requirement: Horario propio del profesional en la disponibilidad
-Los combos de un profesional MUST quedar dentro de su horario efectivo del día: sus tramos propios si tiene alguno ese día de la semana, o los del consultorio si no. Sus inicios candidatos SHALL alinearse al inicio de esos tramos con el paso de la consulta. El orden de los combos no cambia (RN-27, RN-13, DD-25).
+Los combos de un profesional MUST quedar dentro de su horario efectivo del día: sus tramos propios si tiene alguno ese día de la semana, o los del consultorio si no. Sus inicios candidatos SHALL alinearse al inicio de esos tramos con el paso de la consulta. El orden de los combos no cambia (RN-28, RN-13, DD-26).
 
 #### Scenario: Huecos de un profesional con horario propio
 - **GIVEN** `p2` tiene un tramo propio el lunes de 14:00 a 18:00

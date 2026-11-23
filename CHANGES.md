@@ -216,8 +216,8 @@ Carriles: **A** = núcleo y reserva online (Matías: C-01 → C-07 → C-10); **
 - **Scope**:
   - Casos de uso de alta/modificación/baja lógica de `Profesional`, `Sillon`, `Prestacion` (`duracionMinutos` entero > 0) y `HorarioAtencion` por consultorio y opcional por profesional (el del profesional prevalece, SU-09)
   - Reemplaza los fixtures de C-01 por carga vía casos de uso (los fixtures quedan como seed para tests/demo)
-  - ~~**Extiende** el puerto `PacienteRepositorio`~~: ya satisfecho por C-10 y C-12 (`obtenerPorDni`, `obtenerPorId`, `guardar`); C-05 no lo modifica (DD-27, explore 2026-11-23)
-  - Regla: no se desactiva un recurso con turnos activos futuros sin resolver (RN-26); un profesional inactivo no recibe turnos nuevos (RN-18); horario propio por día (RN-27) y validez de la configuración (RN-28)
+  - ~~**Extiende** el puerto `PacienteRepositorio`~~: ya satisfecho por C-10 y C-12 (`obtenerPorDni`, `obtenerPorId`, `guardar`); C-05 no lo modifica (DD-28, explore 2026-11-23)
+  - Regla: no se desactiva un recurso con turnos activos futuros sin resolver (RN-27); un profesional inactivo no recibe turnos nuevos (RN-18); horario propio por día (RN-28) y validez de la configuración (RN-29)
   - Tests: ABM, desactivación bloqueada con turnos futuros, prevalencia del horario por profesional
   - Cubre US-008
 - **Dependencias**: `C-01`

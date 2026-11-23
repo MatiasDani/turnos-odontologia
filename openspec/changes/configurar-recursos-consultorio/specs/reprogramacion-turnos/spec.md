@@ -3,7 +3,7 @@
 ## ADDED Requirements
 
 ### Requirement: Horario propio del profesional al reprogramar
-El nuevo horario de un turno reprogramado MUST validarse contra el horario efectivo del día del profesional de destino: sus tramos propios si tiene alguno ese día de la semana, o los del consultorio si no. Si queda fuera, se rechaza con `RN-07` o `RN-17` y el turno no cambia (RN-27, RN-11, DD-25).
+El nuevo horario de un turno reprogramado MUST validarse contra el horario efectivo del día del profesional de destino: sus tramos propios si tiene alguno ese día de la semana, o los del consultorio si no. Si queda fuera, se rechaza con `RN-07` o `RN-17` y el turno no cambia (RN-28, RN-11, DD-26).
 
 #### Scenario: Reprogramar al horario propio del profesional de destino
 - **GIVEN** el turno base y `p2` con un tramo propio el lunes de 14:00 a 18:00

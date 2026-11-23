@@ -48,21 +48,21 @@ Usuario     0..1 ── 1 Profesional        (un usuario odontólogo se vincula 
 ### Profesional
 - `id`, `consultorioId`, `nombre`, `apellido`, `matricula?: string` (ficticia en seed), `activo: boolean`, `prestacionIds: string[]`.
 - Relaciones: N a N con Prestacion; 1 a N con Turno, BloqueoHorario.
-- Constraint: un profesional inactivo no recibe turnos nuevos (RN-18). Baja lógica y reactivación; no se desactiva con turnos activos futuros (RN-26, DD-24). `nombre` y `apellido` obligatorios (recortados, no vacíos, hasta 80 caracteres) y `prestacionIds` sin repetidos, que existan (RN-28, DD-26). La consulta de disponibilidad (C-07) solo lo ofrece para las prestaciones de su `prestacionIds` (RN-13, DD-12); el alta de C-01 no lo exige (pregunta abierta).
+- Constraint: un profesional inactivo no recibe turnos nuevos (RN-18). Baja lógica y reactivación; no se desactiva con turnos activos futuros (RN-27, DD-25). `nombre` y `apellido` obligatorios (recortados, no vacíos, hasta 80 caracteres) y `prestacionIds` sin repetidos, que existan (RN-29, DD-27). La consulta de disponibilidad (C-07) solo lo ofrece para las prestaciones de su `prestacionIds` (RN-13, DD-12); el alta de C-01 no lo exige (pregunta abierta).
 
 ### Sillon (Box)
 - `id`, `consultorioId`, `nombre` (ej. "Sillón 1"), `activo: boolean`.
 - Relaciones: 1 a N con Turno y BloqueoHorario.
-- Constraint: no se admiten dos turnos activos solapados en el mismo sillón (RN-03). Baja lógica y reactivación; no se desactiva con turnos activos futuros (RN-26). `nombre` obligatorio (RN-28).
+- Constraint: no se admiten dos turnos activos solapados en el mismo sillón (RN-03). Baja lógica y reactivación; no se desactiva con turnos activos futuros (RN-27). `nombre` obligatorio (RN-29).
 
 ### Prestacion
-- `id`, `consultorioId`, `nombre`, `duracionMinutos: number` (entero > 0 y múltiplo de 5, RN-28), `activa: boolean`, `requiereSillonIds?: string[]` (**Suposición**: opcional, para prestaciones que solo pueden hacerse en ciertos sillones; C-07 no lo evalúa: cualquier sillón activo sirve, DD-12 y pregunta abierta).
-- Constraint: `duracionMinutos` es la duración por defecto del turno (RN-06). Cada turno puede ajustarla de forma opcional (DD-10, RN-16). Una prestación inactiva no puede usarse para dar turnos (RN-18). Baja lógica y reactivación; no se desactiva con turnos activos futuros (RN-26). Cambiar `duracionMinutos` no altera los turnos existentes. `requiereSillonIds` no existe en el código (C-05 no lo agrega; pregunta abierta).
+- `id`, `consultorioId`, `nombre`, `duracionMinutos: number` (entero > 0 y múltiplo de 5, RN-29), `activa: boolean`, `requiereSillonIds?: string[]` (**Suposición**: opcional, para prestaciones que solo pueden hacerse en ciertos sillones; C-07 no lo evalúa: cualquier sillón activo sirve, DD-12 y pregunta abierta).
+- Constraint: `duracionMinutos` es la duración por defecto del turno (RN-06). Cada turno puede ajustarla de forma opcional (DD-10, RN-16). Una prestación inactiva no puede usarse para dar turnos (RN-18). Baja lógica y reactivación; no se desactiva con turnos activos futuros (RN-27). Cambiar `duracionMinutos` no altera los turnos existentes. `requiereSillonIds` no existe en el código (C-05 no lo agrega; pregunta abierta).
 
 ### Paciente
 - `id`, `nombre`, `apellido`, `dni: string`, `telefono: string` (para `wa.me`), `email?: string`, `consentimientoContacto: boolean`.
 - Relaciones: 1 a N con Turno.
-- Constraint: **solo datos ficticios en el repositorio** (Ley 25.326). Datos de salud: sensibles; en el MVP no se almacenan datos clínicos. La reserva online hace un alta mínima sin cuenta (DNI de 7-8 dígitos, nombre y apellido no vacíos de hasta 80 caracteres, teléfono normalizado y `consentimientoContacto` verdadero; e-mail opcional con formato válido; DD-17); si el DNI ya existe se reutiliza el paciente sin modificarlo (DD-14, RN-22). Puerto `PacienteRepositorio` (`obtenerPorDni`, `guardar`) creado por C-10 y extendido con `obtenerPorId` por C-12 (DD-16); C-05 no necesita extenderlo (DD-27).
+- Constraint: **solo datos ficticios en el repositorio** (Ley 25.326). Datos de salud: sensibles; en el MVP no se almacenan datos clínicos. La reserva online hace un alta mínima sin cuenta (DNI de 7-8 dígitos, nombre y apellido no vacíos de hasta 80 caracteres, teléfono normalizado y `consentimientoContacto` verdadero; e-mail opcional con formato válido; DD-17); si el DNI ya existe se reutiliza el paciente sin modificarlo (DD-14, RN-22). Puerto `PacienteRepositorio` (`obtenerPorDni`, `guardar`) creado por C-10 y extendido con `obtenerPorId` por C-12 (DD-16); C-05 no necesita extenderlo (DD-28).
 - Índice: (`dni`) y (`telefono`) para búsqueda por recepción.
 
 ### Turno
@@ -87,7 +87,7 @@ Usuario     0..1 ── 1 Profesional        (un usuario odontólogo se vincula 
 
 ### HorarioAtencion
 - `id`, `consultorioId`, `profesionalId?` (si es nulo, aplica al consultorio), `diaSemana: 0..6`, `desde: 'HH:mm'`, `hasta: 'HH:mm'`.
-- Constraint: sin turnos fuera de horario de atención (RN-07). Si el profesional tiene tramos propios para un día de la semana, ese día solo valen sus tramos; si no, los del consultorio (RN-27, DD-25; resuelve SU-09). `diaSemana` entero 0..6, `desde`/`hasta` en `HH:mm` de 24 h con `desde < hasta`, sin solapar con otro tramo del mismo día y ámbito (consultorio, o el mismo profesional) (RN-28). Los tramos se agregan, modifican (sin cambiar de ámbito) y eliminan; no tienen baja lógica.
+- Constraint: sin turnos fuera de horario de atención (RN-07). Si el profesional tiene tramos propios para un día de la semana, ese día solo valen sus tramos; si no, los del consultorio (RN-28, DD-26; resuelve SU-09). `diaSemana` entero 0..6, `desde`/`hasta` en `HH:mm` de 24 h con `desde < hasta`, sin solapar con otro tramo del mismo día y ámbito (consultorio, o el mismo profesional) (RN-29). Los tramos se agregan, modifican (sin cambiar de ámbito) y eliminan; no tienen baja lógica.
 
 ### Usuario
 - `id`, `consultorioId`, `email`, `hashClave: string` (nunca en texto plano), `rolId`, `profesionalId?`, `activo`.

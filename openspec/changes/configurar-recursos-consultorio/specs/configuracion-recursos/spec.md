@@ -9,7 +9,7 @@ Permite que el administrador configure los recursos del consultorio (profesional
 ## ADDED Requirements
 
 ### Requirement: Solo el administrador configura recursos
-Dar de alta, modificar, desactivar o reactivar profesionales, sillones y prestaciones, y agregar, modificar o eliminar tramos de horario, SHALL estar permitido solo al rol `administrador`. Cualquier otro rol MUST rechazarse con un error de acceso denegado que indica el rol, sin modificar nada (US-008, DD-27).
+Dar de alta, modificar, desactivar o reactivar profesionales, sillones y prestaciones, y agregar, modificar o eliminar tramos de horario, SHALL estar permitido solo al rol `administrador`. Cualquier otro rol MUST rechazarse con un error de acceso denegado que indica el rol, sin modificar nada (US-008, DD-28).
 
 #### Scenario: El administrador da de alta un sillón
 - **WHEN** el administrador da de alta el sillón "Sillón 3" en `c1`
@@ -35,7 +35,7 @@ Dar de alta, modificar, desactivar o reactivar profesionales, sillones y prestac
 - **THEN** se rechaza con acceso denegado para el rol `recepcion`
 
 ### Requirement: Alta de profesional
-Dar de alta un profesional SHALL registrarlo activo, con un id nuevo, en el consultorio indicado, con su nombre, apellido, matrícula opcional y las prestaciones que realiza (`prestacionIds`). El consultorio y cada prestación MUST existir; `prestacionIds` MUST no tener repetidos y puede estar vacío (RN-28, DD-26).
+Dar de alta un profesional SHALL registrarlo activo, con un id nuevo, en el consultorio indicado, con su nombre, apellido, matrícula opcional y las prestaciones que realiza (`prestacionIds`). El consultorio y cada prestación MUST existir; `prestacionIds` MUST no tener repetidos y puede estar vacío (RN-29, DD-27).
 
 #### Scenario: Alta de un profesional con sus prestaciones
 - **WHEN** el administrador da de alta en `c1` al profesional "Franco" "Ficticio", matrícula "0003", con las prestaciones `pr1` y `pr2`
@@ -64,7 +64,7 @@ Dar de alta un profesional SHALL registrarlo activo, con un id nuevo, en el cons
 - **THEN** se rechaza con un error de no encontrado que identifica el consultorio `c9`
 
 ### Requirement: Modificación de profesional
-Modificar un profesional SHALL cambiar solo los datos informados entre nombre, apellido, matrícula y `prestacionIds`, con las mismas validaciones que el alta, y MUST conservar su id, su consultorio y su estado de actividad. Las prestaciones que deja de realizar dejan de ofrecerlo en la disponibilidad (RN-13, DD-26).
+Modificar un profesional SHALL cambiar solo los datos informados entre nombre, apellido, matrícula y `prestacionIds`, con las mismas validaciones que el alta, y MUST conservar su id, su consultorio y su estado de actividad. Las prestaciones que deja de realizar dejan de ofrecerlo en la disponibilidad (RN-13, DD-27).
 
 #### Scenario: Modificar las prestaciones de un profesional
 - **WHEN** el administrador cambia las prestaciones de `p2` a solo `pr1`
@@ -91,7 +91,7 @@ Modificar un profesional SHALL cambiar solo los datos informados entre nombre, a
 - **THEN** se rechaza con un error de no encontrado que identifica el profesional `p9`
 
 ### Requirement: Alta y modificación de sillón
-Dar de alta un sillón SHALL registrarlo activo, con un id nuevo, en el consultorio indicado. Modificar un sillón SHALL cambiar solo su nombre y MUST conservar su id, consultorio y actividad. El nombre MUST ser válido (RN-28).
+Dar de alta un sillón SHALL registrarlo activo, con un id nuevo, en el consultorio indicado. Modificar un sillón SHALL cambiar solo su nombre y MUST conservar su id, consultorio y actividad. El nombre MUST ser válido (RN-29).
 
 #### Scenario: Alta de un sillón
 - **WHEN** el administrador da de alta el sillón "Sillón 3" en `c1`
@@ -117,7 +117,7 @@ Dar de alta un sillón SHALL registrarlo activo, con un id nuevo, en el consulto
 - **THEN** se rechaza con un error de no encontrado que identifica el sillón `s9`
 
 ### Requirement: Alta y modificación de prestación
-Dar de alta una prestación SHALL registrarla activa, con un id nuevo, en el consultorio indicado, con su nombre y duración por defecto. Modificar una prestación SHALL cambiar solo su nombre o su duración, MUST conservar su id, consultorio y actividad, y MUST NOT alterar los turnos ya existentes (RN-06, RN-28).
+Dar de alta una prestación SHALL registrarla activa, con un id nuevo, en el consultorio indicado, con su nombre y duración por defecto. Modificar una prestación SHALL cambiar solo su nombre o su duración, MUST conservar su id, consultorio y actividad, y MUST NOT alterar los turnos ya existentes (RN-06, RN-29).
 
 #### Scenario: Alta de una prestación
 - **WHEN** el administrador da de alta en `c1` la prestación "Blanqueamiento" de 60 minutos
@@ -138,7 +138,7 @@ Dar de alta una prestación SHALL registrarla activa, con un id nuevo, en el con
 - **THEN** se rechaza con un error de no encontrado que identifica la prestación `pr9`
 
 ### Requirement: Duración válida de la prestación
-La duración de una prestación MUST ser un entero mayor que 0 y múltiplo de 5, tanto en el alta como en la modificación. Si no, se rechaza como configuración inválida por el campo `duracionMinutos`, sin registrar ni modificar nada (RN-28).
+La duración de una prestación MUST ser un entero mayor que 0 y múltiplo de 5, tanto en el alta como en la modificación. Si no, se rechaza como configuración inválida por el campo `duracionMinutos`, sin registrar ni modificar nada (RN-29).
 
 #### Scenario: Prestación de 5 minutos es válida
 - **WHEN** el administrador da de alta la prestación "Control rápido" de 5 minutos
@@ -155,7 +155,7 @@ La duración de una prestación MUST ser un entero mayor que 0 y múltiplo de 5,
 - **AND** `pr1` sigue durando 30 minutos
 
 ### Requirement: Desactivación lógica de recursos
-Desactivar un profesional, un sillón o una prestación SHALL marcarlo inactivo sin borrarlo: sigue existiendo y conserva sus datos. Desactivar un recurso ya inactivo MUST tener éxito sin cambios (DD-24).
+Desactivar un profesional, un sillón o una prestación SHALL marcarlo inactivo sin borrarlo: sigue existiendo y conserva sus datos. Desactivar un recurso ya inactivo MUST tener éxito sin cambios (DD-25).
 
 #### Scenario: Desactivar un profesional sin turnos futuros
 - **WHEN** el administrador desactiva a `p2`
@@ -180,30 +180,30 @@ Desactivar un profesional, un sillón o una prestación SHALL marcarlo inactivo 
 - **THEN** se rechaza con un error de no encontrado que identifica el profesional `p9`
 
 ### Requirement: Desactivación bloqueada por turnos activos futuros
-Un profesional, sillón o prestación con turnos `reservado` o `confirmado` cuyo `inicio` es igual o posterior a `ahora` MUST NOT desactivarse: se rechaza con `RN-26` listando todos esos turnos ordenados por `inicio`, y el recurso sigue activo. Los turnos en otro estado o ya iniciados no lo impiden (RN-26).
+Un profesional, sillón o prestación con turnos `reservado` o `confirmado` cuyo `inicio` es igual o posterior a `ahora` MUST NOT desactivarse: se rechaza con `RN-27` listando todos esos turnos ordenados por `inicio`, y el recurso sigue activo. Los turnos en otro estado o ya iniciados no lo impiden (RN-27).
 
 #### Scenario: Desactivar un profesional con un turno confirmado futuro
 - **GIVEN** un turno `confirmado` de `pa1` con `p1`, `s1`, `pr1` el martes de 09:00 a 09:30
 - **WHEN** el administrador desactiva a `p1`
-- **THEN** se rechaza con `RN-26` e informa ese turno como conflicto
+- **THEN** se rechaza con `RN-27` e informa ese turno como conflicto
 - **AND** `p1` sigue activa
 
 #### Scenario: Desactivar un sillón con un turno reservado futuro
 - **GIVEN** un turno `reservado` de `pa2` con `p2`, `s2`, `pr1` el martes de 10:00 a 10:30
 - **WHEN** el administrador desactiva `s2`
-- **THEN** se rechaza con `RN-26` e informa ese turno como conflicto
+- **THEN** se rechaza con `RN-27` e informa ese turno como conflicto
 - **AND** `s2` sigue activo
 
 #### Scenario: Desactivar una prestación lista todos los turnos en conflicto
 - **GIVEN** un turno `confirmado` de `pa1` con `p1`, `s1`, `pr2` el martes a las 11:00 y otro `reservado` de `pa2` con `p2`, `s2`, `pr2` el lunes a las 15:00
 - **WHEN** el administrador desactiva `pr2`
-- **THEN** se rechaza con `RN-26` e informa como conflicto los dos turnos, primero el del lunes a las 15:00 y después el del martes a las 11:00
+- **THEN** se rechaza con `RN-27` e informa como conflicto los dos turnos, primero el del lunes a las 15:00 y después el del martes a las 11:00
 - **AND** `pr2` sigue activa
 
 #### Scenario: Un turno que empieza justo ahora impide desactivar
 - **GIVEN** un turno `confirmado` de `pa1` con `p1`, `s1`, `pr1` el lunes de 10:00 a 10:30 y `ahora` el lunes a las 10:00
 - **WHEN** el administrador desactiva a `p1`
-- **THEN** se rechaza con `RN-26` e informa ese turno como conflicto
+- **THEN** se rechaza con `RN-27` e informa ese turno como conflicto
 
 #### Scenario: Turnos no activos o ya iniciados no impiden desactivar
 - **GIVEN** turnos de `p1` el martes a las 09:00 `cancelado`, el martes a las 10:00 `ausente`, el lunes a las 09:00 `atendido` y el lunes de 09:45 a 10:15 `confirmado`, con `ahora` el lunes a las 10:00
@@ -216,7 +216,7 @@ Un profesional, sillón o prestación con turnos `reservado` o `confirmado` cuyo
 - **THEN** `s2` queda inactivo
 
 ### Requirement: Reactivación de recursos
-Reactivar un profesional, sillón o prestación inactivo SHALL marcarlo activo de nuevo, sin otra condición, y desde ese momento puede volver a usarse para dar turnos. Reactivar un recurso ya activo MUST tener éxito sin cambios (DD-24).
+Reactivar un profesional, sillón o prestación inactivo SHALL marcarlo activo de nuevo, sin otra condición, y desde ese momento puede volver a usarse para dar turnos. Reactivar un recurso ya activo MUST tener éxito sin cambios (DD-25).
 
 #### Scenario: Reactivar un profesional inactivo
 - **GIVEN** `p2` está inactivo
@@ -261,7 +261,7 @@ Un profesional, sillón o prestación desactivado MUST NOT usarse en un turno nu
 - **THEN** ambas operaciones se rechazan con `RN-18`
 
 ### Requirement: Tramos del horario de atención
-El administrador SHALL poder agregar tramos de horario del consultorio o de un profesional (`diaSemana`, `desde`, `hasta`), modificar el día y las horas de un tramo sin cambiar a quién pertenece, y eliminarlo. Los cambios rigen de inmediato para el alta, la disponibilidad y la reprogramación. El profesional del tramo MUST existir (RN-07, RN-27).
+El administrador SHALL poder agregar tramos de horario del consultorio o de un profesional (`diaSemana`, `desde`, `hasta`), modificar el día y las horas de un tramo sin cambiar a quién pertenece, y eliminarlo. Los cambios rigen de inmediato para el alta, la disponibilidad y la reprogramación. El profesional del tramo MUST existir (RN-07, RN-28).
 
 #### Scenario: Agregar un tramo del consultorio habilita la agenda ese día
 - **GIVEN** el administrador agregó un tramo del consultorio el sábado de 09:00 a 13:00
@@ -291,7 +291,7 @@ El administrador SHALL poder agregar tramos de horario del consultorio o de un p
 - **THEN** ambas operaciones se rechazan con un error de no encontrado que identifica el horario `h9`
 
 ### Requirement: Validez de los tramos de horario
-Un tramo MUST tener `diaSemana` entero de 0 (domingo) a 6 (sábado), `desde` y `hasta` con formato `HH:mm` de 24 horas (de 00:00 a 23:59) y `desde` anterior a `hasta`. Si no, se rechaza como configuración inválida por el campo que falla, sin registrar ni modificar nada (RN-28).
+Un tramo MUST tener `diaSemana` entero de 0 (domingo) a 6 (sábado), `desde` y `hasta` con formato `HH:mm` de 24 horas (de 00:00 a 23:59) y `desde` anterior a `hasta`. Si no, se rechaza como configuración inválida por el campo que falla, sin registrar ni modificar nada (RN-29).
 
 #### Scenario: Día de la semana inválido
 - **WHEN** el administrador agrega tramos del consultorio con `diaSemana` 7, -1 y 1,5
@@ -315,7 +315,7 @@ Un tramo MUST tener `diaSemana` entero de 0 (domingo) a 6 (sábado), `desde` y `
 - **AND** `h1m` sigue de 09:00 a 13:00
 
 ### Requirement: Sin tramos solapados en el mismo ámbito
-Un tramo MUST NOT solaparse (intervalo semiabierto) con otro tramo del mismo día de la semana y del mismo ámbito: el del consultorio, o el del mismo profesional. Si se solapa, se rechaza como configuración inválida por el campo `tramo`, informando el tramo en conflicto. Tramos contiguos y tramos de ámbitos distintos son válidos (RN-28, RN-05).
+Un tramo MUST NOT solaparse (intervalo semiabierto) con otro tramo del mismo día de la semana y del mismo ámbito: el del consultorio, o el del mismo profesional. Si se solapa, se rechaza como configuración inválida por el campo `tramo`, informando el tramo en conflicto. Tramos contiguos y tramos de ámbitos distintos son válidos (RN-29, RN-05).
 
 #### Scenario: Tramo del consultorio que solapa otro del mismo día
 - **WHEN** el administrador agrega un tramo del consultorio el lunes de 12:00 a 14:00
@@ -349,7 +349,7 @@ Un tramo MUST NOT solaparse (intervalo semiabierto) con otro tramo del mismo dí
 - **AND** `h1t` sigue de 15:00 a 19:00
 
 ### Requirement: Orden de evaluación de los rechazos de configuración
-Los rechazos de configuración SHALL evaluarse en orden fijo y se informa solo el primero: rol no autorizado, luego datos inválidos (en el orden nombre, apellido, matrícula, `prestacionIds`, `duracionMinutos`, `diaSemana`, `desde`, `hasta`), luego recurso o referencia inexistente, luego tramo solapado, luego `RN-26` (DD-26, DD-27).
+Los rechazos de configuración SHALL evaluarse en orden fijo y se informa solo el primero: rol no autorizado, luego datos inválidos (en el orden nombre, apellido, matrícula, `prestacionIds`, `duracionMinutos`, `diaSemana`, `desde`, `hasta`), luego recurso o referencia inexistente, luego tramo solapado, luego `RN-27` (DD-27, DD-28).
 
 #### Scenario: Rol no autorizado prevalece sobre datos inválidos
 - **WHEN** recepción da de alta una prestación de 0 minutos

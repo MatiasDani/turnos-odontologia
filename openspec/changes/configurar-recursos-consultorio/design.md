@@ -2,7 +2,7 @@
 
 ## Context
 
-Ver `proposal.md` (Why) y los specs de `specs/` (requisitos). Las decisiones de negocio están en RN-26, RN-27 y RN-28 (`knowledge-base/05_reglas_de_negocio.md`) y en DD-24 a DD-27 (`09_decisiones_y_supuestos.md`). Estado actual relevante:
+Ver `proposal.md` (Why) y los specs de `specs/` (requisitos). Las decisiones de negocio están en RN-27, RN-28 y RN-29 (`knowledge-base/05_reglas_de_negocio.md`) y en DD-25 a DD-28 (`09_decisiones_y_supuestos.md`). Estado actual relevante:
 
 - `Profesional`, `Sillon`, `Prestacion` y `HorarioAtencion` (`src/domain/*.ts`) son interfaces `readonly`; `HorarioAtencion.profesionalId?` existe pero ningún código lo evalúa.
 - `src/domain/reglas/horario.ts`: `validarHorario(intervalo, zona, horarios)` filtra `h.profesionalId === undefined`. Lo llama solo `validarAlta`, que ya recibe el `profesional` y es la única fuente de reglas del alta (C-01), la disponibilidad (C-07, DD-12) y la reprogramación (C-03).
@@ -16,7 +16,7 @@ Ver `proposal.md` (Why) y los specs de `specs/` (requisitos). Las decisiones de 
 
 **Goals:**
 - Reglas de configuración y de desactivación como funciones puras del dominio, testeables sin repositorio ni reloj.
-- Una sola función de selección de tramos (RN-27) usada por el alta, la disponibilidad y la reprogramación.
+- Una sola función de selección de tramos (RN-28) usada por el alta, la disponibilidad y la reprogramación.
 - Cambios aditivos: las suites existentes (C-01, C-02, C-03, C-04, C-07, C-10, C-11, C-12) siguen en verde sin editar sus tests; solo se tocan fixtures de cableado.
 
 **Non-Goals:**
@@ -29,7 +29,7 @@ Ver `proposal.md` (Why) y los specs de `specs/` (requisitos). Las decisiones de 
 ### D1. Capas y archivos
 
 ```
-src/domain/errores.ts                        + 'RN-26', turnosEnConflicto, AccesoDenegadoError, ConfiguracionInvalidaError
+src/domain/errores.ts                        + 'RN-27', turnosEnConflicto, AccesoDenegadoError, ConfiguracionInvalidaError
 src/domain/reglas/horario.ts                 + tramosDelDia(horarios, diaSemana, profesionalId?) ; validarHorario(…, profesionalId?)
 src/domain/reglas/validar-alta.ts            pasa profesional.id a validarHorario
 src/domain/disponibilidad/generar-candidatos.ts  GenerarIniciosEntrada.profesionalId? ; usa tramosDelDia
@@ -50,7 +50,7 @@ tests/fixtures/sistema-configuracion.ts      NUEVO: cableado compartido configur
 
 Las reglas viven en `src/domain/reglas/` y reciben `ahora` como dato (reglas duras 2 y 3). `Profesional`, `Sillon`, `Prestacion`, `HorarioAtencion` y `Turno` no cambian de forma.
 
-### D2. Horario efectivo por día (RN-27)
+### D2. Horario efectivo por día (RN-28)
 
 ```ts
 tramosDelDia(horarios, diaSemana, profesionalId?: string): { desde: number; hasta: number }[]
@@ -74,7 +74,7 @@ Alternativa descartada: unión de inicios evaluada para todos los profesionales.
 ### D4. Errores nuevos
 
 ```ts
-type CodigoRN = … | 'RN-26';
+type CodigoRN = … | 'RN-27';
 interface Violacion { …; readonly turnosEnConflicto?: readonly Turno[] }   // también en ReglaNegocioError
 class AccesoDenegadoError extends Error { readonly rol: Rol; readonly operacion: string }
 type CampoConfiguracion = 'nombre' | 'apellido' | 'matricula' | 'prestacionIds' | 'duracionMinutos'
@@ -86,7 +86,7 @@ class ConfiguracionInvalidaError extends Error {
 
 - `AccesoDenegadoError` sigue el patrón de `RecursoNoEncontradoError` (sin código RN): el permiso no es una regla de agenda y C-09 lo reutiliza. `operacion` es un string estable (`'configurar-profesional'`, …) para mensajes y logs.
 - `ConfiguracionInvalidaError` sigue el patrón de `ConsultaInvalidaError` (DD-12). `desde >= hasta` se informa en el campo `hasta`; el solapamiento en `tramo` con el tramo en conflicto (el primero por `desde`).
-- RN-26 reutiliza `ReglaNegocioError` con `turnosEnConflicto` (lista completa, por `inicio` y luego `id`); `turnoEnConflicto` queda sin valor. Se elige un campo nuevo y no reutilizar el singular porque la recepción necesita todos los turnos para resolverlos.
+- RN-27 reutiliza `ReglaNegocioError` con `turnosEnConflicto` (lista completa, por `inicio` y luego `id`); `turnoEnConflicto` queda sin valor. Se elige un campo nuevo y no reutilizar el singular porque la recepción necesita todos los turnos para resolverlos.
 
 ### D5. Reglas puras de configuración (`configuracion.ts`)
 
@@ -100,10 +100,10 @@ class ConfiguracionInvalidaError extends Error {
 ```ts
 evaluarDesactivacion(turnos: readonly Turno[], ahora: Date): Violacion | null
 // conflictos = turnos con estado 'reservado' | 'confirmado' e inicio.getTime() >= ahora.getTime()
-// vacío → null ; si no → { codigo: 'RN-26', turnosEnConflicto: ordenados por inicio, luego id }
+// vacío → null ; si no → { codigo: 'RN-27', turnosEnConflicto: ordenados por inicio, luego id }
 ```
 
-No usa `esActivo` porque `atendido` es activo para la ocupación (DD-05) pero no cuenta para RN-26 (un `atendido` futuro no puede existir por RN-24; se excluye de forma explícita para no depender de esa invariante).
+No usa `esActivo` porque `atendido` es activo para la ocupación (DD-05) pero no cuenta para RN-27 (un `atendido` futuro no puede existir por RN-24; se excluye de forma explícita para no depender de esa invariante).
 
 ### D7. Puertos y adaptadores
 
@@ -120,9 +120,9 @@ interface TurnoRepositorio { …; listarPorRecurso(recurso: RecursoDeTurno): Pro
 ```
 
 - `guardar` es alta o reemplazo por `id` (mismo contrato que `PacienteRepositorio.guardar`); `eliminar` de un id inexistente no hace nada (el caso de uso ya verificó la existencia).
-- `listarPorRecurso` devuelve turnos de cualquier estado y el dominio filtra (D6): la regla queda en un solo lugar. Un adaptador PostgreSQL futuro puede filtrar por estado e `inicio` en la consulta sin cambiar el contrato observable de RN-26.
+- `listarPorRecurso` devuelve turnos de cualquier estado y el dominio filtra (D6): la regla queda en un solo lugar. Un adaptador PostgreSQL futuro puede filtrar por estado e `inicio` en la consulta sin cambiar el contrato observable de RN-27.
 - Adaptadores en memoria: `PorId`/`PorIdYConsultorio` pasan a guardar una copia mutable (`[...iniciales]`) y suman `guardar`; `PrestacionRepositorioEnMemoria` pasa a extender `PorIdYConsultorio`; `HorarioAtencionRepositorioEnMemoria` suma `obtenerPorId`, `guardar` y `eliminar`. Los constructores conservan su firma, así que `crearSistema*` y `tests/adapters/catalogos.test.ts` no cambian. Las listas conservan el orden de carga y un alta se agrega al final.
-- `PacienteRepositorio` no cambia (DD-27).
+- `PacienteRepositorio` no cambia (DD-28).
 
 ### D8. Casos de uso
 
@@ -142,7 +142,7 @@ Secuencia fija (orden del requisito de rechazos):
 2. Validación pura de los campos informados (D5) → `ConfiguracionInvalidaError`.
 3. Lecturas: recurso a modificar, consultorio, prestaciones de `prestacionIds` (deben existir y pertenecer al mismo consultorio), profesional del tramo → `RecursoNoEncontradoError('profesional' | 'sillon' | 'prestacion' | 'consultorio' | 'horario', id)`.
 4. Modificación: se valida de nuevo la entidad combinada (D5). Tramos: `tramoEnConflicto` sobre `listarPorConsultorio` → `ConfiguracionInvalidaError('tramo')`.
-5. Desactivación: si ya está inactivo, devuelve sin cambios; si no, `evaluarDesactivacion(await turnos.listarPorRecurso(…), reloj.ahora())` → `ReglaNegocioError` RN-26; si no hay conflicto, `guardar({ …actual, activo: false })`.
+5. Desactivación: si ya está inactivo, devuelve sin cambios; si no, `evaluarDesactivacion(await turnos.listarPorRecurso(…), reloj.ahora())` → `ReglaNegocioError` RN-27; si no hay conflicto, `guardar({ …actual, activo: false })`.
 6. `guardar` y devolver.
 
 Se eligen clases por recurso (y no una clase por operación, como en C-04) porque las operaciones comparten dependencias y validaciones, y toda la configuración tiene el mismo permiso en la matriz RBAC; C-09 puede envolver cada método si llega a necesitarlo.
@@ -160,7 +160,7 @@ Se eligen clases por recurso (y no una clase por operación, como en C-04) porqu
 - `tests/domain/reglas/horario.test.ts`: casos nuevos de `tramosDelDia` y `validarHorario` con `profesionalId` (propio del día, otro día, otro profesional, RN-07 y RN-17 sobre tramos propios); los casos existentes sin `profesionalId` quedan intactos.
 - `tests/domain/disponibilidad/generar-candidatos.test.ts`: grilla con tramos propios y alineación (14:10, 14:25).
 - `tests/domain/reglas/configuracion.test.ts` y `tests/domain/reglas/desactivacion.test.ts`: tablas con `test.each` (mínimo dos casos por comportamiento: límites 80/81, 5 min, horas inválidas, contiguos, mismo id, umbral `inicio == ahora`, estados que no cuentan).
-- `tests/domain/errores.test.ts`: `RN-26` con `turnosEnConflicto`, `AccesoDenegadoError`, `ConfiguracionInvalidaError`.
+- `tests/domain/errores.test.ts`: `RN-27` con `turnosEnConflicto`, `AccesoDenegadoError`, `ConfiguracionInvalidaError`.
 - `tests/adapters/catalogos.test.ts` y `tests/adapters/turno-repositorio.test.ts`: `guardar` alta/reemplazo, copia defensiva del arreglo inicial, `eliminar`, `listarPorRecurso` por cada tipo.
 - `tests/application/configuracion-recursos.test.ts`: un test por `#### Scenario:` de `specs/configuracion-recursos/spec.md` con el mismo nombre, agrupados en `describe` por requisito (regla dura 8).
 - Los escenarios ADDED de `agenda-turnos`, `disponibilidad-turnos` y `reprogramacion-turnos` van en `describe` nuevos de `tests/application/agendar-turno.test.ts`, `consultar-disponibilidad.test.ts` y `reprogramar-turno.test.ts`, con un tramo propio sembrado por `overrides.horarios`; los `describe` existentes no se editan.
@@ -168,11 +168,11 @@ Se eligen clases por recurso (y no una clase por operación, como en C-04) porqu
 
 ## Risks / Trade-offs
 
-- [Una desactivación y un alta concurrentes no comparten sección crítica: un alta que ya leyó el recurso activo puede crear un turno sobre el recurso recién desactivado] → Riesgo bajo (configuración poco frecuente, Node de un hilo en memoria); documentado en DD-24 y en `10_preguntas_abiertas.md` para el change de persistencia real (transacción o `SELECT … FOR UPDATE`).
-- [Eliminar o acortar un tramo puede dejar turnos futuros fuera de horario] → Fuera de alcance por decisión (DD-26); pregunta abierta nueva en `10`.
+- [Una desactivación y un alta concurrentes no comparten sección crítica: un alta que ya leyó el recurso activo puede crear un turno sobre el recurso recién desactivado] → Riesgo bajo (configuración poco frecuente, Node de un hilo en memoria); documentado en DD-25 y en `10_preguntas_abiertas.md` para el change de persistencia real (transacción o `SELECT … FOR UPDATE`).
+- [Eliminar o acortar un tramo puede dejar turnos futuros fuera de horario] → Fuera de alcance por decisión (DD-27); pregunta abierta nueva en `10`.
 - [Cambiar `validarHorario` y `generarInicios` toca código de C-01 y C-07] → Parámetro opcional y sin horarios propios el resultado es idéntico; las suites de C-01, C-03, C-07 y C-10 se corren antes y después sin editarlas.
-- [Los puertos que leen el alta y la disponibilidad ahora también escriben] → Aceptado (DD-27); el único adaptador es el en memoria.
-- [Un profesional puede atender fuera del horario del consultorio con un tramo propio] → Decisión del administrador (DD-25); para quitarle un día del consultorio se usa un bloqueo (C-06).
+- [Los puertos que leen el alta y la disponibilidad ahora también escriben] → Aceptado (DD-28); el único adaptador es el en memoria.
+- [Un profesional puede atender fuera del horario del consultorio con un tramo propio] → Decisión del administrador (DD-26); para quitarle un día del consultorio se usa un bloqueo (C-06).
 - [Un `AccesoDenegadoError` propio puede chocar con lo que diseñe C-09] → Clase mínima (`rol`, `operacion`) que C-09 puede ampliar sin romper a C-05.
 
 ## UI Mockups

@@ -3,7 +3,7 @@
 ## ADDED Requirements
 
 ### Requirement: Horario propio del profesional por día
-Si el profesional del turno tiene al menos un tramo de horario propio para el día de la semana del turno, el horario de atención de ese día MUST ser solo el de sus tramos propios; si no tiene, SHALL valer el horario del consultorio. Sobre los tramos resultantes rigen igual `RN-07` y `RN-17`. Un profesional sin horario propio se comporta igual que antes (RN-27, DD-25).
+Si el profesional del turno tiene al menos un tramo de horario propio para el día de la semana del turno, el horario de atención de ese día MUST ser solo el de sus tramos propios; si no tiene, SHALL valer el horario del consultorio. Sobre los tramos resultantes rigen igual `RN-07` y `RN-17`. Un profesional sin horario propio se comporta igual que antes (RN-28, DD-26).
 
 #### Scenario: Turno dentro del horario propio del profesional
 - **GIVEN** `p2` tiene un tramo propio el lunes de 14:00 a 18:00
