@@ -63,8 +63,13 @@ export class HorarioAtencionRepositorioEnMemoria
   }
 }
 
-export class BloqueoRepositorioEnMemoria implements BloqueoRepositorio {
-  constructor(private readonly bloqueos: readonly BloqueoHorario[]) {}
+export class BloqueoRepositorioEnMemoria
+  extends PorId<BloqueoHorario>
+  implements BloqueoRepositorio
+{
+  constructor(bloqueos: readonly BloqueoHorario[] = []) {
+    super(bloqueos);
+  }
 
   listarPorRecursos(
     profesionalId: string,
@@ -72,11 +77,21 @@ export class BloqueoRepositorioEnMemoria implements BloqueoRepositorio {
     intervalo: Intervalo,
   ): Promise<readonly BloqueoHorario[]> {
     return Promise.resolve(
-      this.bloqueos.filter(
+      this.items.filter(
         (b) =>
           (b.profesionalId === profesionalId || b.sillonId === sillonId) &&
           seSolapa(intervalo, { inicio: b.inicio, fin: b.fin }),
       ),
     );
+  }
+
+  eliminar(id: string): Promise<void> {
+    const indice = this.items.findIndex((b) => b.id === id);
+    if (indice >= 0) this.items.splice(indice, 1);
+    return Promise.resolve();
+  }
+
+  listarTodos(): Promise<readonly BloqueoHorario[]> {
+    return Promise.resolve([...this.items]);
   }
 }

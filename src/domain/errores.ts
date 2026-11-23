@@ -14,7 +14,8 @@ export type CodigoRN =
   | 'RN-17'
   | 'RN-18'
   | 'RN-24'
-  | 'RN-27';
+  | 'RN-27'
+  | 'RN-31';
 export type RecursoBloqueado = 'profesional' | 'sillon';
 
 /** Resultado de una regla pura que no se cumple. */

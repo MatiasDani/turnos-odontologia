@@ -119,6 +119,17 @@ describe('RN-27 (desactivación con turnos activos futuros)', () => {
   });
 });
 
+describe('RN-31 (bloqueo sobre turnos activos existentes, DD-06)', () => {
+  const otro: Turno = { ...turno, id: 't2', inicio: new Date('2026-11-24T12:00:00Z') };
+
+  test('conserva la lista de turnos en conflicto y código RN-31', () => {
+    const e = new ReglaNegocioError({ codigo: 'RN-31', turnosEnConflicto: [turno, otro] });
+    expect(e.codigo).toBe('RN-31');
+    expect(e.message).toBe('Regla de negocio violada: RN-31');
+    expect(e.turnosEnConflicto).toEqual([turno, otro]);
+  });
+});
+
 describe('AccesoDenegadoError', () => {
   test('preserva instanceof, name, rol y operación, y no es ReglaNegocioError', () => {
     const e = new AccesoDenegadoError('recepcion', 'configurar-sillon');

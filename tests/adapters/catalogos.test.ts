@@ -138,6 +138,39 @@ describe('repositorios de catálogo mutables (C-05)', () => {
     await new ProfesionalRepositorioEnMemoria(inicial).guardar({ ...e.profesionales[0]!, id: 'p3' });
     expect(inicial).toHaveLength(2);
   });
+
+  test('bloqueos: guardar, obtenerPorId, eliminar y listarTodos (C-06)', async () => {
+    const repo = new BloqueoRepositorioEnMemoria(e.bloqueos);
+    expect(await repo.listarTodos()).toHaveLength(1);
+    expect((await repo.obtenerPorId('b1'))?.profesionalId).toBe('p1');
+
+    const nuevo = {
+      id: 'b2',
+      profesionalId: 'p2',
+      sillonId: 's1',
+      inicio: local(LUNES, '10:00'),
+      fin: local(LUNES, '12:00'),
+      motivo: 'Vacaciones',
+    };
+    await repo.guardar(nuevo);
+    expect(await repo.listarTodos()).toHaveLength(2);
+    expect(await repo.obtenerPorId('b2')).toEqual(nuevo);
+
+    // Reemplazo por id
+    const editado = { ...nuevo, motivo: 'Congreso' };
+    await repo.guardar(editado);
+    expect(await repo.listarTodos()).toHaveLength(2);
+    expect((await repo.obtenerPorId('b2'))?.motivo).toBe('Congreso');
+
+    // Eliminar
+    await repo.eliminar('b2');
+    expect(await repo.listarTodos()).toHaveLength(1);
+    expect(await repo.obtenerPorId('b2')).toBeUndefined();
+
+    // Eliminar id inexistente no falla
+    await repo.eliminar('b-inexistente');
+    expect(await repo.listarTodos()).toHaveLength(1);
+  });
 });
 
 describe('GeneradorIdUuid', () => {
