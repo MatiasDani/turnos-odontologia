@@ -265,6 +265,41 @@ C-02 **reutiliza** el `Reloj` (no lo redefine) y C-05 **extiende** `PacienteRepo
 **Justificación**: US-008 es del administrador y la configuración es sensible para toda la agenda; un error propio sin código RN distingue permisos de reglas de agenda.
 **Trade-offs aceptados**: los casos de uso de lectura (alta, disponibilidad) dependen de puertos que ahora también escriben; cualquier adaptador futuro debe implementar las escrituras.
 
+### DD-29 — Servidor HTTP público: Fastify, fábrica de la app, rutas, errores y logs
+**Decisión** (2026-11-23, explore/propose de C-14, Alejo Carabelli; numeración desde DD-29 porque C-05 reserva DD-25 a DD-28):
+- **Servidor**: Fastify 5.x (primera integración HTTP; cierra la parte pendiente de DD-13). Fábrica `crearApp` en `src/adapters/http/` que recibe casos de uso ya construidos y registra módulos de rutas como plugins; raíz de composición única (`src/main.ts`). C-15 reutiliza la fábrica agregando su módulo de rutas sin modificar las públicas. Tests de contrato con `fastify.inject`.
+- **Rutas públicas**: `GET /public/prestaciones`, `GET /public/prestaciones/:prestacionId/profesionales`, `GET /public/disponibilidad`, `POST /public/reservas`, `GET /public/turnos/:token` (HTML o JSON según `Accept`, con `Vary: Accept`), `GET /public/turnos/:token/confirmar` (HTML), `POST /public/turnos/:token/{confirmar,cancelar,reprogramar}`, `GET /public/turnos/:token/disponibilidad` y la página `GET /public/reservar`. Se conservan las rutas de los e-mails de C-12.
+- **Ningún `GET` cambia estado**: el enlace `/confirmar` del e-mail abre la página y la confirmación es un `POST` (los clientes de correo prefetchean enlaces). Agrega un clic al flujo de DD-21.
+- **Errores**: formato único `{ error: { codigo, mensaje, campos?, nuevaOferta? } }`; `DATOS_INVALIDOS` 400, `ENLACE_INVALIDO` 404, `HORARIO_NO_DISPONIBLE` y `RESERVA_DUPLICADA` 409, el resto de los códigos públicos 422, inesperado 500 `ERROR_INTERNO` sin detalle. Entradas validadas con validadores puros (la frontera de C-10 se reutiliza); respuestas con schema `additionalProperties: false`.
+- **Logs redactados (en alcance)**: método, ruta con el token reemplazado por `[redactado]` y estado; sin cuerpos, query strings, cabeceras ni cookies (RN-21, RN-D-02). Cabeceras `no-store`, `Referrer-Policy: no-referrer` y CSP estricta.
+- **Rate limit (fuera de alcance)**: queda como pregunta abierta y requisito antes de publicar fuera de la demo.
+**Contexto**: DD-13, DD-21 y DD-23 difirieron endpoints, logs redactados y rate limit a C-14; los e-mails de C-12 ya apuntan a `/public/turnos/<token>`.
+**Alternativas consideradas**: `node:http` puro; Express; Fastify 4; prefijo `/public/api` para JSON; confirmar en el `GET`; `@fastify/rate-limit` en memoria.
+**Justificación**: `inject` permite tests de contrato sin red; la fábrica evita que C-15 rehaga el arranque; la negociación mantiene las rutas ya publicadas en los e-mails.
+**Trade-offs aceptados**: una dependencia de runtime nueva; sin rate limit hasta un change posterior; un clic extra para confirmar.
+
+### DD-30 — Interfaz del paciente sin framework, horizonte de 30 días y estrategia de pruebas
+**Decisión** (2026-11-23, explore/propose de C-14, Alejo Carabelli):
+- **UI**: HTML + CSS + JavaScript (módulos ES) sin framework ni build, servidos por el mismo Fastify desde `src/adapters/http/web/` con lista blanca; usan `design-system/tokens.css` y `brand.js` tal cual. JS con `// @ts-check` y JSDoc, tipado con `tsconfig.web.json`. Copy en voseo. El token nunca se guarda en el almacenamiento del navegador.
+- **Reserva**: prestación → profesional (por defecto "Cualquiera") → día de los próximos 30 y sus horarios libres → datos → confirmación con profesional asignado y enlace de gestión (entrega única, DD-15). Nunca se muestra el sillón (DD-18).
+- **Horizonte**: RN-30 (hoy a hoy + 30 días locales) validado en el servidor, no solo en la UI; los días reservables los calcula el servidor con el `Reloj`.
+- **Pruebas**: contrato HTTP con `fastify.inject` dentro de `npm test`; estados de UI con Playwright (Chromium) en `tests/ui/*.ui.test.ts` bajo `vitest.ui.config.ts` y `npm run test:ui`, fuera de `npm test` para mantenerlo rápido; ambos obligatorios antes de archivar.
+- **Ejecución**: `npm run build` (`tsc` a `dist/`) y `npm start` con seed demo ficticio en memoria.
+**Contexto**: el owner eligió en el explore UI sin framework, selector de día y profesional opcional.
+**Alternativas consideradas**: React/Vite; SSR con plantillas; límite de 30 días solo en la UI; Playwright dentro de `npm test`; `tsx` para ejecutar.
+**Justificación**: dos pantallas no justifican build ni framework; validar RN-30 en el servidor impide reservas fuera de rango con un cliente propio; separar la suite de UI preserva el ciclo TDD rápido.
+**Trade-offs aceptados**: JS sin compilación (tipado opcional por JSDoc); suite de UI más lenta, ejecutada aparte.
+
+### DD-31 — Vista de gestión por token y reprogramación online
+**Decisión** (2026-11-23, propose de C-14, Alejo Carabelli; supuestos a confirmar por el owner antes del apply):
+- **Vista HTTP**: `GET /public/turnos/:token` (JSON) devuelve `inicio`, `fin`, prestación, profesional, `asistenciaConfirmada` (booleano: `confirmado` vs. `reservado` del propio turno, coherente con la respuesta de `ConfirmarDesdeEnlace`), `gestionOnline` (RN-08 calculado en el servidor), contacto del consultorio (nombre, teléfono, e-mail, zona) y días reservables. Sin `turnoId`, token, sillón ni datos del paciente. `TurnoPublico` de DD-23 no cambia.
+- **Menos de 24 h**: la pantalla reemplaza cancelar y reprogramar por el contacto del consultorio; confirmar asistencia sigue disponible (RN-08 no la limita).
+- **Reprogramar online solo cambia el horario**: la disponibilidad para reprogramar ofrece horarios del mismo profesional y del mismo sillón (C-03 conserva el sillón y la entrada pública no lo acepta) y el cuerpo admite solo `inicio`. Los horarios que se solapan con el propio turno actual no se ofrecen.
+**Contexto**: DD-23 excluyó el estado de la respuesta pública y la entrada de reprogramación no admite sillón.
+**Alternativas consideradas**: no exponer la confirmación (mostrar siempre "Confirmar"); aceptar `profesionalId` y reasignar sillón en el servidor (cambia C-11/C-03).
+**Justificación**: muestra al paciente lo que ya sabe de su propio turno sin datos ajenos; ofrecer solo horarios que la reprogramación puede concretar evita rechazos sorpresivos.
+**Trade-offs aceptados**: el paciente no puede cambiar de profesional online; un pequeño corrimiento dentro del propio horario no se ofrece.
+
 ## Supuestos inferidos
 
 ### SU-01 — E-mail + `wa.me` es suficiente frente a WhatsApp automático

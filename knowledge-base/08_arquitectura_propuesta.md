@@ -38,7 +38,8 @@ Global-desarrollo/
 │   └── adapters/
 │       ├── persistence/   # repos en memoria (PostgreSQL luego)
 │       ├── recordatorios/ # no-op para cableados sin recordatorios (C-02, C-12)
-│       ├── http/          # DTO y validador puro de frontera (C-10, sin framework); Fastify opcional después
+│       ├── http/          # validador puro de frontera (C-10); Fastify: crearApp, rutas públicas, errores, logs redactados (C-14, DD-29)
+│       │   └── web/       # UI del paciente: HTML + CSS + JS sin build (C-14, DD-30)
 │       ├── notificador/   # SMTP con nodemailer (C-12); generador wa.me (C-13)
 │       └── config/        # lectura y validación de variables de entorno (C-12)
 ├── tests/                 # Vitest: unit (dominio), use-cases, integración
@@ -46,6 +47,16 @@ Global-desarrollo/
 ├── knowledge-base/
 └── openspec/
 ```
+
+## Capa HTTP e interfaz del paciente (C-14, DD-29 a DD-31)
+
+- **Fábrica de la app**: `src/adapters/http/app.ts` (`crearApp`) recibe casos de uso ya construidos y registra módulos de rutas como plugins de Fastify; `src/main.ts` es la raíz de composición (repos en memoria, seed demo ficticio, `RelojSistema`). C-15 agrega su módulo de rutas internas sin modificar las públicas.
+- **Rutas públicas**: ver DD-29 y `03_actores_y_roles.md` §Rutas públicas. Ningún `GET` cambia estado; `GET /public/turnos/:token` sirve HTML o JSON según `Accept`.
+- **Errores**: formato único `{ error: { codigo, mensaje, campos?, nuevaOferta? } }` con estado HTTP fijo por código; 500 sin detalle.
+- **Logs**: token reemplazado por `[redactado]`, sin cuerpos ni query strings (RN-21, RN-D-02). Rate limit pendiente (`10_preguntas_abiertas.md`).
+- **UI**: `src/adapters/http/web/` con módulos ES y `design-system/tokens.css` + `brand.js` sin modificar; el servidor decide RN-08 y RN-30 (la UI no usa el reloj del navegador).
+- **Pruebas**: contrato con `fastify.inject` en `npm test`; estados de UI con Playwright en `npm run test:ui` (`vitest.ui.config.ts`, `tests/ui/`).
+- **Ejecución**: `npm run build` (`tsc` a `dist/`) y `npm start`.
 
 ## Orden de implementación sugerido (primer change)
 
@@ -59,7 +70,7 @@ Luego: cancelar, reprogramar, disponibilidad, reserva online, recordatorios.
 ## Estrategia de pruebas
 
 - **TDD estricto** con Vitest: rojo, verde, triangulación (mínimo dos casos por comportamiento), refactor.
-- Capas: unitarias del dominio (puras), de casos de uso con repos en memoria, y de la API con `fastify.inject` (si se implementa).
+- Capas: unitarias del dominio (puras), de casos de uso con repos en memoria, y de la API con `fastify.inject` (C-14); estados de UI con Playwright en una suite aparte (`npm run test:ui`).
 - Casos obligatorios: contiguos válidos, solapamiento parcial, contención total, mismo profesional con distinto sillón, mismo sillón con distinto profesional, cancelación que libera, reprogramación atómica, umbral exacto de 24 h.
 - Datos de test: solo ficticios (RN-D-01).
 
@@ -78,6 +89,8 @@ Luego: cancelar, reprogramar, disponibilidad, reserva online, recordatorios.
 | Variable | Descripción | Ejemplo | Sensible |
 |---|---|---|---|
 | `PORT` | Puerto de la API | `3000` | N |
+| `HOST` | Interfaz donde escucha el servidor (C-14) | `127.0.0.1` | N |
+| `LOG_LEVEL` | Nivel de log de Fastify; los logs nunca incluyen tokens ni datos personales (C-14) | `info` | N |
 | `TZ_CONSULTORIO` | Zona horaria por defecto | `America/Argentina/Buenos_Aires` | N |
 | `JWT_SECRET` | Secreto de firma de sesiones | `cambiar-en-local` | Y |
 | `SMTP_HOST` / `SMTP_PORT` | Servidor de e-mail (free tier); TLS directo solo con el puerto 465 | `smtp.ethereal.email` / `587` | N |
