@@ -14,6 +14,8 @@ import { RecordatorioRepositorioEnMemoria } from './adapters/persistence/en-memo
 import { TokenGestionRepositorioEnMemoria } from './adapters/persistence/en-memoria/token-gestion-repositorio.js';
 import { TurnoRepositorioEnMemoria } from './adapters/persistence/en-memoria/turno-repositorio.js';
 import { AgendarTurno } from './application/agendar-turno.js';
+import { AgendaDiaria } from './application/agenda-diaria.js';
+import { AgendaSemanal } from './application/agenda-semanal.js';
 import { CancelarTurno } from './application/cancelar-turno.js';
 import type { CasosDeUsoPublicos } from './adapters/http/casos-de-uso.js';
 import { CancelarTurnoDesdeToken } from './application/cancelar-turno-desde-token.js';
@@ -102,6 +104,7 @@ export function componerNucleo(opciones: OpcionesComposicion) {
     reloj,
   });
   const consultarDisponibilidad = new ConsultarDisponibilidad(repos);
+  const agendaDiaria = new AgendaDiaria(repos, datos.consultorio.zonaHoraria);
   // El recordatorio se programa al emitir el token (ver EmitirTokenConRecordatorio), no en el alta.
   const agendar = new AgendarTurno({ ...repos, ids });
   const reservarOnline = new ReservarOnline({
@@ -132,6 +135,8 @@ export function componerNucleo(opciones: OpcionesComposicion) {
     repoRecordatorios,
     servicioTokens,
     consultarDisponibilidad,
+    agendaDiaria,
+    agendaSemanal: new AgendaSemanal(agendaDiaria),
     reservarOnline,
     resolver,
     confirmarDesdeEnlace: new ConfirmarDesdeEnlace({ tokens: servicioTokens, turnos, confirmar: confirmarTurno }),

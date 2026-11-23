@@ -14,6 +14,10 @@ export class TurnoRepositorioEnMemoria implements TurnoRepositorio {
     this.turnos = [...iniciales];
   }
 
+  listarTodos(): Promise<readonly Turno[]> {
+    return Promise.resolve([...this.turnos]);
+  }
+
   /**
    * SECCIÓN CRÍTICA (RN-12): leer, validar e insertar ocurren sin ningún `await` entre medio.
    * Node ejecuta un solo hilo: ninguna otra alta puede intercalarse entre la lectura de los

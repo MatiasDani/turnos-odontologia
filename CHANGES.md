@@ -265,7 +265,8 @@ Carriles: **A** = núcleo y reserva online (Matías: C-01 → C-07 → C-10); **
   - `knowledge-base/04_modelo_de_datos.md` §Profesional (prestacionIds), §Prestacion
 
 ### [C-08] `ver-agenda-diaria-semanal`
-- **Estado**: `[ ]` pendiente
+- **Estado**: `[ ]` implementado en la rama de C-08, pendiente de archivo e integración
+- **OpenSpec**: [C-08](openspec/changes/c08-ver-agenda-diaria-semanal/proposal.md)
 - **Owner**: Mara Ferrer (51974)
 - **Scope**:
   - Casos de uso de consulta `AgendaDiaria` y `AgendaSemanal` (modelo de lectura: turnos con estado, prestación, paciente, sillón, y bloqueos), filtros por profesional y por sillón
