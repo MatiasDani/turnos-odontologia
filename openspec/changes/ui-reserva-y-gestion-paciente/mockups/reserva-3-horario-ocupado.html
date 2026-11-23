@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Completá tus datos - Consultorio Odontológico Demo</title>
+<!-- Mockup C-14 ui-reserva-y-gestion-paciente: Reserva paso 3: horario ocupado al confirmar. Datos 100 % ficticios. -->
+<link rel="stylesheet" href="../../../../design-system/tokens.css">
+<link rel="stylesheet" href="paciente.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+<symbol id="i-alert" viewBox="0 0 20 20"><path d="M10 2.5 18 16.5H2L10 2.5Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M10 8v4M10 14.2v.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+<symbol id="i-check" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="m6.5 10.2 2.4 2.4 4.6-5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-info" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10 9v5M10 6.2v.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+<symbol id="i-cal" viewBox="0 0 20 20"><rect x="3" y="4.5" width="14" height="12.5" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3 8.5h14M7 2.5v4M13 2.5v4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+<symbol id="i-tooth" viewBox="0 0 20 20"><path d="M6.5 3C4.3 3 3 4.8 3 7c0 2 .9 3.2 1.4 5 .5 2 .7 5 2.1 5 1.3 0 1.4-2.6 1.9-4 .3-.9.9-1.3 1.6-1.3s1.3.4 1.6 1.3c.5 1.4.6 4 1.9 4 1.4 0 1.6-3 2.1-5 .5-1.8 1.4-3 1.4-5 0-2.2-1.3-4-3.5-4-1.5 0-2.3.8-3.5.8S8 3 6.5 3Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></symbol>
+<symbol id="i-user" viewBox="0 0 20 20"><circle cx="10" cy="7" r="3.2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3.8 17c.8-3.2 3.3-5 6.2-5s5.4 1.8 6.2 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+<symbol id="i-pin" viewBox="0 0 20 20"><path d="M10 17.5s5.5-5 5.5-9.5a5.5 5.5 0 0 0-11 0c0 4.5 5.5 9.5 5.5 9.5Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="10" cy="8" r="2" fill="none" stroke="currentColor" stroke-width="1.6"/></symbol>
+<symbol id="i-phone" viewBox="0 0 20 20"><path d="M5 3h3l1.5 4-2 1.3a9 9 0 0 0 4.2 4.2l1.3-2 4 1.5v3a2 2 0 0 1-2 2A14 14 0 0 1 3 5a2 2 0 0 1 2-2Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+<symbol id="i-mail" viewBox="0 0 20 20"><rect x="2.5" y="4.5" width="15" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="m3 5.5 7 5.5 7-5.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+<symbol id="i-copy" viewBox="0 0 20 20"><rect x="7" y="7" width="10" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M13 7V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2" fill="none" stroke="currentColor" stroke-width="1.6"/></symbol>
+<symbol id="i-clock" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10 6v4.2l2.8 1.8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+<symbol id="i-link" viewBox="0 0 20 20"><path d="M8.5 11.5a3.5 3.5 0 0 0 5 0l2.5-2.5a3.5 3.5 0 0 0-5-5l-1 1M11.5 8.5a3.5 3.5 0 0 0-5 0L4 11a3.5 3.5 0 0 0 5 5l1-1" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+</svg>
+<a class="skip" href="#contenido">Saltar al contenido</a>
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brand">
+      <img src="../../../../design-system/assets/logo.svg" alt="" width="96" height="32">
+      <div class="brand-text"><b data-brand-name>Turnos Odonto (TBD)</b><span>Consultorio Odontológico Demo</span></div>
+    </div>
+    <p class="topbar-meta">Turnos online</p>
+  </div>
+</header>
+<main id="contenido" class="shell" tabindex="-1">
+
+<div class="layout with-aside">
+  <section class="panel" aria-labelledby="h1">
+    <ol class="steps" aria-hidden="true"><li class="on"></li><li class="on"></li><li class="on"></li><li class=""></li></ol><p class="step-label">Paso 3 de 4 · Tus datos</p>
+    <div class="page-head"><h1 id="h1">Completá tus datos</h1><p>No hace falta crear una cuenta. Solo los usamos para este turno.</p></div>
+    <p class="summary-inline"><b>Consulta/control</b> · <b>Lun 23/11 11:00</b> · Cualquiera</p>
+    <div class="stack"><div class="alert a-danger" role="alert"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-alert"/></svg><div><strong>Ese horario se acaba de ocupar</strong><p>Alguien reservó las 11:00 mientras completabas tus datos. Elegí otro horario del lunes 23; tus datos quedan cargados.</p></div></div>
+<div><div class="field-title">Horarios libres <span>lunes 23 de noviembre</span></div><div class="slots" role="group" aria-label="Otros horarios libres"><button type="button" class="slot" aria-pressed="false">11:15</button><button type="button" class="slot" aria-pressed="false">11:30</button><button type="button" class="slot" aria-pressed="false">12:00</button><button type="button" class="slot" aria-pressed="false">12:30</button><button type="button" class="slot" aria-pressed="false">15:00</button><button type="button" class="slot" aria-pressed="false">15:15</button></div></div><form class="form-grid" novalidate><div class="field"><label for="dni">DNI</label><input class="input" id="dni" type="text" value="30000001" aria-describedby="dni-h" inputmode="numeric" autocomplete="off"><p class="hint" id="dni-h">Sin puntos. Ej.: 30000001</p></div><div class="field"><label for="nom">Nombre</label><input class="input" id="nom" type="text" value="Paciente" autocomplete="given-name"></div><div class="field"><label for="ape">Apellido</label><input class="input" id="ape" type="text" value="Ficticio 1" autocomplete="family-name"></div><div class="field"><label for="tel">Teléfono</label><input class="input" id="tel" type="tel" value="1100000000" aria-describedby="tel-h" autocomplete="tel"><p class="hint" id="tel-h">Con código de área. Ej.: 11 0000 0000</p></div><div class="field full"><label for="mail">E-mail <span class="opt">(opcional)</span></label><input class="input" id="mail" type="email" value="paciente1@ejemplo.test" aria-describedby="mail-h" autocomplete="email"><p class="hint" id="mail-h">Te mandamos el recordatorio y el enlace para gestionar el turno.</p></div><div class="field full"><div class="check"><input type="checkbox" id="cons" checked><label for="cons">Acepto que el consultorio me contacte por teléfono, WhatsApp o e-mail para gestionar este turno.</label></div></div></form></div>
+    <div class="sticky-actions"><a class="btn btn-secondary" href="#">Volver</a><button type="button" class="btn btn-primary">Confirmar turno</button></div>
+  </section>
+  <aside class="aside" aria-label="Resumen de tu turno">
+  <div class="panel">
+    <h2>Tu turno</h2>
+    <dl class="summary">
+      <div><dt>Prestación</dt><dd>Consulta/control · 30 min</dd></div>
+      <div><dt>Profesional</dt><dd>Cualquiera</dd></div>
+      <div><dt>Día</dt><dd>Lunes 23 de noviembre</dd></div>
+      <div><dt>Horario</dt><dd>11:00 a 11:30</dd></div>
+    </dl>
+    <p class="note">Podés cancelar o reprogramar online hasta 24 h antes del turno.</p>
+  </div>
+</aside>
+</div>
+</main>
+<footer class="footer">
+  <div class="footer-in">
+    <span>Consultorio Odontológico Demo · Usamos tus datos solo para gestionar tu turno (Ley 25.326).</span>
+    <span>Mockup C-14 · Reserva paso 3: horario ocupado al confirmar</span>
+  </div>
+</footer>
+<script src="../../../../design-system/brand.js"></script>
+</body>
+</html>

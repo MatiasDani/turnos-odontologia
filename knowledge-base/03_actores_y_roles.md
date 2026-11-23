@@ -39,4 +39,6 @@ Reglas transversales de permisos:
 - Alta de reserva por el paciente: identificación mínima sin cuenta (DNI, nombre, apellido, teléfono y consentimiento de contacto; e-mail opcional; DD-14, DD-17). La respuesta incluye `inicio`, `fin`, el nombre de la prestación y el nombre y apellido del profesional asignado (DD-18). La ruta pública no modifica pacientes existentes ni revela datos de otros (RN-22).
 - Enlace de gestión del turno con **token no adivinable** (confirmar, cancelar, reprogramar), sujeto a RN-08. Cada recordatorio rota el token: solo el último enlace recibido es válido (DD-15).
 
+- Rutas concretas (C-14, DD-29): páginas `GET /public/reservar` y `GET /public/turnos/:token` (y `.../confirmar`); API `GET /public/prestaciones`, `GET /public/prestaciones/:prestacionId/profesionales`, `GET /public/disponibilidad`, `POST /public/reservas`, `GET /public/turnos/:token` (JSON), `POST /public/turnos/:token/{confirmar,cancelar,reprogramar}` y `GET /public/turnos/:token/disponibilidad`. Ningún `GET` modifica un turno; los logs redactan el token; reserva y reprogramación limitadas a 30 días (RN-30).
+
 Todo lo demás requiere autenticación (usuario con rol).
