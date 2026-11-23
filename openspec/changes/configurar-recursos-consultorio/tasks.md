@@ -43,9 +43,9 @@
 
 - [x] 6.1 RED/GREEN escenarios de "Un recurso desactivado no recibe turnos nuevos" (desactivación por caso de uso y luego `AgendarTurno` / `ConsultarDisponibilidad` sobre el mismo sistema; sin código nuevo, RN-18 ya lo cubre); verificar en verde
 - [x] 6.2 RED/GREEN escenarios de "Agenda operativa con recursos configurados por casos de uso" con el catálogo vacío de `crearSistemaConfiguracion`; verificar en verde
-- [ ] 6.3 Ejecutar `npm test` y `npm run typecheck` completos: todo en verde con el baseline de 1.1 más los tests nuevos; `git diff --stat tests/` solo muestra archivos nuevos, `describe` agregados y los fixtures/tests de puertos y adaptadores previstos; verificar que cada `#### Scenario:` de los cuatro specs tiene su test con el mismo nombre (p. ej. con `grep`)
-- [ ] 6.4 Alinear la KB con la implementación (`knowledge-base/04_modelo_de_datos.md`, `08_arquitectura_propuesta.md` si lista casos de uso, puertos o reglas del dominio, RN-27/RN-28/RN-29 y DD-25..DD-28 si cambió algún detalle) y actualizar el comentario de `src/domain/horario-atencion.ts` que dice que C-01 solo evalúa el horario del consultorio; verificar que la KB no contradice los specs ni el design
-- [ ] 6.5 Ejecutar `openspec validate configurar-recursos-consultorio --strict --no-interactive` y verificar que el change es válido
+- [x] 6.3 Ejecutar `npm test` y `npm run typecheck` completos: todo en verde con el baseline de 1.1 más los tests nuevos; `git diff --stat tests/` solo muestra archivos nuevos, `describe` agregados y los fixtures/tests de puertos y adaptadores previstos; verificar que cada `#### Scenario:` de los cuatro specs tiene su test con el mismo nombre (p. ej. con `grep`)
+- [x] 6.4 Alinear la KB con la implementación (`knowledge-base/04_modelo_de_datos.md`, `08_arquitectura_propuesta.md` si lista casos de uso, puertos o reglas del dominio, RN-27/RN-28/RN-29 y DD-25..DD-28 si cambió algún detalle) y actualizar el comentario de `src/domain/horario-atencion.ts` que dice que C-01 solo evalúa el horario del consultorio; verificar que la KB no contradice los specs ni el design
+- [x] 6.5 Ejecutar `openspec validate configurar-recursos-consultorio --strict --no-interactive` y verificar que el change es válido
 
 ## Workflow follow-up
 
