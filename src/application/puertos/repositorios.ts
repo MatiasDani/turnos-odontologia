@@ -15,16 +15,24 @@ export interface ProfesionalRepositorio {
   obtenerPorId(id: string): Promise<Profesional | undefined>;
   /** Profesionales del consultorio, activos e inactivos (el filtrado es de quien consulta). */
   listarPorConsultorio(consultorioId: string): Promise<readonly Profesional[]>;
+  /** Alta o reemplazo por `id` (C-05, DD-28). */
+  guardar(profesional: Profesional): Promise<void>;
 }
 
 export interface SillonRepositorio {
   obtenerPorId(id: string): Promise<Sillon | undefined>;
   /** Sillones del consultorio, activos e inactivos (el filtrado es de quien consulta). */
   listarPorConsultorio(consultorioId: string): Promise<readonly Sillon[]>;
+  /** Alta o reemplazo por `id` (C-05, DD-28). */
+  guardar(sillon: Sillon): Promise<void>;
 }
 
 export interface PrestacionRepositorio {
   obtenerPorId(id: string): Promise<Prestacion | undefined>;
+  /** Prestaciones del consultorio, activas e inactivas. */
+  listarPorConsultorio(consultorioId: string): Promise<readonly Prestacion[]>;
+  /** Alta o reemplazo por `id` (C-05, DD-28). */
+  guardar(prestacion: Prestacion): Promise<void>;
 }
 
 export interface ConsultorioRepositorio {
@@ -33,6 +41,12 @@ export interface ConsultorioRepositorio {
 
 export interface HorarioAtencionRepositorio {
   listarPorConsultorio(consultorioId: string): Promise<readonly HorarioAtencion[]>;
+  /** Tramo por id, o `undefined` si no existe (C-05). */
+  obtenerPorId(id: string): Promise<HorarioAtencion | undefined>;
+  /** Alta o reemplazo por `id` (C-05, DD-28). */
+  guardar(horario: HorarioAtencion): Promise<void>;
+  /** Elimina el tramo; un id inexistente no hace nada. */
+  eliminar(id: string): Promise<void>;
 }
 
 export interface BloqueoRepositorio {
@@ -65,6 +79,12 @@ export type CambioTurno = (
   turnosDeLosRecursos?: readonly Turno[],
 ) => ResultadoCambio;
 
+/** Recurso cuyos turnos se consultan para decidir su desactivación (C-05, RN-27). */
+export type RecursoDeTurno = {
+  readonly tipo: 'profesional' | 'sillon' | 'prestacion';
+  readonly id: string;
+};
+
 export interface TurnoRepositorio {
   /**
    * Operación atómica (RN-12): lee los turnos del profesional y del sillón del candidato,
@@ -78,6 +98,9 @@ export interface TurnoRepositorio {
 
   /** Lectura de los turnos del profesional o del sillón (cualquier estado). */
   listarPorRecursos(profesionalId: string, sillonId: string): Promise<readonly Turno[]>;
+
+  /** Turnos del recurso, de cualquier estado; el dominio filtra (C-05, RN-27). */
+  listarPorRecurso(recurso: RecursoDeTurno): Promise<readonly Turno[]>;
 
   /** Turno por id (cualquier estado), o `undefined` si no existe. */
   obtenerPorId(id: string): Promise<Turno | undefined>;

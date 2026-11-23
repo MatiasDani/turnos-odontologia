@@ -19,9 +19,9 @@
 
 ## 3. Puertos y adaptadores en memoria
 
-- [ ] 3.1 Sumar a `src/application/puertos/repositorios.ts` las escrituras de catálogo, `PrestacionRepositorio.listarPorConsultorio`, `HorarioAtencionRepositorio.obtenerPorId`/`guardar`/`eliminar` y `TurnoRepositorio.listarPorRecurso` con `RecursoDeTurno` (design D7); actualizar `tests/application/puertos.test.ts` con `expectTypeOf` de las firmas nuevas; verificar `npm run typecheck` (fallará hasta 3.2–3.3)
-- [ ] 3.2 RED/GREEN/TRIANGULATE adaptadores de catálogo mutables (`src/adapters/persistence/en-memoria/catalogos.ts`): `guardar` como alta al final y como reemplazo por `id` para profesionales, sillones, prestaciones y horarios; `listarPorConsultorio` de prestaciones; `obtenerPorId` y `eliminar` de horarios (id inexistente no hace nada); modificar el arreglo pasado al constructor no altera el repositorio; verificar `tests/adapters/catalogos.test.ts` en verde sin editar sus casos existentes
-- [ ] 3.3 RED/GREEN/TRIANGULATE `TurnoRepositorioEnMemoria.listarPorRecurso` para `profesional`, `sillon` y `prestacion`, devolviendo turnos de cualquier estado y solo del recurso pedido; verificar `tests/adapters/turno-repositorio.test.ts` en verde, `npm run typecheck` y la suite completa sin regresiones
+- [x] 3.1 Sumar a `src/application/puertos/repositorios.ts` las escrituras de catálogo, `PrestacionRepositorio.listarPorConsultorio`, `HorarioAtencionRepositorio.obtenerPorId`/`guardar`/`eliminar` y `TurnoRepositorio.listarPorRecurso` con `RecursoDeTurno` (design D7); actualizar `tests/application/puertos.test.ts` con `expectTypeOf` de las firmas nuevas; verificar `npm run typecheck` (fallará hasta 3.2–3.3)
+- [x] 3.2 RED/GREEN/TRIANGULATE adaptadores de catálogo mutables (`src/adapters/persistence/en-memoria/catalogos.ts`): `guardar` como alta al final y como reemplazo por `id` para profesionales, sillones, prestaciones y horarios; `listarPorConsultorio` de prestaciones; `obtenerPorId` y `eliminar` de horarios (id inexistente no hace nada); modificar el arreglo pasado al constructor no altera el repositorio; verificar `tests/adapters/catalogos.test.ts` en verde sin editar sus casos existentes
+- [x] 3.3 RED/GREEN/TRIANGULATE `TurnoRepositorioEnMemoria.listarPorRecurso` para `profesional`, `sillon` y `prestacion`, devolviendo turnos de cualquier estado y solo del recurso pedido; verificar `tests/adapters/turno-repositorio.test.ts` en verde, `npm run typecheck` y la suite completa sin regresiones
 
 ## 4. Reglas puras de configuración y desactivación
 

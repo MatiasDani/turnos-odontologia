@@ -1,5 +1,6 @@
 import type {
   CambioTurno,
+  RecursoDeTurno,
   RecursosDestino,
   TurnoRepositorio,
 } from '../../../application/puertos/repositorios.js';
@@ -32,6 +33,11 @@ export class TurnoRepositorioEnMemoria implements TurnoRepositorio {
 
   listarPorRecursos(profesionalId: string, sillonId: string): Promise<readonly Turno[]> {
     return Promise.resolve(this.filtrarPorRecursos(profesionalId, sillonId));
+  }
+
+  listarPorRecurso(recurso: RecursoDeTurno): Promise<readonly Turno[]> {
+    const campo = { profesional: 'profesionalId', sillon: 'sillonId', prestacion: 'prestacionId' } as const;
+    return Promise.resolve(this.turnos.filter((t) => t[campo[recurso.tipo]] === recurso.id));
   }
 
   obtenerPorId(id: string): Promise<Turno | undefined> {
