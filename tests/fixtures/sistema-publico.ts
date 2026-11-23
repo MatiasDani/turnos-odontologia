@@ -1,5 +1,5 @@
 // Cableado del sistema público (C-14) sobre el seed ficticio y un reloj fijo (solo tests).
-import { componerNucleo, type NucleoPublico } from '../../src/composicion.js';
+import { componerSistema, type SistemaCompuesto } from '../../src/composicion.js';
 import type { Turno } from '../../src/domain/turno.js';
 import { RelojFijo } from './reloj-fijo.js';
 import { crearEntorno, type Entorno, local } from './seed.js';
@@ -15,7 +15,7 @@ export type OpcionesSistemaPublico = Partial<Entorno> & {
   readonly sinTurnoBase?: boolean;
 };
 
-export interface SistemaPublico extends NucleoPublico {
+export interface SistemaPublico extends SistemaCompuesto {
   readonly datos: Entorno;
   readonly reloj: RelojFijo;
   readonly turnos: TurnoRepositorioDePrueba;
@@ -41,7 +41,7 @@ export async function crearSistemaPublico(opciones: OpcionesSistemaPublico = {})
   const datos = crearEntorno({ turnos: sinTurnoBase === true ? [] : [turnoBasePublico()], ...overrides });
   const reloj = new RelojFijo(ahora ?? AHORA_POR_DEFECTO);
   const turnos = new TurnoRepositorioDePrueba(datos.turnos);
-  const nucleo = componerNucleo({
+  const nucleo = componerSistema({
     reloj,
     datos,
     turnos,

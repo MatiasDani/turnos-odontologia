@@ -22,13 +22,13 @@ const HORAS_ANTES_POR_DEFECTO = 24;
 const PUERTO_SMTP_POR_DEFECTO = 587;
 const ENTERO = /^\d+$/;
 
-function obligatoria(env: VariablesEntorno, variable: string): string {
+export function obligatoria(env: VariablesEntorno, variable: string): string {
   const valor = env[variable]?.trim();
   if (valor === undefined || valor === '') throw new ConfiguracionInvalidaError(variable, 'es obligatoria');
   return valor;
 }
 
-function enteroPositivo(env: VariablesEntorno, variable: string, porDefecto: number, maximo: number): number {
+export function enteroPositivo(env: VariablesEntorno, variable: string, porDefecto: number, maximo: number): number {
   const valor = env[variable];
   if (valor === undefined) return porDefecto;
   const numero = ENTERO.test(valor.trim()) ? Number(valor.trim()) : Number.NaN;
@@ -38,7 +38,7 @@ function enteroPositivo(env: VariablesEntorno, variable: string, porDefecto: num
   return numero;
 }
 
-function urlHttp(env: VariablesEntorno, variable: string): string {
+export function urlHttp(env: VariablesEntorno, variable: string): string {
   const valor = obligatoria(env, variable);
   let protocolo: string;
   try {

@@ -15,7 +15,11 @@ import { TokenGestionRepositorioEnMemoria } from './adapters/persistence/en-memo
 import { TurnoRepositorioEnMemoria } from './adapters/persistence/en-memoria/turno-repositorio.js';
 import { AgendarTurno } from './application/agendar-turno.js';
 import { CancelarTurno } from './application/cancelar-turno.js';
+import type { CasosDeUsoPublicos } from './adapters/http/casos-de-uso.js';
 import { CancelarTurnoDesdeToken } from './application/cancelar-turno-desde-token.js';
+import { ConsultarDisponibilidadParaReprogramar } from './application/consultar-disponibilidad-para-reprogramar.js';
+import { ConsultarDisponibilidadPublica } from './application/consultar-disponibilidad-publica.js';
+import { ConsultarGestionDesdeToken } from './application/consultar-gestion-desde-token.js';
 import { ConfirmarDesdeEnlace } from './application/confirmar-desde-enlace.js';
 import { ConfirmarTurno } from './application/confirmar-turno.js';
 import { ConsultarDisponibilidad } from './application/consultar-disponibilidad.js';
@@ -23,10 +27,14 @@ import { EmitirTokenConRecordatorio } from './application/emitir-token-con-recor
 import type { GeneradorId } from './application/puertos/generador-id.js';
 import type { Reloj } from './application/puertos/reloj.js';
 import type { TurnoRepositorio } from './application/puertos/repositorios.js';
+import { ListarCatalogoPublico } from './application/listar-catalogo-publico.js';
+import { ListarProfesionalesPublicos } from './application/listar-profesionales-publicos.js';
 import { RecordatoriosEmail } from './application/recordatorios-email.js';
 import { ReprogramarTurno } from './application/reprogramar-turno.js';
+import { ReprogramarDesdeTokenPublica } from './application/reprogramar-desde-token-publica.js';
 import { ReprogramarTurnoDesdeToken } from './application/reprogramar-turno-desde-token.js';
 import { ReservarOnline } from './application/reservar-online.js';
+import { ReservarOnlinePublica } from './application/reservar-online-publica.js';
 import { ResolverTurnoDesdeToken } from './application/resolver-turno-desde-token.js';
 import { ServicioTokens } from './application/servicio-tokens.js';
 import type { BloqueoHorario } from './domain/bloqueo-horario.js';
@@ -133,3 +141,64 @@ export function componerNucleo(opciones: OpcionesComposicion) {
 }
 
 export type NucleoPublico = ReturnType<typeof componerNucleo>;
+
+/** Casos de uso que consume la capa HTTP pública (DD-29): nada de repositorios ni de dominio crudo. */
+export function crearCasosPublicos(nucleo: NucleoPublico, consultorioId: string): CasosDeUsoPublicos {
+  const { repos, reloj, resolver } = nucleo;
+  return {
+    catalogo: new ListarCatalogoPublico({
+      consultorioId,
+      consultorios: repos.consultorios,
+      prestaciones: repos.prestaciones,
+      reloj,
+    }),
+    profesionales: new ListarProfesionalesPublicos({
+      prestaciones: repos.prestaciones,
+      profesionales: repos.profesionales,
+    }),
+    disponibilidad: new ConsultarDisponibilidadPublica({
+      consultar: nucleo.consultarDisponibilidad,
+      prestaciones: repos.prestaciones,
+      profesionales: repos.profesionales,
+      consultorios: repos.consultorios,
+      reloj,
+    }),
+    reservar: new ReservarOnlinePublica({
+      reservar: nucleo.reservarOnline,
+      prestaciones: repos.prestaciones,
+      consultorios: repos.consultorios,
+      reloj,
+    }),
+    gestion: new ConsultarGestionDesdeToken({
+      resolver,
+      prestaciones: repos.prestaciones,
+      consultorios: repos.consultorios,
+      reloj,
+    }),
+    confirmar: nucleo.confirmarDesdeEnlace,
+    cancelar: nucleo.cancelarDesdeToken,
+    disponibilidadParaReprogramar: new ConsultarDisponibilidadParaReprogramar({
+      resolver,
+      consultar: nucleo.consultarDisponibilidad,
+      prestaciones: repos.prestaciones,
+      profesionales: repos.profesionales,
+      consultorios: repos.consultorios,
+      reloj,
+    }),
+    reprogramar: new ReprogramarDesdeTokenPublica({
+      reprogramar: nucleo.reprogramarDesdeToken,
+      resolver,
+      prestaciones: repos.prestaciones,
+      consultorios: repos.consultorios,
+      reloj,
+    }),
+  };
+}
+
+/** Sistema completo: núcleo (C-02 a C-12) más los casos de uso públicos de C-14. */
+export function componerSistema(opciones: OpcionesComposicion) {
+  const nucleo = componerNucleo(opciones);
+  return { ...nucleo, casos: crearCasosPublicos(nucleo, opciones.datos.consultorio.id) };
+}
+
+export type SistemaCompuesto = ReturnType<typeof componerSistema>;

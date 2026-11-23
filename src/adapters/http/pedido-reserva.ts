@@ -13,7 +13,7 @@ const INICIO_ISO =
 
 type Objeto = Readonly<Record<string, unknown>>;
 
-function esObjetoPlano(valor: unknown): valor is Objeto {
+export function esObjetoPlano(valor: unknown): valor is Objeto {
   if (typeof valor !== 'object' || valor === null || Array.isArray(valor)) return false;
   const prototipo: unknown = Object.getPrototypeOf(valor);
   return prototipo === Object.prototype || prototipo === null;
@@ -24,7 +24,7 @@ function esTextoNoVacio(valor: unknown): valor is string {
 }
 
 /** `inicio` ISO 8601 con zona obligatoria y componentes reales (V8 acepta 30 de febrero o 24:00). */
-function parsearInicio(valor: unknown): Date | undefined {
+export function parsearInicio(valor: unknown): Date | undefined {
   if (typeof valor !== 'string') return undefined;
   const m = INICIO_ISO.exec(valor);
   if (m === null) return undefined;
