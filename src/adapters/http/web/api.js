@@ -16,15 +16,15 @@ const TIMEOUT_MS = 12_000;
  * @typedef {TurnoPublico & { token: string }} Reserva
  * @typedef {TurnoPublico & { asistenciaConfirmada: boolean, gestionOnline: boolean, consultorio: { nombre: string, telefono: string, email: string, zonaHoraria: string }, diasReservables: DiasReservables }} VistaTurno
  * @typedef {{ codigo: string, campos?: string[], nuevaOferta?: Horario[] }} ErrorApi
- * @typedef {{ ok: true, datos: any }} Exito
  * @typedef {{ ok: false, red: boolean, estado: number, error: ErrorApi }} Fallo
  */
 
 /**
+ * @template T
  * @param {string} metodo
  * @param {string} ruta
  * @param {unknown} [cuerpo]
- * @returns {Promise<Exito | Fallo>}
+ * @returns {Promise<{ ok: true, datos: T } | Fallo>}
  */
 async function pedir(metodo, ruta, cuerpo) {
   const control = new AbortController();
@@ -42,15 +42,19 @@ async function pedir(metodo, ruta, cuerpo) {
       credentials: 'omit',
       referrerPolicy: 'no-referrer',
     });
-    /** @type {any} */
+    /** @type {unknown} */
     let datos = null;
     try {
       datos = await respuesta.json();
     } catch {
       datos = null;
     }
-    if (respuesta.ok) return { ok: true, datos };
-    const error = datos && typeof datos === 'object' && datos.error ? datos.error : { codigo: 'ERROR_INTERNO' };
+    // El contrato de cada ruta lo fijan los tipos de `api` (validados por los tests de contrato).
+    if (respuesta.ok) return { ok: true, datos: /** @type {T} */ (datos) };
+    const cuerpoError = datos !== null && typeof datos === 'object' && 'error' in datos ? datos.error : undefined;
+    const error = cuerpoError !== undefined && cuerpoError !== null && typeof cuerpoError === 'object'
+      ? /** @type {ErrorApi} */ (cuerpoError)
+      : { codigo: 'ERROR_INTERNO' };
     return { ok: false, red: false, estado: respuesta.status, error };
   } catch {
     return { ok: false, red: true, estado: 0, error: { codigo: 'RED' } };
