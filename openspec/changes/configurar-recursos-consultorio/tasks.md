@@ -31,18 +31,18 @@
 
 ## 5. Casos de uso de configuración
 
-- [ ] 5.1 Crear `exigirAdministrador` (`src/application/control-acceso.ts`), los tipos de entrada (`src/application/configuracion-input.ts`) y `tests/fixtures/sistema-configuracion.ts` (design D8, D9: una instancia por repositorio compartida por configuración, alta, disponibilidad y reprogramación; `RelojFijo` lunes 10:00; ids con prefijo; opción de catálogo vacío); verificar `npm run typecheck`
+- [x] 5.1 Crear `exigirAdministrador` (`src/application/control-acceso.ts`), los tipos de entrada (`src/application/configuracion-input.ts`) y `tests/fixtures/sistema-configuracion.ts` (design D8, D9: una instancia por repositorio compartida por configuración, alta, disponibilidad y reprogramación; `RelojFijo` lunes 10:00; ids con prefijo; opción de catálogo vacío); verificar `npm run typecheck`
 - [x] 5.2 RED/GREEN `ConfigurarSillones` (`src/application/configurar-sillones.ts`): escenarios de "Alta y modificación de sillón" y los de "Solo el administrador configura recursos" sobre sillones, en `tests/application/configuracion-recursos.test.ts`; verificar en verde
 - [x] 5.3 RED/GREEN `ConfigurarPrestaciones`: escenarios de "Alta y modificación de prestación", "Duración válida de la prestación" y "Paciente no puede modificar una prestación"; verificar en verde
 - [x] 5.4 RED/GREEN `ConfigurarProfesionales`: escenarios de "Alta de profesional", "Modificación de profesional" y "Odontólogo no puede desactivar un profesional"; verificar en verde
 - [x] 5.5 RED/GREEN `desactivar` y `reactivar` en las tres clases: escenarios de "Desactivación lógica de recursos", "Desactivación bloqueada por turnos activos futuros" (turnos sembrados con `TurnoRepositorioDePrueba`) y "Reactivación de recursos"; validar con una mutación (quitar el chequeo RN-27 o usar `esActivo`) que los tests fallan; verificar en verde
-- [ ] 5.6 RED/GREEN `ConfigurarHorarios` (`agregarTramo`, `modificarTramo`, `eliminarTramo`): escenarios de "Tramos del horario de atención", "Validez de los tramos de horario", "Sin tramos solapados en el mismo ámbito" y "Recepción no puede agregar un tramo de horario"; verificar en verde
-- [ ] 5.7 RED/GREEN escenarios de "Orden de evaluación de los rechazos de configuración"; verificar en verde
+- [x] 5.6 RED/GREEN `ConfigurarHorarios` (`agregarTramo`, `modificarTramo`, `eliminarTramo`): escenarios de "Tramos del horario de atención", "Validez de los tramos de horario", "Sin tramos solapados en el mismo ámbito" y "Recepción no puede agregar un tramo de horario"; verificar en verde
+- [x] 5.7 RED/GREEN escenarios de "Orden de evaluación de los rechazos de configuración"; verificar en verde
 
 ## 6. Integración con la agenda
 
-- [ ] 6.1 RED/GREEN escenarios de "Un recurso desactivado no recibe turnos nuevos" (desactivación por caso de uso y luego `AgendarTurno` / `ConsultarDisponibilidad` sobre el mismo sistema; sin código nuevo, RN-18 ya lo cubre); verificar en verde
-- [ ] 6.2 RED/GREEN escenarios de "Agenda operativa con recursos configurados por casos de uso" con el catálogo vacío de `crearSistemaConfiguracion`; verificar en verde
+- [x] 6.1 RED/GREEN escenarios de "Un recurso desactivado no recibe turnos nuevos" (desactivación por caso de uso y luego `AgendarTurno` / `ConsultarDisponibilidad` sobre el mismo sistema; sin código nuevo, RN-18 ya lo cubre); verificar en verde
+- [x] 6.2 RED/GREEN escenarios de "Agenda operativa con recursos configurados por casos de uso" con el catálogo vacío de `crearSistemaConfiguracion`; verificar en verde
 - [ ] 6.3 Ejecutar `npm test` y `npm run typecheck` completos: todo en verde con el baseline de 1.1 más los tests nuevos; `git diff --stat tests/` solo muestra archivos nuevos, `describe` agregados y los fixtures/tests de puertos y adaptadores previstos; verificar que cada `#### Scenario:` de los cuatro specs tiene su test con el mismo nombre (p. ej. con `grep`)
 - [ ] 6.4 Alinear la KB con la implementación (`knowledge-base/04_modelo_de_datos.md`, `08_arquitectura_propuesta.md` si lista casos de uso, puertos o reglas del dominio, RN-27/RN-28/RN-29 y DD-25..DD-28 si cambió algún detalle) y actualizar el comentario de `src/domain/horario-atencion.ts` que dice que C-01 solo evalúa el horario del consultorio; verificar que la KB no contradice los specs ni el design
 - [ ] 6.5 Ejecutar `openspec validate configurar-recursos-consultorio --strict --no-interactive` y verificar que el change es válido

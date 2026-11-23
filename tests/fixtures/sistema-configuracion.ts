@@ -1,6 +1,7 @@
 // Cableado de C-05: los casos de uso de configuración, el alta, la disponibilidad y la reprogramación
 // comparten UNA instancia de cada repositorio en memoria (solo para tests, datos ficticios).
 import { AgendarTurno } from '../../src/application/agendar-turno.js';
+import { ConfigurarHorarios } from '../../src/application/configurar-horarios.js';
 import { ConfigurarProfesionales } from '../../src/application/configurar-profesionales.js';
 import { ConfigurarPrestaciones } from '../../src/application/configurar-prestaciones.js';
 import { ConfigurarSillones } from '../../src/application/configurar-sillones.js';
@@ -64,6 +65,12 @@ export function crearSistemaConfiguracion(opciones: OpcionesSistemaConfiguracion
       turnos,
       reloj,
       ids: new GeneradorIdConPrefijo('sn-'),
+    }),
+    configurarHorarios: new ConfigurarHorarios({
+      horarios: repos.horarios,
+      profesionales: repos.profesionales,
+      consultorios: repos.consultorios,
+      ids: new GeneradorIdConPrefijo('hn-'),
     }),
     configurarProfesionales: new ConfigurarProfesionales({
       profesionales: repos.profesionales,
