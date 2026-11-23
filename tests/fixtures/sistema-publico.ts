@@ -1,4 +1,5 @@
 // Cableado del sistema público (C-14) sobre el seed ficticio y un reloj fijo (solo tests).
+import { RecordatorioRepositorioEnMemoria } from '../../src/adapters/persistence/en-memoria/recordatorio-repositorio.js';
 import { componerSistema, type SistemaCompuesto } from '../../src/composicion.js';
 import type { Turno } from '../../src/domain/turno.js';
 import { RelojFijo } from './reloj-fijo.js';
@@ -13,6 +14,8 @@ export type OpcionesSistemaPublico = Partial<Entorno> & {
   readonly ahora?: Date;
   /** Sin turno base (agenda vacía salvo `turnos`). */
   readonly sinTurnoBase?: boolean;
+  /** Repositorio de recordatorios a usar (p. ej. uno que falla); por defecto en memoria. */
+  readonly repoRecordatorios?: RecordatorioRepositorioEnMemoria;
 };
 
 export interface SistemaPublico extends SistemaCompuesto {
@@ -37,7 +40,7 @@ export function turnoBasePublico(overrides: Partial<Turno> = {}): Turno {
 
 /** Sistema público con el turno base y su token emitido. */
 export async function crearSistemaPublico(opciones: OpcionesSistemaPublico = {}): Promise<SistemaPublico> {
-  const { ahora, sinTurnoBase, ...overrides } = opciones;
+  const { ahora, sinTurnoBase, repoRecordatorios, ...overrides } = opciones;
   const datos = crearEntorno({ turnos: sinTurnoBase === true ? [] : [turnoBasePublico()], ...overrides });
   const reloj = new RelojFijo(ahora ?? AHORA_POR_DEFECTO);
   const turnos = new TurnoRepositorioDePrueba(datos.turnos);
@@ -46,6 +49,7 @@ export async function crearSistemaPublico(opciones: OpcionesSistemaPublico = {})
     datos,
     turnos,
     ids: new GeneradorIdConPrefijo('pn-'),
+    ...(repoRecordatorios === undefined ? {} : { repoRecordatorios }),
   });
   const token = sinTurnoBase === true ? undefined : await nucleo.servicioTokens.emitir(ID_TURNO_BASE);
   return { ...nucleo, datos, reloj, turnos, token };

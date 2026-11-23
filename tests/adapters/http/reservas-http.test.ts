@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, test } from 'vitest';
+import { RecordatorioRepositorioQueFalla } from '../../fixtures/recordatorio-repositorio-que-falla.js';
 import { local } from '../../fixtures/seed.js';
 import { crearSistemaHttp, cuerpoReserva, type SistemaHttp } from '../../fixtures/sistema-http.js';
 import { turnoBasePublico } from '../../fixtures/sistema-publico.js';
@@ -51,5 +52,43 @@ describe('Alta de reserva por HTTP', () => {
       expect(h.inicio.slice(0, 10)).toBe('2026-11-23');
       expect(h.inicio).not.toBe(local('2026-11-23', '11:00').toISOString());
     }
+  });
+});
+
+describe('Recordatorio de la reserva por HTTP', () => {
+  test('Reserva por HTTP de un paciente nuevo deja su recordatorio pendiente', async () => {
+    sistema = await crearSistemaHttp();
+
+    const r = await sistema.post('/public/reservas', cuerpoReserva());
+
+    expect(r.statusCode).toBe(201);
+    const { token } = r.json();
+    const turno = sistema.s.turnos.todos().find((t) => t.inicio.getTime() === local('2026-11-23', '11:00').getTime());
+    expect(turno).toBeDefined();
+    const recordatorios = await sistema.s.repoRecordatorios.listarPorTurno(turno?.id ?? '');
+    expect(recordatorios).toHaveLength(1);
+    expect(recordatorios[0]).toMatchObject({
+      canal: 'email',
+      estado: 'pendiente',
+      programadoPara: local('2026-11-22', '11:00'),
+    });
+    await expect(sistema.s.servicioTokens.resolver(token)).resolves.toBe(turno?.id);
+  });
+
+  test('Falla al programar el recordatorio por HTTP', async () => {
+    const repo = new RecordatorioRepositorioQueFalla();
+    repo.fallarAlGuardar(new Error('registro de recordatorios caído'));
+    sistema = await crearSistemaHttp({ repoRecordatorios: repo });
+
+    const r = await sistema.post('/public/reservas', cuerpoReserva());
+
+    expect(r.statusCode).toBe(500);
+    expect(r.json()).toEqual({
+      error: { codigo: 'ERROR_INTERNO', mensaje: 'Ocurrió un error. Probá de nuevo en unos minutos.' },
+    });
+    expect(r.body).not.toMatch(/token|registro de recordatorios caído/);
+    expect(
+      sistema.s.turnos.todos().some((t) => t.inicio.getTime() === local('2026-11-23', '11:00').getTime()),
+    ).toBe(true);
   });
 });

@@ -4,8 +4,8 @@ import { crearSistemaPublico } from '../fixtures/sistema-publico.js';
 import { pedidoBase } from '../fixtures/sistema.js';
 
 // Hallazgo de C-14: `ReservarOnline` guarda al paciente nuevo DESPUÉS del alta, así que programar el
-// recordatorio dentro del alta (decorador de C-12) falla para un DNI nuevo. La composición lo programa
-// al emitir el token, cuando el paciente ya existe.
+// recordatorio dentro del alta (decorador de C-12) falla para un DNI nuevo. Desde DD-32, `ReservarOnline`
+// recibe el puerto `recordatorios` y lo programa con el paciente ya guardado y antes de emitir el token.
 describe('Reserva online con recordatorio (composición)', () => {
   test('un paciente nuevo con e-mail y consentimiento reserva y queda con un recordatorio pendiente', async () => {
     const s = await crearSistemaPublico();
