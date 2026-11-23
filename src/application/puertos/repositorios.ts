@@ -120,6 +120,8 @@ export interface TokenGestionRepositorio {
 export interface RecordatorioRepositorio {
   /** Alta o reemplazo por `id`. */
   guardar(recordatorio: Recordatorio): Promise<void>;
+  /** Recordatorio por `id`, o `undefined` si no existe (C-13: marca manual del envío). */
+  obtenerPorId(id: string): Promise<Recordatorio | undefined>;
   /** Recordatorios del turno, de cualquier estado. */
   listarPorTurno(turnoId: string): Promise<readonly Recordatorio[]>;
   /** Recordatorios `pendiente` con `programadoPara <= hasta`, por `programadoPara` ascendente. */
