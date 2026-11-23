@@ -39,9 +39,9 @@
 
 ## 5. Integración y verificación
 
-- [ ] 5.1 Capturar las pantallas implementadas a 390x844 y 1440x900 y compararlas con `mockups/previews/`; registrar diferencias aceptadas en `design.md`; verificar que cada mockup tiene su captura de implementación
-- [ ] 5.2 Ejecutar `npm run typecheck`, `npm test` y `npm run test:ui` completos con 0 fallos, y confirmar que las suites de C-10, C-11 y C-12 no se editaron (`git diff --stat tests/application`)
-- [ ] 5.3 Marcar US-009 (enlace público) y US-010 (pantalla y HTTP) como cubiertas en `knowledge-base/06_funcionalidades.md`; ejecutar `openspec validate ui-reserva-y-gestion-paciente --strict --no-interactive` sin errores
+- [x] 5.1 Capturar las pantallas implementadas a 390x844 y 1440x900 y compararlas con `mockups/previews/`; registrar diferencias aceptadas en `design.md`; verificar que cada mockup tiene su captura de implementación
+- [x] 5.2 Ejecutar `npm run typecheck`, `npm test` y `npm run test:ui` completos con 0 fallos, y confirmar que las suites de C-10, C-11 y C-12 no se editaron (`git diff --stat tests/application`)
+- [x] 5.3 Marcar US-009 (enlace público) y US-010 (pantalla y HTTP) como cubiertas en `knowledge-base/06_funcionalidades.md`; ejecutar `openspec validate ui-reserva-y-gestion-paciente --strict --no-interactive` sin errores
 
 ## Workflow follow-up
 

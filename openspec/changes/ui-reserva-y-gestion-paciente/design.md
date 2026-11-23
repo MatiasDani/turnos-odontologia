@@ -133,3 +133,15 @@ Change aditivo: nuevas rutas, dependencias y scripts; no se migran datos ni camb
 Índice navegable: `mockups/index.html`. Las capturas son de página completa (en 390 px se toman con un viewport tan alto como la página, por eso la barra de acciones fija de los pasos de reserva aparece al pie). Generadas con Playwright/Chromium; sin desplazamiento horizontal en ningún mockup y todos los controles visibles de al menos 44 px.
 
 Notas de diseño: mobile-first, una columna en 390 px y resumen "Tu turno" lateral desde 1024 px; acento teal único del design system; estados siempre con texto + icono (nunca solo color); foco con `--focus-ring`; movimiento solo de `transform`/`opacity` (press `scale(0.97)`, entrada del diálogo `scale(0.96)` → 1 en 240 ms `--ease-out`), anulado por `prefers-reduced-motion` desde `tokens.css`; hover solo con `(hover: hover) and (pointer: fine)`; sin fotos ni ilustraciones (brand.md). De `design-taste-frontend` se tomaron solo los principios aplicables (bordes iguales, sin leyendas bajo imágenes, objetivos táctiles, foco y movimiento); sus reglas de sitio de marketing (fotos, héroe, efectos, gate) no aplican a esta app y prevalece el design system aprobado. El apply no empieza hasta que el owner cambie `Approval: pending` por `Approval: approved (<fecha>, <quién>)`; `verify` compara las pantallas implementadas contra estas capturas.
+
+### Verificación visual (tarea 5.1, 2026-11-23)
+
+Capturas de la implementación a 390x844 y 1440x900 de las 14 pantallas en `verify/` (`<mockup>-mobile.png` y `<mockup>-desktop.png`), generadas con `CAPTURAS_DIR=<carpeta> npx vitest run --config vitest.ui.config.ts tests/ui/capturas.ui.test.ts` y comparadas con `mockups/previews/`. Diferencias aceptadas:
+
+- Los mockups llevan el rótulo "Mockup C-14 · ..." en el pie y un enlace de ejemplo (`localhost:3000/...EjemploToken`); la implementación no tiene el rótulo y muestra el enlace real.
+- La reserva paso 1 no preselecciona ninguna prestación (el mockup mostraba una elegida); "Continuar" queda deshabilitado hasta elegir.
+- El selector de días lista los 31 días del horizonte (el mockup mostraba 14) y el paso 2 empieza en "Hoy"; si ese día no tiene horarios se ofrece "Ver el <próximo día con horarios>" (el servidor lo busca día por día hasta 14 días).
+- Tras "Ese horario se acaba de ocupar" el horario elegido se limpia ("Sin horario") y "Confirmar turno" queda deshabilitado hasta elegir otro, en vez de conservar el horario ocupado; la lista de la nueva oferta muestra todos los horarios del día devueltos por el servidor.
+- La columna lateral de "menos de 24 h" no incluye la línea "Lunes a viernes de 09:00 a 13:00 y de 15:00 a 19:00": la API pública no expone los horarios de atención (queda como mejora si se agrega al contrato).
+- Textos: "hasta el mar 22 de diciembre" se mantiene; "Cancelaste tu turno." lleva punto final (el spec lo cita así) y el aviso del horario ocupado dice "del lunes 23 de noviembre" en vez de "del lunes 23".
+- Nombre del consultorio en el encabezado y el pie: se completa desde la API (la página HTML es estática y no incluye datos).
