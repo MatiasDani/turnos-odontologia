@@ -51,7 +51,7 @@ export function validarAlta(entrada: EntradaValidacion): ResultadoValidacion {
   const intervalo = crearIntervalo(inicio, new Date(inicio.getTime() + duracionMinutos * 60_000));
 
   const reglasDeIntervalo: readonly (() => Violacion | null)[] = [
-    () => validarHorario(intervalo, entrada.zonaHoraria, entrada.horarios),
+    () => validarHorario(intervalo, entrada.zonaHoraria, entrada.horarios, profesional.id),
     () => validarBloqueos(intervalo, profesional.id, sillon.id, entrada.bloqueos),
     () => validarSolapamiento(intervalo, profesional.id, sillon.id, entrada.turnos),
   ];
