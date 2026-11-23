@@ -2,7 +2,7 @@
 
 ## 0. Gate de mockup (bloqueante)
 
-- [x] 0.1 Esperar la aprobación explícita del mockup por el owner (Alejo Carabelli): no escribir código hasta que `design.md` § UI Mockups diga `Approval: approved (<fecha>, <quién>)`; verificar con `grep -n "Approval: approved" openspec/changes/ui-reserva-y-gestion-paciente/design.md`
+- [x] 0.1 Esperar la aprobación explícita del mockup por el owner (Alejo Carabelli): no escribir código hasta que `design.md` § UI Mockups diga `Approval: approved (<fecha>, <quién>)`; verificar con `grep -n "Approval: approved" openspec/changes/archive/2026-11-23-ui-reserva-y-gestion-paciente/design.md`
 - [x] 0.2 Confirmar con el owner los supuestos marcados en `design.md` (campo `asistenciaConfirmada` en la vista HTTP, D6; reprogramación online solo de horario, D7; barrido periódico de recordatorios fuera de C-14, Non-Goals) y registrar la respuesta en `design.md`; verificar que no queda ningún "a confirmar" sin respuesta
 
 ## 1. Preparación, KB y dependencias
