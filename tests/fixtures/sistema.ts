@@ -24,6 +24,7 @@ import { ConfirmarTurno } from '../../src/application/confirmar-turno.js';
 import { MarcarAtendido } from '../../src/application/marcar-atendido.js';
 import { MarcarAusente } from '../../src/application/marcar-ausente.js';
 import { RecordatoriosEspia } from './recordatorios-espia.js';
+import { ReprogramarTurno } from '../../src/application/reprogramar-turno.js';
 import { ConsultarDisponibilidad } from '../../src/application/consultar-disponibilidad.js';
 import type { ConsultarDisponibilidadInput } from '../../src/application/consultar-disponibilidad-input.js';
 import type { GeneradorId } from '../../src/application/puertos/generador-id.js';
@@ -351,4 +352,72 @@ export async function rechazo(promesa: Promise<unknown>): Promise<unknown> {
   );
   if (resultado.resuelta) throw new Error('Se esperaba un rechazo y la promesa se resolvió');
   return resultado.error;
+}
+
+// ---------------------------------------------------------------------------------------------
+// Reprogramación (C-03)
+
+export type OpcionesSistemaReprogramacion = Partial<Entorno> & {
+  /** Instante del reloj fijo; por defecto el domingo 2026-11-22 08:00 local. */
+  readonly ahora?: Date;
+};
+
+export interface SistemaReprogramacion {
+  readonly datos: Entorno;
+  readonly reloj: RelojFijo;
+  readonly turnos: TurnoRepositorioDePrueba;
+  readonly recordatorios: RecordatoriosEspia;
+  readonly agendarTurno: AgendarTurno;
+  readonly cancelarTurno: CancelarTurno;
+  readonly reprogramarTurno: ReprogramarTurno;
+}
+
+/** Cableado de la reprogramación: mismos repos y reloj que cancelación, más el caso de uso C-03. */
+export function crearSistemaReprogramacion(opciones: OpcionesSistemaReprogramacion = {}): SistemaReprogramacion {
+  const { ahora, ...overrides } = opciones;
+  const datos = crearEntorno(overrides);
+  const reloj = new RelojFijo(ahora ?? AHORA_POR_DEFECTO);
+  const turnos = new TurnoRepositorioDePrueba(datos.turnos);
+  const recordatorios = new RecordatoriosEspia();
+  const repos = {
+    profesionales: new ProfesionalRepositorioEnMemoria(datos.profesionales),
+    sillones: new SillonRepositorioEnMemoria(datos.sillones),
+    prestaciones: new PrestacionRepositorioEnMemoria(datos.prestaciones),
+    consultorios: new ConsultorioRepositorioEnMemoria([datos.consultorio]),
+    horarios: new HorarioAtencionRepositorioEnMemoria(datos.horarios),
+    bloqueos: new BloqueoRepositorioEnMemoria(datos.bloqueos),
+    turnos,
+  };
+  return {
+    datos,
+    reloj,
+    turnos,
+    recordatorios,
+    agendarTurno: new AgendarTurno({ ...repos, ids: new GeneradorIdSecuencial() }),
+    cancelarTurno: new CancelarTurno({ turnos, reloj, recordatorios }),
+    reprogramarTurno: new ReprogramarTurno({ ...repos, reloj, recordatorios }),
+  };
+}
+
+export type PedidoReprogramacion = {
+  readonly turnoId: string;
+  readonly inicio: Date;
+  readonly rol?: Rol;
+  readonly profesionalId?: string;
+  readonly sillonId?: string;
+  readonly prestacionId?: string;
+  readonly duracionMinutos?: number;
+};
+
+/** Reprograma con valores por defecto del contexto común del spec (recepción). */
+export function reprogramar(sistema: SistemaReprogramacion, p: PedidoReprogramacion): Promise<Turno> {
+  return sistema.reprogramarTurno.ejecutar({
+    turnoId: p.turnoId,
+    actor: { rol: p.rol ?? 'recepcion' },
+    inicio: p.inicio,
+    ...(p.profesionalId === undefined ? {} : { profesionalId: p.profesionalId }),
+    ...(p.sillonId === undefined ? {} : { sillonId: p.sillonId }),
+    ...(p.prestacionId === undefined ? {} : { prestacionId: p.prestacionId }),
+    ...(p.duracionMinutos === undefined ? {} : { duracionMinutos: p.duracionMinutos }),
+  });
 }

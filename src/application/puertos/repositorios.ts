@@ -49,6 +49,22 @@ export type ResultadoCambio =
   | { readonly ok: true; readonly turno: Turno }
   | { readonly ok: false; readonly violacion: Violacion };
 
+/** Recursos de destino cuyos turnos deben leerse dentro de la sección crítica (C-03, RN-12). */
+export interface RecursosDestino {
+  readonly profesionalId: string;
+  readonly sillonId: string;
+}
+
+/**
+ * Callback de modificación atómica. Recibe el turno actual y, cuando se informan recursos de
+ * destino, los turnos de esos recursos leídos dentro de la sección crítica (DD-22). El segundo
+ * argumento es opcional para no alterar a los callers de C-02 y C-04.
+ */
+export type CambioTurno = (
+  actual: Turno,
+  turnosDeLosRecursos?: readonly Turno[],
+) => ResultadoCambio;
+
 export interface TurnoRepositorio {
   /**
    * Operación atómica (RN-12): lee los turnos del profesional y del sillón del candidato,
@@ -71,11 +87,13 @@ export interface TurnoRepositorio {
 
   /**
    * Operación atómica de modificación (RN-12, DD-19): lee el turno actual, ejecuta `cambio` con él
-   * y, si el resultado es `ok`, lo reemplaza y resuelve con el turno nuevo. Si `cambio` informa una
+   * y, si el resultado es `ok`, lo reemplaza y resuelve con el turno nuevo. Si se informan
+   * `recursos`, el callback recibe también los turnos de esos recursos leídos en la misma sección
+   * crítica; sin ellos el callback recibe un solo argumento (C-02, C-04). Si `cambio` informa una
    * violación rechaza con `ReglaNegocioError` y no modifica nada. Un id inexistente rechaza con
    * `RecursoNoEncontradoError('turno', id)`. El turno devuelto por `cambio` debe conservar el `id`.
    */
-  actualizarSi(id: string, cambio: (actual: Turno) => ResultadoCambio): Promise<Turno>;
+  actualizarSi(id: string, cambio: CambioTurno, recursos?: RecursosDestino): Promise<Turno>;
 }
 
 export interface PacienteRepositorio {

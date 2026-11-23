@@ -1,26 +1,19 @@
 import type { Rol } from '../actor.js';
 import type { Violacion } from '../errores.js';
 import type { Turno } from '../turno.js';
+import { evaluarAnticipacionPaciente } from './anticipacion.js';
 import { puedeTransicionar } from './transiciones.js';
-
-/** Anticipación mínima del paciente (RN-08): 24 h, umbral inclusivo. */
-const ANTICIPACION_MINIMA_PACIENTE_MS = 24 * 60 * 60_000;
 
 /**
  * Regla pura de cancelación (DD-19). Orden fijo: estado (RN-10, según la tabla única de
- * transiciones de DD-20), luego anticipación del
- * paciente (RN-08). El personal del consultorio no tiene restricción de anticipación.
- * La anticipación es una duración absoluta en milisegundos (Argentina no tiene horario de verano).
- * Devuelve la primera violación o `null` si el turno se puede cancelar.
+ * transiciones de DD-20), luego anticipación del paciente (RN-08 compartida con la reprogramación,
+ * DD-22). Devuelve la primera violación o `null` si el turno se puede cancelar.
  */
 export function evaluarCancelacion(turno: Turno, rol: Rol, ahora: Date): Violacion | null {
   if (!puedeTransicionar(turno.estado, 'cancelado')) {
     return { codigo: 'RN-10', estadoActual: turno.estado };
   }
-  if (rol === 'paciente' && turno.inicio.getTime() - ahora.getTime() < ANTICIPACION_MINIMA_PACIENTE_MS) {
-    return { codigo: 'RN-08' };
-  }
-  return null;
+  return evaluarAnticipacionPaciente(turno, rol, ahora);
 }
 
 /**

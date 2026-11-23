@@ -14,6 +14,7 @@ export function local(fecha: string, hhmm: string): Date {
 }
 
 export const LUNES = '2026-11-23';
+export const MARTES = '2026-11-24';
 export const MIERCOLES = '2026-11-25';
 export const SABADO = '2026-11-28';
 

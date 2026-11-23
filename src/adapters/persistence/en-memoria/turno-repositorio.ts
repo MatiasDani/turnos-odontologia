@@ -1,4 +1,8 @@
-import type { ResultadoCambio, TurnoRepositorio } from '../../../application/puertos/repositorios.js';
+import type {
+  CambioTurno,
+  RecursosDestino,
+  TurnoRepositorio,
+} from '../../../application/puertos/repositorios.js';
 import { RecursoNoEncontradoError, ReglaNegocioError, type Violacion } from '../../../domain/errores.js';
 import type { Turno } from '../../../domain/turno.js';
 
@@ -41,13 +45,17 @@ export class TurnoRepositorioEnMemoria implements TurnoRepositorio {
   /**
    * SECCIÓN CRÍTICA (RN-12, DD-19): leer, ejecutar `cambio` y reemplazar ocurren sin ningún `await`
    * entre medio, igual que `agregarSiDisponible`. Dos modificaciones concurrentes del mismo turno se
-   * serializan: la segunda ve el estado que dejó la primera. NO agregar `await` dentro de este método.
+   * serializan: la segunda ve el estado que dejó la primera. Con `recursos`, la lectura de los
+   * turnos de destino también ocurre aquí, antes de cualquier `await`. NO agregar `await`.
    */
-  actualizarSi(id: string, cambio: (actual: Turno) => ResultadoCambio): Promise<Turno> {
+  actualizarSi(id: string, cambio: CambioTurno, recursos?: RecursosDestino): Promise<Turno> {
     const indice = this.turnos.findIndex((t) => t.id === id);
     const actual = this.turnos[indice];
     if (actual === undefined) return Promise.reject(new RecursoNoEncontradoError('turno', id));
-    const resultado = cambio(actual);
+    const resultado =
+      recursos === undefined
+        ? cambio(actual)
+        : cambio(actual, this.filtrarPorRecursos(recursos.profesionalId, recursos.sillonId));
     if (!resultado.ok) return Promise.reject(new ReglaNegocioError(resultado.violacion));
     if (resultado.turno.id !== id) {
       return Promise.reject(new Error(`actualizarSi: el cambio no puede alterar el id del turno (${id})`));

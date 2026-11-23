@@ -196,6 +196,20 @@ C-02 **reutiliza** el `Reloj` (no lo redefine) y C-05 **extiende** `PacienteRepo
 **Trade-offs aceptados**: el token de la reserva deja de servir cuando sale el recordatorio; si un envío falla, el paciente queda sin enlace válido hasta que la recepción lo contacte; sin el runner (C-14) el barrido solo se ejecuta llamándolo; `nodemailer` es la primera dependencia de producción.
 **Precisiones del apply** (2026-11-22, C-12): el remitente del e-mail es `SMTP_USER` (los free tier exigen que coincida con la cuenta autenticada), así que `SMTP_USER` y `SMTP_PASS` son obligatorias al usar SMTP; `RECORDATORIO_HORAS_ANTES` acepta enteros de 1 a 720 y los errores de configuración nombran la variable sin mostrar su valor; el motivo de un envío fallido es el texto fijo "El servicio de e-mail rechazó el envío."; el error público del enlace tiene el único código `ENLACE_INVALIDO` con el mensaje fijo "El enlace no es válido o ya no está vigente."; `MensajeEmail` (para, asunto, texto plano) vive en el dominio y el puerto `Notificador` lo reexporta; el mensaje no incluye el nombre del paciente (mínimo dato); si dos confirmaciones del mismo enlace compiten, la que pierde (`RN-10` con estado actual `confirmado`) también responde éxito.
 
+### DD-22 — Reprogramación atómica: estados, anticipación, atomicidad y contrato
+**Decisión** (2026-11-23, explore de C-03, Luka Garro; confirmada por el equipo):
+- **Estados**: solo se reprograman turnos `reservado` y `confirmado`. Otro estado se rechaza con `RN-10` e `estadoActual`. La reprogramación no cambia el estado ni agrega un estado `reprogramado`: conserva `id`, paciente, estado y origen (coherente con DD-19 y DD-20).
+- **Orden de rechazos**: turno inexistente (`RecursoNoEncontradoError`, sin código RN) → `RN-10` → `RN-08` → reglas del nuevo horario en el orden de `validarAlta`. RN-08 se extrae a una regla pura compartida con `evaluarCancelacion` (24 h en milisegundos, umbral inclusivo); el comportamiento de C-02 no cambia.
+- **Atomicidad**: `TurnoRepositorio.actualizarSi` se extiende de forma compatible para pasar al callback los turnos de los recursos de destino (parámetro opcional `recursos`). El caso de uso excluye el propio turno por `id` y re-ejecuta `validarAlta` dentro de la sección crítica, sin `await`, igual que `AgendarTurno` con `agregarSiDisponible`. Así se cierra el riesgo documentado en el design de C-02 (D4).
+- **Entrada**: `{ turnoId, actor, inicio, profesionalId?, sillonId?, prestacionId?, duracionMinutos? }`. Los recursos no informados se conservan; la duración sigue RN-06/RN-16; no existe campo para forzar solapamientos (RN-04). No se agrega la restricción RN-20 para el personal: es exclusiva de la reserva online.
+- **Recordatorio**: después de persistir y fuera de la sección crítica se llama a `Recordatorios.programar(turnoId)` (DD-21, RN-25). Si falla, el error se propaga y el turno ya movido no se deshace, igual que en DD-19. Cierra la pregunta abierta N° 84.
+- **Roles**: C-03 no hace control de acceso; C-09 debe cubrir también reprogramar en la matriz RBAC (pregunta abierta N° 81).
+
+**Contexto**: C-02 creó `actualizarSi` pero su callback solo veía el turno propio; C-12 ya dejó el puerto `Recordatorios.programar` listo; la KB no definía estados reprogramables ni el orden de rechazos.
+**Alternativas consideradas**: reutilizar `evaluarCancelacion` (arrastra la transición a `cancelado`); un estado `reprogramado` (pierde identidad y rompe el vínculo con el token); un método `reprogramarSi` separado (duplica la sección crítica); validar solo fuera de la sección crítica (carrera RN-12).
+**Justificación**: reutiliza `validarAlta` como única fuente de reglas y mantiene la atomicidad en un solo contrato de modificación, sin tocar el comportamiento de changes archivados.
+**Trade-offs aceptados**: extensión aditiva de un puerto que implementan C-02 y C-04; fallo del adaptador de recordatorios deja el turno movido; RBAC diferido a C-09.
+
 ## Supuestos inferidos
 
 ### SU-01 — E-mail + `wa.me` es suficiente frente a WhatsApp automático

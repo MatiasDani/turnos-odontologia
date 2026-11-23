@@ -5,6 +5,7 @@ export class RecordatoriosEspia implements Recordatorios {
   private readonly pedidos: string[] = [];
   private readonly pedidosProgramar: string[] = [];
   private error: Error | undefined;
+  private errorProgramar: Error | undefined;
 
   /** Turnos para los que se pidió cancelar recordatorios, en orden. */
   get cancelados(): readonly string[] {
@@ -26,8 +27,13 @@ export class RecordatoriosEspia implements Recordatorios {
     return [...this.pedidosProgramar];
   }
 
+  /** A partir de ahora cada pedido de programar rechaza con `error` (el pedido se registra igual). */
+  fallarProgramarCon(error: Error): void {
+    this.errorProgramar = error;
+  }
+
   programar(turnoId: string): Promise<void> {
     this.pedidosProgramar.push(turnoId);
-    return Promise.resolve();
+    return this.errorProgramar === undefined ? Promise.resolve() : Promise.reject(this.errorProgramar);
   }
 }

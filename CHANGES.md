@@ -169,7 +169,7 @@ Carriles: **A** = núcleo y reserva online (Matías: C-01 → C-07 → C-10); **
   - `knowledge-base/07_flujos_principales.md` §Flujo 4
 
 ### [C-03] `reprogramar-turno-atomico`
-- **Estado**: `[ ]` pendiente
+- **Estado**: `[x]` completado (archivado 2026-11-23)
 - **Owner**: Luka Garro (51988)
 - **Scope**:
   - Caso de uso `ReprogramarTurno`: conserva el `id`; nuevo `inicio`/`fin` y recursos validados con RN-01..RN-07 **excluyendo el propio turno** (RN-11)
@@ -178,6 +178,7 @@ Carriles: **A** = núcleo y reserva online (Matías: C-01 → C-07 → C-10); **
   - Reprograma el recordatorio asociado si existe: después de concretar el cambio llama a `Recordatorios.programar(turnoId)`, que es idempotente y reemplaza el pendiente con el nuevo `programadoPara` (puerto ampliado por C-12, DD-21, RN-25; con el no-op o el adaptador real según el cableado)
   - Tests: mover a un hueco libre, mover sobre sí mismo parcialmente solapado (permitido), mover sobre otro turno (rechazado y original intacto), cambio de sillón/profesional, paciente < 24 h rechazado
   - Cubre US-005
+  - **Implementado en el apply (2026-11-23)**: reglas puras `anticipacion.ts` (RN-08 compartida con cancelación) y `reprogramacion.ts` (RN-10/RN-08 y `moverTurno`); `actualizarSi` pasa los turnos de los recursos destino al callback dentro de la sección crítica sin romper C-02/C-04; `ReprogramarTurno` conserva identidad, re-valida con `validarAlta` excluyendo el propio turno, serializa reprogramaciones concurrentes con control optimista y llama a `Recordatorios.programar` fuera de la sección crítica; DD-22 en la KB y spec `openspec/specs/reprogramacion-turnos` (7 requisitos, un test por escenario); 740 tests en verde y `typecheck` limpio
 - **Dependencias**: `C-01`, `C-02`
 - **Governance**: MEDIO
 - **Leer antes**:

@@ -183,3 +183,49 @@ describe('TurnoRepositorioEnMemoria.actualizarSi: atomicidad (RN-12)', () => {
     return expect(repo.obtenerPorId('t1')).resolves.toMatchObject({ estado: 'cancelado' });
   });
 });
+
+describe('TurnoRepositorioEnMemoria.actualizarSi con recursos destino (C-03, RN-12)', () => {
+  const destino = { profesionalId: 'p1', sillonId: 's2' };
+
+  test('el callback recibe solo los turnos del profesional o del sillón destino', async () => {
+    const propio = crearTurno({ id: 't-base', profesionalId: 'p1', sillonId: 's1' });
+    const delDestino = crearTurno({ id: 'a', profesionalId: 'p1', sillonId: 's1' });
+    const delSillon = crearTurno({ id: 'b', profesionalId: 'p2', sillonId: 's2' });
+    const ajeno = crearTurno({ id: 'c', profesionalId: 'p2', sillonId: 's1' });
+    const repo = new TurnoRepositorioEnMemoria([propio, delDestino, delSillon, ajeno]);
+    const cambio = vi.fn((actual: Turno) => ({ ok: true as const, turno: actual }));
+    await repo.actualizarSi('t-base', cambio, destino);
+    expect(cambio).toHaveBeenCalledWith(propio, [propio, delDestino, delSillon]);
+  });
+
+  test('sin recursos el callback sigue recibiendo un solo argumento (C-02, C-04)', async () => {
+    const repo = new TurnoRepositorioEnMemoria([crearTurno({ id: 't1' })]);
+    const cambio = vi.fn((actual: Turno) => ({ ok: true as const, turno: actual }));
+    await repo.actualizarSi('t1', cambio);
+    expect(cambio.mock.calls[0]).toHaveLength(1);
+  });
+
+  test('con recursos, leer, validar y reemplazar ocurre sin await intermedio', () => {
+    const repo = new TurnoRepositorioEnMemoria([crearTurno({ id: 't1' })]);
+    const cambio = vi.fn((actual: Turno) => ({ ok: true as const, turno: { ...actual, inicio: local(LUNES, '11:00') } }));
+    void repo.actualizarSi('t1', cambio, destino);
+    expect(cambio).toHaveBeenCalledTimes(1);
+    return expect(repo.obtenerPorId('t1')).resolves.toMatchObject({ inicio: local(LUNES, '11:00') });
+  });
+
+  test('dos modificaciones concurrentes con recursos se serializan', async () => {
+    const t1 = crearTurno({ id: 't1' });
+    const repo = new TurnoRepositorioEnMemoria([t1]);
+    const mover = (hora: string) => (actual: Turno): ResultadoCambio =>
+      actual.inicio.getTime() === local(LUNES, '09:00').getTime()
+        ? { ok: true, turno: { ...actual, inicio: local(LUNES, hora) } }
+        : { ok: false, violacion: { codigo: 'RN-10', estadoActual: actual.estado } };
+    const [a, b] = await Promise.allSettled([
+      repo.actualizarSi('t1', mover('11:00'), destino),
+      repo.actualizarSi('t1', mover('12:00'), destino),
+    ]);
+    expect(a.status).toBe('fulfilled');
+    expect(b.status).toBe('rejected');
+    expect(b.status === 'rejected' && b.reason).toMatchObject({ codigo: 'RN-10', estadoActual: 'confirmado' });
+  });
+});

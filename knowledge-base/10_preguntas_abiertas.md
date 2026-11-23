@@ -81,7 +81,7 @@
 | Media | La matriz RBAC no permite cancelar ni reprogramar al odontólogo, pero `CancelarTurno` (C-02) no controla roles y lo trata como a la recepción. C-09 debe cubrir cancelar y reprogramar en el control de acceso | C-09 | Lautaro Medina (C-09) |
 | Resuelta | Si el adaptador real de recordatorios (C-12) falla al cancelar, la cancelación ya quedó persistida y el error se propaga (DD-19). ¿Se reintenta o se registra para un proceso posterior? | n/a | Resuelta el 2026-11-22 (explore de C-12): sin reintento; el barrido revalida el estado del turno antes de enviar y marca `cancelado` el pendiente de un turno que ya no está activo (RN-25, DD-21) |
 | Media | ¿Qué proceso ejecuta periódicamente `EnviarRecordatoriosPendientes` (cron, `setInterval`) y cada cuánto? | C-14 o el change que integre HTTP | Equipo (C-14) |
-| Media | C-03 debe llamar a `Recordatorios.programar(turnoId)` después de reprogramar el turno para mover el recordatorio (DD-21) | C-03 | Luka Garro (C-03) |
+| Resuelta | C-03 debe llamar a `Recordatorios.programar(turnoId)` después de reprogramar el turno para mover el recordatorio (DD-21) | n/a | Resuelta el 2026-11-23 (explore de C-03, DD-22): se llama después de persistir y fuera de la sección crítica; si falla, el error se propaga y el turno ya movido no se deshace (RN-25, DD-21) |
 | Baja | El token de la respuesta de la reserva deja de valer cuando sale el recordatorio (rotación, RN-21). C-11 resuelve con `resolver` y no necesita cambios, pero la pantalla de C-14 debería avisar que el enlace vigente es el del último e-mail | C-11, C-14 | Luka Garro (C-11), Alejo Carabelli (C-14) |
 | Baja | Versión mínima de Node LTS y de Vitest a fijar | Inicialización del proyecto | Equipo técnico |
 
