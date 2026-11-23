@@ -100,7 +100,7 @@ Change aditivo: nuevas rutas, dependencias y scripts; no se migran datos ni camb
 
 ## UI Mockups
 
-- Approval: pending
+- Approval: approved (2026-11-23, Alejo Carabelli como owner y Lautaro Medina en el PR #6: "okey")
 - Design system: `design-system/` revisión 1 (aprobada); los mockups enlazan `../../../../design-system/tokens.css` y `brand.js` sin modificarlos.
 - Hoja de estilos compartida de los mockups: `mockups/paciente.css` (base de `src/adapters/http/web/paciente.css` en el apply).
 - Datos 100 % ficticios: "Paciente Ficticio 1", DNI 30000001, teléfono 1100000000, "Ana Ejemplo"/"Bruno Muestra", "Consultorio Odontológico Demo".
