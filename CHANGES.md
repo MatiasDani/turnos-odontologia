@@ -406,7 +406,7 @@ Carriles: **A** = núcleo y reserva online (Matías: C-01 → C-07 → C-10); **
 > Política visual `system-and-mockups`, design-system rev. 1 aprobado. Para cada change: leer `design-system/README.md`, crear mockups locales responsive (390x844 y 1440x900) en `openspec/changes/<name>/mockups/`, registrar `## UI Mockups` en `design.md` y esperar aprobación explícita del usuario antes de `/opsx:apply`.
 
 ### [C-14] `ui-reserva-y-gestion-paciente`
-- **Estado**: `[ ]` pendiente
+- **Estado**: `[x]` completado (archivado 2026-11-23)
 - **Owner**: Alejo Carabelli (51928)
 - **Scope**:
   - Pantalla pública de reserva por enlace: elegir prestación, ver huecos reales (C-07), cargar DNI + nombre + apellido + teléfono + consentimiento (e-mail opcional), confirmar y mostrar profesional asignado (C-10, DD-17, DD-18)
