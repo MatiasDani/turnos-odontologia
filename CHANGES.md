@@ -211,7 +211,7 @@ Carriles: **A** = núcleo y reserva online (Matías: C-01 → C-07 → C-10); **
 > C-05, C-06 y C-07 son independientes entre sí y se abren juntos con el GATE 0.
 
 ### [C-05] `configurar-recursos-consultorio`
-- **Estado**: `[ ]` pendiente
+- **Estado**: `[x]` completado (archivado 2026-11-23)
 - **Owner**: Alejo Carabelli (51928)
 - **Scope**:
   - Casos de uso de alta/modificación/baja lógica de `Profesional`, `Sillon`, `Prestacion` (`duracionMinutos` entero > 0) y `HorarioAtencion` por consultorio y opcional por profesional (el del profesional prevalece, SU-09)
