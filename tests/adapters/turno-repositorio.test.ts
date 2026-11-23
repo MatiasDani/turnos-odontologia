@@ -229,3 +229,33 @@ describe('TurnoRepositorioEnMemoria.actualizarSi con recursos destino (C-03, RN-
     expect(b.status === 'rejected' && b.reason).toMatchObject({ codigo: 'RN-10', estadoActual: 'confirmado' });
   });
 });
+
+describe('TurnoRepositorioEnMemoria.listarPorRecurso (C-05, RN-27)', () => {
+  const turnos = [
+    crearTurno({ id: 'a', profesionalId: 'p1', sillonId: 's1', prestacionId: 'pr1' }),
+    crearTurno({ id: 'b', profesionalId: 'p1', sillonId: 's2', prestacionId: 'pr2', estado: 'cancelado' }),
+    crearTurno({ id: 'c', profesionalId: 'p2', sillonId: 's2', prestacionId: 'pr1', estado: 'atendido' }),
+  ];
+  const repo = new TurnoRepositorioEnMemoria(turnos);
+  const ids = async (tipo: 'profesional' | 'sillon' | 'prestacion', id: string) =>
+    (await repo.listarPorRecurso({ tipo, id })).map((t) => t.id);
+
+  test('por profesional devuelve turnos de cualquier estado, solo de ese profesional', async () => {
+    expect(await ids('profesional', 'p1')).toEqual(['a', 'b']);
+    expect(await ids('profesional', 'p2')).toEqual(['c']);
+  });
+
+  test('por sillón devuelve solo los de ese sillón', async () => {
+    expect(await ids('sillon', 's1')).toEqual(['a']);
+    expect(await ids('sillon', 's2')).toEqual(['b', 'c']);
+  });
+
+  test('por prestación devuelve solo los de esa prestación', async () => {
+    expect(await ids('prestacion', 'pr1')).toEqual(['a', 'c']);
+    expect(await ids('prestacion', 'pr2')).toEqual(['b']);
+  });
+
+  test('un recurso sin turnos devuelve una lista vacía', async () => {
+    expect(await ids('profesional', 'p9')).toEqual([]);
+  });
+});

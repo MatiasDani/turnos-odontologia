@@ -211,13 +211,13 @@ Carriles: **A** = núcleo y reserva online (Matías: C-01 → C-07 → C-10); **
 > C-05, C-06 y C-07 son independientes entre sí y se abren juntos con el GATE 0.
 
 ### [C-05] `configurar-recursos-consultorio`
-- **Estado**: `[ ]` pendiente
+- **Estado**: `[x]` completado (archivado 2026-11-23)
 - **Owner**: Alejo Carabelli (51928)
 - **Scope**:
   - Casos de uso de alta/modificación/baja lógica de `Profesional`, `Sillon`, `Prestacion` (`duracionMinutos` entero > 0) y `HorarioAtencion` por consultorio y opcional por profesional (el del profesional prevalece, SU-09)
   - Reemplaza los fixtures de C-01 por carga vía casos de uso (los fixtures quedan como seed para tests/demo)
-  - **Extiende** el puerto `PacienteRepositorio` (`obtenerPorDni`, `guardar`) y su adaptador en memoria creados por C-10 (DD-16), sin romper sus contratos
-  - Regla: no se desactiva un recurso con turnos activos futuros sin resolver; un profesional inactivo no recibe turnos nuevos
+  - ~~**Extiende** el puerto `PacienteRepositorio`~~: ya satisfecho por C-10 y C-12 (`obtenerPorDni`, `obtenerPorId`, `guardar`); C-05 no lo modifica (DD-28, explore 2026-11-23)
+  - Regla: no se desactiva un recurso con turnos activos futuros sin resolver (RN-27); un profesional inactivo no recibe turnos nuevos (RN-18); horario propio por día (RN-28) y validez de la configuración (RN-29)
   - Tests: ABM, desactivación bloqueada con turnos futuros, prevalencia del horario por profesional
   - Cubre US-008
 - **Dependencias**: `C-01`

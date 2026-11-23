@@ -8,7 +8,7 @@ import {
   reprogramar,
   turnoBaseCancelacion,
 } from '../fixtures/sistema.js';
-import { crearTurno, local, LUNES, MARTES, MIERCOLES } from '../fixtures/seed.js';
+import { crearEntorno, crearTurno, local, LUNES, MARTES, MIERCOLES } from '../fixtures/seed.js';
 
 const DOMINGO = '2026-11-22';
 const martes = (hhmm: string) => local(MARTES, hhmm);
@@ -316,5 +316,57 @@ describe('Reprogramación del recordatorio', () => {
     const error = await rechazo(reprogramar(sistema, { turnoId: 't-base', inicio: martes('10:00') }));
     expect(error).toBe(errorFallo);
     await expect(sistema.turnos.obtenerPorId('t-base')).resolves.toMatchObject({ inicio: martes('10:00') });
+  });
+});
+
+describe('Horario propio del profesional al reprogramar', () => {
+  const tramoPropio = {
+    id: 'hp1',
+    consultorioId: 'c1',
+    profesionalId: 'p2',
+    diaSemana: 1,
+    desde: '14:00',
+    hasta: '18:00',
+  };
+  const sistemaConPropio = () =>
+    crearSistemaReprogramacion({
+      turnos: [base()],
+      horarios: [...crearEntorno().horarios, tramoPropio],
+    });
+
+  test('Reprogramar al horario propio del profesional de destino', async () => {
+    const movido = await reprogramar(sistemaConPropio(), {
+      turnoId: 't-base',
+      inicio: local(LUNES, '14:00'),
+      profesionalId: 'p2',
+    });
+    expect(movido).toMatchObject({
+      id: 't-base',
+      inicio: local(LUNES, '14:00'),
+      fin: local(LUNES, '14:30'),
+      profesionalId: 'p2',
+      sillonId: 's1',
+    });
+  });
+
+  test('Reprogramar fuera del horario propio del profesional de destino', async () => {
+    const sistema = sistemaConPropio();
+    const error = await rechazo(
+      reprogramar(sistema, { turnoId: 't-base', inicio: local(LUNES, '10:00'), profesionalId: 'p2' }),
+    );
+    expect(error).toBeInstanceOf(ReglaNegocioError);
+    expect(error).toMatchObject({ codigo: 'RN-07' });
+    await expect(sistema.turnos.obtenerPorId('t-base')).resolves.toMatchObject({
+      inicio: local(LUNES, '09:00'),
+      profesionalId: 'p1',
+      sillonId: 's1',
+    });
+  });
+
+  test('Reprogramar sin horario propio usa el horario del consultorio', async () => {
+    const error = await rechazo(
+      reprogramar(sistemaConPropio(), { turnoId: 't-base', inicio: local(LUNES, '14:00') }),
+    );
+    expect(error).toMatchObject({ codigo: 'RN-07' });
   });
 });

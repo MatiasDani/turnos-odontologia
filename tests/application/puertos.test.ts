@@ -6,9 +6,17 @@ import type { ReprogramarTurnoInput } from '../../src/application/reprogramar-tu
 import type { TurnoPublico } from '../../src/application/turno-publico.js';
 import type {
   BloqueoRepositorio,
+  HorarioAtencionRepositorio,
+  PrestacionRepositorio,
   ProfesionalRepositorio,
+  RecursoDeTurno,
+  SillonRepositorio,
   TurnoRepositorio,
 } from '../../src/application/puertos/repositorios.js';
+import type { HorarioAtencion } from '../../src/domain/horario-atencion.js';
+import type { Prestacion } from '../../src/domain/prestacion.js';
+import type { Profesional } from '../../src/domain/profesional.js';
+import type { Sillon } from '../../src/domain/sillon.js';
 import type { Turno } from '../../src/domain/turno.js';
 
 describe('contratos de los puertos (5.1)', () => {
@@ -66,5 +74,34 @@ describe('contratos de los puertos (5.1)', () => {
     expectTypeOf<ReturnType<ProfesionalRepositorio['obtenerPorId']>>().toMatchTypeOf<Promise<unknown>>();
     expectTypeOf<ReturnType<BloqueoRepositorio['listarPorRecursos']>>().toMatchTypeOf<Promise<unknown>>();
     expectTypeOf<ReturnType<GeneradorId['siguiente']>>().toEqualTypeOf<string>();
+  });
+
+  test('los puertos de catálogo suman escrituras (C-05, DD-28)', () => {
+    expectTypeOf<ProfesionalRepositorio['guardar']>().toEqualTypeOf<(p: Profesional) => Promise<void>>();
+    expectTypeOf<SillonRepositorio['guardar']>().toEqualTypeOf<(s: Sillon) => Promise<void>>();
+    expectTypeOf<PrestacionRepositorio['guardar']>().toEqualTypeOf<(p: Prestacion) => Promise<void>>();
+    expectTypeOf<PrestacionRepositorio['listarPorConsultorio']>().toEqualTypeOf<
+      (consultorioId: string) => Promise<readonly Prestacion[]>
+    >();
+  });
+
+  test('HorarioAtencionRepositorio suma obtenerPorId, guardar y eliminar', () => {
+    expectTypeOf<HorarioAtencionRepositorio['obtenerPorId']>().toEqualTypeOf<
+      (id: string) => Promise<HorarioAtencion | undefined>
+    >();
+    expectTypeOf<HorarioAtencionRepositorio['guardar']>().toEqualTypeOf<
+      (h: HorarioAtencion) => Promise<void>
+    >();
+    expectTypeOf<HorarioAtencionRepositorio['eliminar']>().toEqualTypeOf<(id: string) => Promise<void>>();
+  });
+
+  test('TurnoRepositorio.listarPorRecurso recibe un RecursoDeTurno y devuelve todos sus turnos', () => {
+    expectTypeOf<RecursoDeTurno>().toEqualTypeOf<{
+      readonly tipo: 'profesional' | 'sillon' | 'prestacion';
+      readonly id: string;
+    }>();
+    expectTypeOf<TurnoRepositorio['listarPorRecurso']>().toEqualTypeOf<
+      (recurso: RecursoDeTurno) => Promise<readonly Turno[]>
+    >();
   });
 });

@@ -237,6 +237,34 @@ C-02 **reutiliza** el `Reloj` (no lo redefine) y C-05 **extiende** `PacienteRepo
 **Justificación**: generar al programar da a recepción vista anticipada; el decorador concentrado evita duplicar puntos de alta; el mensaje mínimo evita filtrar tokens en un canal manual; la marca por `id` es inequívoca e idempotente; los filtros de canal preservan C-12.
 **Trade-offs aceptados**: sin API ni confirmación automática de lectura (SU-01); un teléfono de 10 dígitos se usa sin código de país; sin HTTP ni roles hasta C-14/C-09.
 
+### DD-25 — Desactivación de recursos con turnos activos futuros (RN-27)
+**Decisión** (2026-11-23, explore de C-05, Alejo Carabelli): profesional, sillón y prestación se desactivan de forma lógica (`activo`/`activa` en `false`) y se pueden reactivar; nunca se borran. No se desactiva un recurso que tenga turnos `reservado` o `confirmado` con `inicio >= ahora` (`ahora` del `Reloj`): se rechaza con `RN-27` y la violación lista **todos** los turnos en conflicto ordenados por `inicio` (campo nuevo `turnosEnConflicto`). La regla es una función pura del dominio; `TurnoRepositorio` suma una lectura por recurso (`listarPorRecurso`, cualquier estado) y el filtrado por estado e `inicio` lo hace el dominio. Desactivar un recurso ya inactivo o reactivar uno activo es un no-op exitoso. Que un recurso inactivo no reciba turnos nuevos ya lo cubre RN-18 (solo se agrega un test de integración).
+**Contexto**: US-008 exige "no se desactiva un recurso con turnos activos futuros sin resolver" sin definir "futuro", qué estados cuentan ni cómo se informa.
+**Alternativas consideradas**: cancelar o reasignar en cascada los turnos afectados; borrar físicamente; informar solo el primer conflicto (como RN-02); filtrar en el repositorio.
+**Justificación**: la recepción necesita la lista completa para reprogramar o cancelar antes de reintentar; la regla en el dominio es única fuente de verdad y testeable sin repositorio; un turno ya iniciado no se ve afectado por la baja.
+**Trade-offs aceptados**: entre la lectura de turnos y el guardado del recurso no hay sección crítica común con el alta: un alta concurrente que ya leyó el recurso activo puede crear un turno sobre un recurso recién desactivado (riesgo bajo en memoria; el change de persistencia real lo resuelve con una transacción). Un turno `atendido` futuro no puede existir (RN-24), así que no se cuenta.
+
+### DD-26 — Horario propio del profesional prevalece por día (RN-28, resuelve SU-09)
+**Decisión** (2026-11-23, explore de C-05, Alejo Carabelli): si el profesional tiene al menos un tramo propio (`profesionalId` informado) para el `diaSemana`, ese día solo valen sus tramos; si no, los del consultorio. Una única función pura de selección de tramos la usan `validarHorario` (alta, disponibilidad y reprogramación, vía `validarAlta`) y la generación de inicios candidatos de C-07, que reciben el `profesionalId`. La disponibilidad genera los inicios por profesional, alineados a sus propios tramos. Un tramo propio no necesita estar dentro del horario del consultorio.
+**Contexto**: SU-09 era un supuesto; C-01 y C-07 solo evaluaban los tramos del consultorio.
+**Alternativas consideradas**: prevalencia total (con cualquier tramo propio se ignora siempre el consultorio); intersección o unión de ambos horarios; exigir que el tramo propio esté dentro del horario del consultorio.
+**Justificación**: por día es lo más simple de configurar (un profesional que solo atiende distinto los martes no tiene que recargar toda la semana) y no altera a quien no tiene horario propio.
+**Trade-offs aceptados**: un profesional puede atender fuera del horario general del consultorio (decisión del administrador); para que un profesional no atienda un día del consultorio hace falta un bloqueo (C-06), porque "sin tramos propios ese día" significa "rige el consultorio".
+
+### DD-27 — Validación de la configuración y error de configuración inválida (RN-29)
+**Decisión** (2026-11-23, explore de C-05, Alejo Carabelli): las reglas de RN-29 (nombres, duración de la prestación entero > 0 múltiplo de 5, `diaSemana`, formato `HH:mm`, `desde < hasta`, tramos sin solapar en el mismo día y ámbito) se informan con una clase nueva `ConfiguracionInvalidaError` (`campo`, `motivo` y, para el solapamiento, el tramo en conflicto), sin ampliar `CodigoRN`, igual que `ConsultaInvalidaError` (DD-12). Las referencias inexistentes (consultorio, profesional del tramo, prestaciones de `prestacionIds`, recurso a modificar) usan `RecursoNoEncontradoError`. `prestacionIds` no admite repetidos y puede incluir prestaciones inactivas. La modificación no cambia `id`, `consultorioId`, `activo` ni el ámbito de un tramo (`profesionalId`): la actividad solo cambia con desactivar/reactivar, para que RN-27 no se pueda saltear. Cambiar la duración de una prestación no altera los turnos existentes (guardan su `fin` y su duración efectiva, RN-06). Orden de rechazo, con las validaciones sin I/O primero como en C-07: rol (`AccesoDenegadoError`, DD-28) → campos inválidos (en el orden en que se declaran) → recurso o referencia inexistente → tramo solapado → `RN-27`.
+**Contexto**: US-008 solo pedía "duración en minutos"; el modelo decía "entero > 0".
+**Alternativas consideradas**: códigos RN nuevos para cada validación; permitir duraciones no múltiplo de 5.
+**Justificación**: coherente con la validación de entrada ya existente y con RN-06 (una prestación de 32 min generaría turnos que el ajuste manual no podría reproducir).
+**Trade-offs aceptados**: no se valida que un tramo eliminado o modificado deje turnos futuros fuera de horario (pregunta abierta).
+
+### DD-28 — Solo el administrador configura; puertos de catálogo con escritura
+**Decisión** (2026-11-23, explore de C-05, Alejo Carabelli): los casos de uso de configuración reciben `actor` y rechazan todo rol distinto de `administrador` con una clase nueva `AccesoDenegadoError` (`rol`, `operacion`), sin código RN, antes de cualquier lectura (matriz RBAC de `03_actores_y_roles.md`). Es el primer control de rol del código; C-09 lo reutiliza y agrega la autenticación real. Los puertos `ProfesionalRepositorio`, `SillonRepositorio`, `PrestacionRepositorio` y `HorarioAtencionRepositorio` suman escritura (`guardar` como alta o reemplazo por `id`; los horarios además `obtenerPorId` y `eliminar`) y `PrestacionRepositorio` suma `listarPorConsultorio`; los adaptadores en memoria pasan a ser mutables copiando la colección recibida en el constructor, de modo que el uso con seed de los tests sigue igual. Los ids nuevos salen del puerto `GeneradorId`. `PacienteRepositorio` **no se extiende**: `obtenerPorDni`, `obtenerPorId` y `guardar` ya existen desde C-10 y C-12, así que el "extiende" de `CHANGES.md` y DD-16 queda satisfecho sin cambios.
+**Contexto**: hasta C-05 los catálogos eran de solo lectura y venían de fixtures; ningún caso de uso controlaba roles.
+**Alternativas consideradas**: puertos de escritura separados; un `ReglaNegocioError` con código nuevo para el rol; esperar a C-09 para controlar roles.
+**Justificación**: US-008 es del administrador y la configuración es sensible para toda la agenda; un error propio sin código RN distingue permisos de reglas de agenda.
+**Trade-offs aceptados**: los casos de uso de lectura (alta, disponibilidad) dependen de puertos que ahora también escriben; cualquier adaptador futuro debe implementar las escrituras.
+
 ## Supuestos inferidos
 
 ### SU-01 — E-mail + `wa.me` es suficiente frente a WhatsApp automático
@@ -281,6 +309,7 @@ C-02 **reutiliza** el `Reloj` (no lo redefine) y C-05 **extiende** `PacienteRepo
 **Supuesto**: multi-sucursal queda fuera (etapa posterior).
 **Origen**: D.3.
 
-### SU-09 — Horario por profesional prevalece sobre el del consultorio
+### SU-09 — Horario por profesional prevalece sobre el del consultorio *(confirmado con precisión: DD-26, RN-28, 2026-11-23)*
 **Supuesto**: si existe horario propio del profesional, se usa ese; si no, el del consultorio.
 **Origen**: inferido; el checklist solo habla de "horario de atención".
+**Resolución**: confirmado en el explore de C-05 con la precisión de que la prevalencia es por día de la semana (DD-26, RN-28).
