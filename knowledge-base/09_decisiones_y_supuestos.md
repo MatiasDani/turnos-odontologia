@@ -210,6 +210,20 @@ C-02 **reutiliza** el `Reloj` (no lo redefine) y C-05 **extiende** `PacienteRepo
 **Justificación**: reutiliza `validarAlta` como única fuente de reglas y mantiene la atomicidad en un solo contrato de modificación, sin tocar el comportamiento de changes archivados.
 **Trade-offs aceptados**: extensión aditiva de un puerto que implementan C-02 y C-04; fallo del adaptador de recordatorios deja el turno movido; RBAC diferido a C-09.
 
+### DD-23 — Gestión del turno por token: operaciones, errores públicos y vigencia
+**Decisión** (2026-11-23, explore de C-11, Luka Garro; confirmada por el equipo):
+- **Operaciones**: el paciente consulta, cancela y reprograma su turno con el token vigente del enlace. Las tres resuelven el token con `ServicioTokens.resolver` (DD-15) antes de cualquier otra comprobación; no se acepta `turnoId`, `actor` ni rol desde la entrada. Cancelar y reprogramar delegan en los casos de uso de C-02 y C-03 con actor `paciente`, sin duplicar RN-08/RN-09/RN-10/RN-11/RN-12.
+- **Errores públicos**: el token inválido, vencido, rotado o de un turno cancelado usa `ErrorEnlacePublico` (`ENLACE_INVALIDO`, DD-21), sin revelar motivo. Los demás rechazos usan un error de conjunto cerrado con mensajes fijos: `CONTACTAR_CONSULTORIO` (RN-08), `HORARIO_NO_DISPONIBLE` (reglas del nuevo horario o recursos) y `DATOS_INVALIDOS` (`inicio` inválido). Ningún error incluye códigos RN, ids, sillones, estados, tokens ni errores de dominio de origen (RN-22, RN-D-02, DD-18).
+- **Orden**: token → anticipación de 24 h → reglas del nuevo horario. La anticipación se comprueba con la regla pura compartida de C-03 (umbral inclusivo); con menos de 24 h se responde `CONTACTAR_CONSULTORIO` y no se cancela, mueve ni toca el recordatorio (US-010).
+- **Vigencia**: reprogramar **no rota** el token; `resolver` ya calcula el vencimiento con el `fin` actual del turno, así que el mismo enlace pasa a vencer con el nuevo horario. RN-21 solo exige rotación en cada envío de recordatorio (C-12).
+- **Datos**: la respuesta pública (`TurnoPublico`) contiene `turnoId`, `inicio`, `fin`, prestación y profesional, sin token, sillón, id de paciente, estado ni datos ajenos (DD-18). La entrada de reprogramación expone solo `token`, `inicio`, `profesionalId?` y `prestacionId?`, sin `sillonId`, `duracionMinutos`, `forzar` ni `rol` (RN-04, RN-16).
+- **Sin HTTP**: los casos de uso viven en `src/application`; el cableo de `GET/POST /public/turnos/:token` y la validación de cuerpo `unknown` son de C-14.
+
+**Contexto**: C-10 emite el token y C-12 lo envía, pero solo existía el caso de uso de confirmación; US-010 seguía sin cubrirse y era el último eslabón del camino crítico antes de C-14.
+**Alternativas consideradas**: un único caso de uso con parámetro `accion`; devolver la entidad `Turno`; propagar `ReglaNegocioError` con su código RN; rotar el token al reprogramar y devolver el nuevo en la respuesta; implementar los endpoints HTTP en C-11.
+**Justificación**: un caso de uso por operación mantiene DTOs y errores separados; la traducción centralizada evita filtrar datos internos; reutilizar `resolver` y la regla pura de anticipación impide duplicar reglas; no rotar respeta DD-15 (entrega única) y RN-21.
+**Trade-offs aceptados**: el enlace deja de servir si llega un recordatorio nuevo (el paciente debe usar el último); sin HTTP los escenarios se validan a nivel de caso de uso; RBAC de estas rutas queda para C-09.
+
 ## Supuestos inferidos
 
 ### SU-01 — E-mail + `wa.me` es suficiente frente a WhatsApp automático

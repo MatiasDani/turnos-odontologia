@@ -334,16 +334,17 @@ Carriles: **A** = núcleo y reserva online (Matías: C-01 → C-07 → C-10); **
   - `knowledge-base/09_decisiones_y_supuestos.md` SU-05, DD-13, DD-14, DD-15, DD-16, DD-17, DD-18
 
 ### [C-11] `gestionar-turno-online-por-token`
-- **Estado**: `[ ]` pendiente
+- **Estado**: `[x]` completado (archivado 2026-11-23)
 - **Owner**: Luka Garro (51988)
 - **Scope**:
   - Casos de uso de paciente por token de gestión (resuelto por hash, DD-15): ver el propio turno, cancelar (reutiliza `CancelarTurno` de C-02) y reprogramar (reutiliza `ReprogramarTurno` de C-03)
   - Regla RN-08: con menos de 24 h el sistema indica que debe contactar al consultorio (sin cancelar ni mover)
   - El token solo expone su propio turno (RN-15, RN-21, RN-D-02); se resuelve con el servicio de C-10 (`resolver`, DD-15); token inválido/ajeno devuelve error sin filtrar datos
   - El token vigente es el del último recordatorio: cada envío de C-12 rota el token e invalida el de la reserva (RN-21, DD-21); los turnos internos también tienen token desde su primer recordatorio
-  - Endpoints públicos `GET/POST /public/turnos/:token` (cancelar, reprogramar) si se implementa la capa HTTP
+  - Endpoints públicos `GET/POST /public/turnos/:token` (cancelar, reprogramar) si se implementa la capa HTTP — **fuera de este change: los casos de uso viven en `src/application` y el cableo HTTP queda para C-14**
   - Tests: cancelar con >= 24 h, umbral exacto, < 24 h rechazado con mensaje de contacto, reprogramación atómica vía token, token de otro turno no accede
   - Cubre US-010
+  - **Implementado en el apply (2026-11-23)**: `ResolverTurnoDesdeToken` comparte la resolución por hash con los tres casos de uso; `ConsultarTurnoDesdeToken`, `CancelarTurnoDesdeToken` y `ReprogramarTurnoDesdeToken` delegan en C-02/C-03 con actor `paciente` y reutilizan la regla pura de RN-08; `ErrorEnlacePublico` para token inválido y `ErrorGestionTurnoPublica` con códigos fijos (`CONTACTAR_CONSULTORIO`, `HORARIO_NO_DISPONIBLE`, `DATOS_INVALIDOS`) traducidos desde dominio sin filtrar datos; `TurnoPublico` sin token/sillón/paciente/estado; reprogramar no rota el token; DD-23 en la KB, US-010 marcada, spec `openspec/specs/gestion-turno-online-por-token` (9 requisitos, un test por escenario); 773 tests en verde y `typecheck` limpio
 - **Dependencias**: `C-02`, `C-03`, `C-10`
 - **Governance**: ALTO
 - **Leer antes**:

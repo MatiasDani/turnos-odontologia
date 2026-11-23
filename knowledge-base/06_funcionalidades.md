@@ -137,7 +137,7 @@ Organizadas por épica e historia de usuario (US-NNN). Etapa: **MVP** (D.3 "Impr
 **Para** liberar o mover el horario
 
 **Criterios de aceptación**:
-- [ ] Permitido solo con 24 h o más; con menos, se indica que debe contactar al consultorio.
+- [x] Permitido solo con 24 h o más; con menos, se indica que debe contactar al consultorio. (Cubierto a nivel de caso de uso por C-11, DD-23; la pantalla y el cableo HTTP son C-14.)
 
 **Reglas relacionadas**: RN-08, RN-09, RN-11
 
