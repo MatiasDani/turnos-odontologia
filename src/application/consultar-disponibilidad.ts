@@ -97,18 +97,29 @@ export class ConsultarDisponibilidad {
       }
     }
 
-    const inicios = generarInicios({
-      rango: input.rango,
-      ahora: input.ahora,
-      zona: consultorio.zonaHoraria,
-      horarios,
-      pasoMinutos: paso,
-    });
+    // Inicios por profesional (D3, RN-28): cada uno sigue la grilla de su horario efectivo del día.
+    const iniciosDe = new Map<string, ReadonlySet<number>>();
+    const union = new Map<number, Date>();
+    for (const profesional of profesionales) {
+      const propios = generarInicios({
+        rango: input.rango,
+        ahora: input.ahora,
+        zona: consultorio.zonaHoraria,
+        horarios,
+        pasoMinutos: paso,
+        profesionalId: profesional.id,
+      });
+      iniciosDe.set(profesional.id, new Set(propios.map((i) => i.getTime())));
+      for (const inicio of propios) union.set(inicio.getTime(), inicio);
+    }
+    const inicios = [...union.values()].sort((a, b) => a.getTime() - b.getTime());
 
-    // Orden determinista (D6): inicio → profesionalId → sillonId. Cada combo lo decide validarAlta (D1).
+    // Orden determinista (D6): inicio → profesionalId → sillonId. Cada combo lo decide validarAlta (D1);
+    // un profesional solo se evalúa en los inicios de su propia grilla (D3).
     const huecos: Hueco[] = [];
     for (const inicio of inicios) {
       for (const profesional of profesionales) {
+        if (iniciosDe.get(profesional.id)?.has(inicio.getTime()) !== true) continue;
         for (const sillon of sillones) {
           const agenda = agendas.get(`${profesional.id}|${sillon.id}`);
           if (agenda === undefined) continue;

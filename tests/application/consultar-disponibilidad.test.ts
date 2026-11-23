@@ -430,3 +430,70 @@ describe('Consulta de solo lectura', () => {
     expect(await sistema.turnos.listarPorRecursos('p2', 's1')).toHaveLength(1);
   });
 });
+
+describe('Horario propio del profesional en la disponibilidad', () => {
+  const propio = (id: string, profesionalId: string, desde: string, hasta: string) => ({
+    id,
+    consultorioId: 'c1',
+    profesionalId,
+    diaSemana: 1,
+    desde,
+    hasta,
+  });
+  const sistemaCon = (...tramos: ReturnType<typeof propio>[]) =>
+    crearSistema({ horarios: [...crearEntorno().horarios, ...tramos] });
+  const de = (huecos: readonly Hueco[], profesionalId: string) =>
+    huecos.filter((h) => h.profesionalId === profesionalId);
+
+  test('Huecos de un profesional con horario propio', async () => {
+    const huecos = await consultar(sistemaCon(propio('hp1', 'p2', '14:00', '18:00')));
+    const p2 = de(huecos, 'p2');
+    expect(hhmm(p2[0]!.inicio)).toBe('14:00');
+    expect(hhmm(p2[0]!.fin)).toBe('14:30');
+    expect(hhmm(p2[p2.length - 1]!.inicio)).toBe('17:30');
+    expect(hhmm(p2[p2.length - 1]!.fin)).toBe('18:00');
+    expect(new Set(p2.map((h) => hhmm(h.inicio))).size).toBe(15);
+    const inicios1 = [...new Set(de(huecos, 'p1').map((h) => hhmm(h.inicio)))];
+    expect(inicios1[0]).toBe('09:00');
+    expect(inicios1).toContain('12:30');
+    expect(inicios1).not.toContain('12:45');
+    expect(inicios1).toContain('15:00');
+    expect(inicios1[inicios1.length - 1]).toBe('18:30');
+  });
+
+  test('Inicios alineados al tramo propio del profesional', async () => {
+    const huecos = await consultar(sistemaCon(propio('hp1', 'p2', '14:10', '15:00')), { paso: 15 });
+    expect(horarios(de(huecos, 'p2'))).toEqual(['14:10-14:40', '14:25-14:55']);
+    expect(en(huecos, '14:10').filter((c) => c.startsWith('p1'))).toEqual([]);
+    expect(en(huecos, '14:25').filter((c) => c.startsWith('p1'))).toEqual([]);
+  });
+
+  test('Orden determinista con horarios propios', async () => {
+    const huecos = await consultar(sistemaCon(propio('hp1', 'p2', '14:00', '18:00')));
+    expect(en(huecos, '14:00')).toEqual(['p2/s1', 'p2/s2']);
+    expect(en(huecos, '15:00')).toEqual(['p1/s1', 'p1/s2', 'p2/s1', 'p2/s2']);
+    const inicios = huecos.map((h) => h.inicio.getTime());
+    expect(inicios).toEqual([...inicios].sort((a, b) => a - b));
+  });
+
+  test('Día sin horario propio en la disponibilidad', async () => {
+    const huecos = await consultar(sistemaCon(propio('hp1', 'p2', '14:00', '18:00')), { dia: '2026-11-24' });
+    expect(horarios(huecos)).toHaveLength(30);
+    expect(huecos).toHaveLength(120);
+    expect(en(huecos, '09:00')).toEqual(['p1/s1', 'p1/s2', 'p2/s1', 'p2/s2']);
+  });
+
+  test('cada profesional queda alineado a su propia grilla (triangulación)', async () => {
+    const sistema = sistemaCon(propio('hp1', 'p2', '14:10', '16:00'), propio('hp2', 'p1', '15:05', '16:00'));
+    const huecos = await consultar(sistema, { paso: 15 });
+    expect(horarios(de(huecos, 'p2'))).toEqual([
+      '14:10-14:40',
+      '14:25-14:55',
+      '14:40-15:10',
+      '14:55-15:25',
+      '15:10-15:40',
+      '15:25-15:55',
+    ]);
+    expect(horarios(de(huecos, 'p1'))).toEqual(['15:05-15:35', '15:20-15:50']);
+  });
+});

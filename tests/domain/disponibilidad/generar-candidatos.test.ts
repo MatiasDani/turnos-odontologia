@@ -183,3 +183,44 @@ describe('generarInicios: varios días y fin de semana', () => {
     );
   });
 });
+
+describe('generarInicios: horario propio del profesional (RN-28)', () => {
+  const propio = (desde: string, hasta: string) => ({
+    id: 'hp1',
+    consultorioId: 'c1',
+    profesionalId: 'p2',
+    diaSemana: 1,
+    desde,
+    hasta,
+  });
+  const generar = (extra: ReturnType<typeof propio>, pasoMinutos: number, profesionalId?: string) =>
+    hhmm(
+      generarInicios({
+        rango: rangoDelDia(LUNES),
+        ahora: local('2026-11-22', '08:00'),
+        zona: BA,
+        horarios: [...horarios, extra],
+        pasoMinutos,
+        ...(profesionalId === undefined ? {} : { profesionalId }),
+      }),
+    );
+
+  test('grilla del tramo propio: 14:00..17:45 con paso 15', () => {
+    expect(generar(propio('14:00', '18:00'), 15, 'p2')).toEqual(grilla(840, 1080, 15));
+  });
+
+  test('alineación a 14:10 y 14:25 con paso 15', () => {
+    expect(generar(propio('14:10', '15:00'), 15, 'p2')).toEqual(['14:10', '14:25', '14:40', '14:55']);
+  });
+
+  test('sin profesionalId usa la grilla del consultorio, igual que antes', () => {
+    expect(generar(propio('14:00', '18:00'), 15)).toEqual([...grilla(540, 780, 15), ...grilla(900, 1140, 15)]);
+  });
+
+  test('un profesional sin tramos propios usa la grilla del consultorio', () => {
+    expect(generar(propio('14:00', '18:00'), 15, 'p1')).toEqual([
+      ...grilla(540, 780, 15),
+      ...grilla(900, 1140, 15),
+    ]);
+  });
+});
