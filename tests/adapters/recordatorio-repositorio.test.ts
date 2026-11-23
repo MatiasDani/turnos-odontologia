@@ -24,6 +24,12 @@ describe('RecordatorioRepositorioEnMemoria', () => {
     await expect(repo.listarPorTurno('t-1')).resolves.toEqual([recordatorio({ estado: 'cancelado' })]);
   });
 
+  test('obtenerPorId devuelve el registro o undefined', async () => {
+    const repo = new RecordatorioRepositorioEnMemoria([recordatorio({ id: 'r-1' })]);
+    await expect(repo.obtenerPorId('r-1')).resolves.toEqual(recordatorio({ id: 'r-1' }));
+    await expect(repo.obtenerPorId('r-9')).resolves.toBeUndefined();
+  });
+
   test('listarPorTurno devuelve solo los del turno', async () => {
     const repo = new RecordatorioRepositorioEnMemoria([
       recordatorio({ id: 'r-1', turnoId: 't-1' }),

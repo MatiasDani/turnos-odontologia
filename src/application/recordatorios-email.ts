@@ -30,7 +30,9 @@ export class RecordatoriosEmail implements Recordatorios {
     if (!debeProgramarse(paciente)) return;
     // Idempotente: el pendiente existente se reemplaza conservando su id; enviados, fallidos y
     // cancelados no se tocan (RN-25).
-    const pendiente = (await deps.recordatorios.listarPorTurno(turnoId)).find((r) => r.estado === 'pendiente');
+    const pendiente = (await deps.recordatorios.listarPorTurno(turnoId)).find(
+      (r) => r.estado === 'pendiente' && r.canal === 'email',
+    );
     await deps.recordatorios.guardar({
       id: pendiente?.id ?? deps.ids.siguiente(),
       turnoId,

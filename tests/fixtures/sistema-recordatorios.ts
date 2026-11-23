@@ -25,7 +25,10 @@ import {
   type ResumenBarrido,
 } from '../../src/application/enviar-recordatorios-pendientes.js';
 import { ListarRecordatoriosFallidos } from '../../src/application/listar-recordatorios-fallidos.js';
+import { ListarRecordatoriosPendientesWaMe } from '../../src/application/listar-recordatorios-wa-me-pendientes.js';
+import { MarcarRecordatorioEnviado } from '../../src/application/marcar-recordatorio-enviado.js';
 import type { Recordatorios } from '../../src/application/puertos/recordatorios.js';
+import { RecordatoriosConWaMe } from '../../src/application/recordatorios-wa-me.js';
 import { RecordatoriosEmail } from '../../src/application/recordatorios-email.js';
 import { ReservarOnline, type ReservaOnlineConfirmada } from '../../src/application/reservar-online.js';
 import { ServicioTokens } from '../../src/application/servicio-tokens.js';
@@ -66,6 +69,8 @@ export type OpcionesSistemaRecordatorios = Partial<Entorno> & {
    * falla del adaptador real que deja un pendiente sin anular, DD-19).
    */
   readonly fallarAnulacion?: boolean;
+  /** C-13: cablea el decorador `wa.me` en alta, reserva y cancelación (por defecto `false`). */
+  readonly conWaMe?: boolean;
 };
 
 export interface SistemaRecordatorios {
@@ -88,11 +93,15 @@ export interface SistemaRecordatorios {
   readonly enviarPendientes: EnviarRecordatoriosPendientes;
   readonly listarFallidos: ListarRecordatoriosFallidos;
   readonly confirmarDesdeEnlace: ConfirmarDesdeEnlace;
+  /** C-13: presentes solo cuando el fixture se crea con `conWaMe: true`. */
+  readonly recordatoriosConWaMe?: RecordatoriosConWaMe | undefined;
+  readonly listarPendientesWaMe?: ListarRecordatoriosPendientesWaMe | undefined;
+  readonly marcarEnviado?: MarcarRecordatorioEnviado | undefined;
 }
 
 /** Cableado completo con repos en memoria, reloj fijo, tokens reales y notificador falso. */
 export function crearSistemaRecordatorios(opciones: OpcionesSistemaRecordatorios = {}): SistemaRecordatorios {
-  const { ahora, horasAntes, recordatorios: repoInyectado, fallarAnulacion, ...overrides } = opciones;
+  const { ahora, horasAntes, recordatorios: repoInyectado, fallarAnulacion, conWaMe, ...overrides } = opciones;
   const datos = crearEntorno({ turnos: [], pacientes: pacientesRecordatorios(), ...overrides });
   const config: ConfiguracionRecordatorios = { horasAntes: horasAntes ?? 24, baseUrlPublica: BASE_URL };
   const reloj = new RelojFijo(ahora ?? AHORA_POR_DEFECTO);
@@ -123,9 +132,30 @@ export function crearSistemaRecordatorios(opciones: OpcionesSistemaRecordatorios
     ids: new GeneradorIdConPrefijo('rec-'),
     config,
   });
+  const paraCancelar: Recordatorios =
+    fallarAnulacion === true
+      ? {
+          programar: (turnoId) => recordatorios.programar(turnoId),
+          cancelarPendientes: () => Promise.reject(new Error('anulación de recordatorios caída')),
+        }
+      : recordatorios;
+  const recordatoriosConWaMe =
+    conWaMe === true
+      ? new RecordatoriosConWaMe({
+          recordatorios: fallarAnulacion === true ? paraCancelar : recordatorios,
+          repoRecordatorios,
+          turnos,
+          pacientes,
+          profesionales: repos.profesionales,
+          prestaciones: repos.prestaciones,
+          consultorios: repos.consultorios,
+          ids: new GeneradorIdConPrefijo('rec-wa-'),
+          config,
+        })
+      : undefined;
   const agendarTurno = new AgendarTurnoConRecordatorio(
     new AgendarTurno({ ...repos, ids: new GeneradorIdConPrefijo('tu-') }),
-    recordatorios,
+    recordatoriosConWaMe ?? recordatorios,
   );
   const reservarOnline = new ReservarOnline({
     reloj,
@@ -141,13 +171,6 @@ export function crearSistemaRecordatorios(opciones: OpcionesSistemaRecordatorios
   });
   const notificador = new NotificadorFalso();
   const confirmarTurno = new ConfirmarTurno({ turnos, reloj });
-  const paraCancelar: Recordatorios =
-    fallarAnulacion === true
-      ? {
-          programar: (turnoId) => recordatorios.programar(turnoId),
-          cancelarPendientes: () => Promise.reject(new Error('anulación de recordatorios caída')),
-        }
-      : recordatorios;
   const enviarPendientes = new EnviarRecordatoriosPendientes({
     reloj,
     recordatorios: repoRecordatorios,
@@ -173,11 +196,16 @@ export function crearSistemaRecordatorios(opciones: OpcionesSistemaRecordatorios
     recordatorios,
     agendarTurno,
     reservarOnline,
-    cancelarTurno: new CancelarTurno({ turnos, reloj, recordatorios: paraCancelar }),
+    cancelarTurno: new CancelarTurno({ turnos, reloj, recordatorios: recordatoriosConWaMe ?? paraCancelar }),
     confirmarTurno,
     enviarPendientes,
     listarFallidos: new ListarRecordatoriosFallidos({ recordatorios: repoRecordatorios }),
     confirmarDesdeEnlace: new ConfirmarDesdeEnlace({ tokens: servicioTokens, turnos, confirmar: confirmarTurno }),
+    recordatoriosConWaMe,
+    listarPendientesWaMe:
+      conWaMe === true ? new ListarRecordatoriosPendientesWaMe({ recordatorios: repoRecordatorios }) : undefined,
+    marcarEnviado:
+      conWaMe === true ? new MarcarRecordatorioEnviado({ recordatorios: repoRecordatorios, reloj }) : undefined,
   };
 }
 

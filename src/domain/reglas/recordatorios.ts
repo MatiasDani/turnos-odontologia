@@ -1,6 +1,7 @@
 import type { Paciente } from '../paciente.js';
 import type { Recordatorio } from '../recordatorio.js';
 import type { EstadoTurno, Turno } from '../turno.js';
+import { normalizarTelefonoArgentino } from './telefono.js';
 
 const MS_POR_HORA = 3_600_000;
 
@@ -16,6 +17,13 @@ export type DecisionEnvio = 'esperar' | 'anular' | 'enviar';
 /** Solo hay recordatorio por e-mail con consentimiento de contacto y e-mail (RN-25, RN-D-02). */
 export function debeProgramarse(paciente: Pick<Paciente, 'consentimientoContacto' | 'email'>): boolean {
   return paciente.consentimientoContacto && paciente.email !== undefined && paciente.email !== '';
+}
+
+/** Hay recordatorio `wa.me` con consentimiento y teléfono válido, sin exigir e-mail (RN-26, DD-24). */
+export function debeProgramarseWaMe(
+  paciente: Pick<Paciente, 'consentimientoContacto' | 'telefono'>,
+): boolean {
+  return paciente.consentimientoContacto && normalizarTelefonoArgentino(paciente.telefono) !== undefined;
 }
 
 /**

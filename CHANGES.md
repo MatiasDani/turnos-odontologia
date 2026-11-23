@@ -381,7 +381,7 @@ Carriles: **A** = núcleo y reserva online (Matías: C-01 → C-07 → C-10); **
   - `knowledge-base/08_arquitectura_propuesta.md` §Variables de entorno
 
 ### [C-13] `recordatorio-wa-me`
-- **Estado**: `[ ]` pendiente
+- **Estado**: `[x]` completado (archivado 2026-11-23)
 - **Owner**: Luka Garro (51988)
 - **Scope**:
   - Generador de URL `https://wa.me/<telefono>?text=<mensaje>` con codificación segura y mensaje armado con datos del turno (sin datos clínicos)
@@ -389,14 +389,15 @@ Carriles: **A** = núcleo y reserva online (Matías: C-01 → C-07 → C-10); **
   - Respeta `consentimientoContacto`; normalización de teléfono argentino ficticio
   - Tests: URL bien formada y codificada, mensaje con fecha/hora/prestación, marcar enviado, sin consentimiento no se genera
   - Cubre US-012
+  - **Implementado en el apply (2026-11-23)**: `RecordatoriosConWaMe` decora el puerto `Recordatorios` y agrega el `wa_me` al programar el turno (24 h antes por defecto) sin tocar C-01/C-10/C-12; `debeProgramarseWaMe` exige consentimiento y teléfono válido sin e-mail, con normalización compartida extraída a `src/domain/reglas/telefono.ts`; `armarEnlaceWaMe` codifica el mensaje con `encodeURIComponent` y nunca incluye token ni enlace de gestión; `ListarRecordatoriosPendientesWaMe` y `MarcarRecordatorioEnviado` con `ErrorMarcarRecordatorio` (`RECORDATORIO_NO_ENCONTRADO`, `ESTADO_NO_ENVIABLE`) e idempotencia sobre `enviado`; `RecordatorioRepositorio.obtenerPorId` aditivo; C-12 filtra por canal en la programación y en el barrido, sin cambios de comportamiento; RN-26 y DD-24 en la KB, US-012 marcada, specs `openspec/specs/recordatorio-wa-me` (5 requisitos) y delta de `recordatorios-turno` (2 requisitos), 38 escenarios con test de título idéntico; 816 tests en verde y `typecheck` limpio
 - **Dependencias**: `C-12`
 - **Governance**: MEDIO
 - **Leer antes**:
-  - `knowledge-base/05_reglas_de_negocio.md` RN-14, RN-D-02
+  - `knowledge-base/05_reglas_de_negocio.md` RN-14, RN-25, RN-26, RN-D-02
   - `knowledge-base/04_modelo_de_datos.md` §Recordatorio, §Paciente
   - `knowledge-base/06_funcionalidades.md` §US-012
   - `knowledge-base/07_flujos_principales.md` §Flujo 6
-  - `knowledge-base/09_decisiones_y_supuestos.md` DD-03, SU-01
+  - `knowledge-base/09_decisiones_y_supuestos.md` DD-03, DD-24, SU-01
 
 ---
 

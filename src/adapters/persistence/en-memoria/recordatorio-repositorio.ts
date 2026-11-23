@@ -15,6 +15,10 @@ export class RecordatorioRepositorioEnMemoria implements RecordatorioRepositorio
     return Promise.resolve();
   }
 
+  obtenerPorId(id: string): Promise<Recordatorio | undefined> {
+    return Promise.resolve(this.recordatorios.find((r) => r.id === id));
+  }
+
   listarPorTurno(turnoId: string): Promise<readonly Recordatorio[]> {
     return Promise.resolve(this.recordatorios.filter((r) => r.turnoId === turnoId));
   }

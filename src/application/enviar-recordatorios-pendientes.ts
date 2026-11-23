@@ -61,6 +61,8 @@ export class EnviarRecordatoriosPendientes {
     let fallidos = 0;
     let anulados = 0;
     for (const recordatorio of await deps.recordatorios.listarPendientesHasta(ahora)) {
+      // Los `wa.me` los ve la recepción y los envía a mano (RN-26): nunca por este barrido.
+      if (recordatorio.canal !== 'email') continue;
       const turno = await deps.turnos.obtenerPorId(recordatorio.turnoId);
       const decision = evaluarEnvio(recordatorio, turno, ahora);
       if (decision === 'esperar') continue;

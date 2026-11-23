@@ -159,11 +159,11 @@ Organizadas por épica e historia de usuario (US-NNN). Etapa: **MVP** (D.3 "Impr
 **Quiero** un enlace `wa.me` con el mensaje armado
 **Para** enviar el recordatorio por WhatsApp sin API ni costo
 
-**Criterios de aceptación**:
-- [ ] El sistema genera la URL con teléfono del paciente y texto del turno.
-- [ ] La recepción marca el recordatorio como enviado.
+**Criterios de aceptación** (cubiertos a nivel de caso de uso por C-13, 2026-11-23):
+- [x] El sistema genera la URL con teléfono del paciente y texto del turno.
+- [x] La recepción marca el recordatorio como enviado.
 
-**Reglas relacionadas**: RN-14
+**Reglas relacionadas**: RN-14, RN-26
 
 ## Épica 6: Acceso y roles (MVP)
 

@@ -1,3 +1,5 @@
+import { normalizarTelefonoArgentino } from './reglas/telefono.js';
+
 /** Datos del paciente que llegan por la ruta pública (DD-17). Reglas puras de formato y normalización. */
 export interface DatosPacienteOnline {
   readonly dni: string;
@@ -14,8 +16,6 @@ export type ResultadoDatosPacienteOnline =
 
 const LARGO_MAXIMO_NOMBRE = 80;
 const DNI = /^\d{7,8}$/;
-const SEPARADORES_TELEFONO = /[\s\-.()]/g;
-const TELEFONO = /^\d{10,13}$/;
 const LARGO_MAXIMO_EMAIL = 254;
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -27,16 +27,6 @@ function normalizarDni(dni: string): string | undefined {
 function normalizarNombre(texto: string): string | undefined {
   const recortado = texto.trim();
   return recortado.length >= 1 && recortado.length <= LARGO_MAXIMO_NOMBRE ? recortado : undefined;
-}
-
-/** Quita separadores, admite prefijo `+54` y devuelve solo dígitos (10 a 13). */
-function normalizarTelefono(telefono: string): string | undefined {
-  let digitos = telefono.replace(SEPARADORES_TELEFONO, '');
-  if (digitos.startsWith('+')) {
-    if (!digitos.startsWith('+54')) return undefined;
-    digitos = digitos.slice(1);
-  }
-  return TELEFONO.test(digitos) ? digitos : undefined;
 }
 
 function normalizarEmail(email: string): string | undefined {
@@ -52,7 +42,7 @@ export function validarDatosPacienteOnline(datos: DatosPacienteOnline): Resultad
   if (nombre === undefined) campos.push('paciente.nombre');
   const apellido = normalizarNombre(datos.apellido);
   if (apellido === undefined) campos.push('paciente.apellido');
-  const telefono = normalizarTelefono(datos.telefono);
+  const telefono = normalizarTelefonoArgentino(datos.telefono);
   if (telefono === undefined) campos.push('paciente.telefono');
   const email = datos.email === undefined ? undefined : normalizarEmail(datos.email);
   if (datos.email !== undefined && email === undefined) campos.push('paciente.email');
