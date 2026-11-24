@@ -28,6 +28,8 @@ import { ReprogramarTurno } from '../../src/application/reprogramar-turno.js';
 import { ConsultarDisponibilidad } from '../../src/application/consultar-disponibilidad.js';
 import type { ConsultarDisponibilidadInput } from '../../src/application/consultar-disponibilidad-input.js';
 import type { GeneradorId } from '../../src/application/puertos/generador-id.js';
+import type { Recordatorios } from '../../src/application/puertos/recordatorios.js';
+import { RecordatoriosNoOp } from '../../src/adapters/recordatorios/recordatorios-no-op.js';
 import type { Rol } from '../../src/domain/actor.js';
 import type { Hueco } from '../../src/domain/disponibilidad/hueco.js';
 import type { Turno } from '../../src/domain/turno.js';
@@ -172,6 +174,8 @@ export type OpcionesSistemaReserva = Partial<Entorno> & {
   /** Doble del alta (para simular rechazos del alta). */
   readonly agendar?: Pick<AgendarTurno, 'ejecutar'>;
   readonly topeTurnosOnline?: number;
+  /** Puerto de recordatorios de la reserva; por defecto `RecordatoriosNoOp` (DD-32). */
+  readonly recordatorios?: Pick<Recordatorios, 'programar'>;
 };
 
 export interface SistemaReserva {
@@ -189,7 +193,7 @@ export interface SistemaReserva {
 
 /** Cableado de la reserva online: repos en memoria, reloj fijo y adaptadores crypto reales. */
 export function crearSistemaReserva(opciones: OpcionesSistemaReserva = {}): SistemaReserva {
-  const { ahora, consultar, agendar, topeTurnosOnline, ...overrides } = opciones;
+  const { ahora, consultar, agendar, topeTurnosOnline, recordatorios, ...overrides } = opciones;
   const datos = crearEntorno(overrides);
   const reloj = new RelojFijo(ahora ?? AHORA_POR_DEFECTO);
   const turnos = new TurnoRepositorioDePrueba(datos.turnos);
@@ -225,6 +229,7 @@ export function crearSistemaReserva(opciones: OpcionesSistemaReserva = {}): Sist
     ids: new GeneradorIdConPrefijo('pn-'),
     consultar: consultar ?? consultarDisponibilidad,
     agendar: agendar ?? agendarTurno,
+    recordatorios: recordatorios ?? new RecordatoriosNoOp(),
     tokens: servicioTokens,
   });
   return {

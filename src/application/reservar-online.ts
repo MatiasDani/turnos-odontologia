@@ -14,6 +14,7 @@ import type { AgendarTurno } from './agendar-turno.js';
 import type { ConsultarDisponibilidad } from './consultar-disponibilidad.js';
 import { ErrorReservaPublica, type HorarioOfrecido } from './errores-reserva-publica.js';
 import type { GeneradorId } from './puertos/generador-id.js';
+import type { Recordatorios } from './puertos/recordatorios.js';
 import type { Reloj } from './puertos/reloj.js';
 import type {
   ConsultorioRepositorio,
@@ -46,6 +47,8 @@ export interface ReservarOnlineDependencias {
   readonly ids: GeneradorId;
   readonly consultar: Pick<ConsultarDisponibilidad, 'ejecutar'>;
   readonly agendar: Pick<AgendarTurno, 'ejecutar'>;
+  /** Programa los recordatorios del turno creado (RN-25, RN-26, DD-32); `RecordatoriosNoOp` si no se usan. */
+  readonly recordatorios: Pick<Recordatorios, 'programar'>;
   readonly tokens: Pick<ServicioTokens, 'emitir'>;
   readonly topeTurnosOnline?: number;
 }
@@ -77,7 +80,10 @@ export class ReservarOnline {
     const turno = await this.agendarConReintento(input, pacienteId, combo, ahora);
     // 9. Solo ahora, con el turno creado, se guarda el paciente nuevo: ningún rechazo deja huérfanos.
     if (existente === undefined) await deps.pacientes.guardar({ id: pacienteId, ...datos });
-    // 10. El token en claro solo existe en la respuesta.
+    // 10. Recordatorios con turno y paciente ya guardados; fuera del reintento, así una falla se propaga sin
+    //     traducir (RN-22) y, al ir antes del token, no deja un token emitido que nadie recibe (DD-32).
+    await deps.recordatorios.programar(turno.id);
+    // 11. El token en claro solo existe en la respuesta.
     const token = await deps.tokens.emitir(turno.id);
     return this.armarRespuesta(turno, prestacion.nombre, token);
   }

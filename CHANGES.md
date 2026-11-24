@@ -444,6 +444,23 @@ Carriles: **A** = núcleo y reserva online (Matías: C-01 → C-07 → C-10); **
 
 ---
 
+## Correcciones de integración
+
+### [FIX-01] `programar-recordatorio-reserva-online`
+- **Estado**: `[x]` completado (archivado 2026-11-23)
+- **Owner**: Matías Ibañez (52006)
+- **Scope**:
+  - `ReservarOnline` recibe el puerto `recordatorios` (obligatorio) y programa los recordatorios después de guardar al paciente nuevo y antes de emitir el token
+  - Se elimina `EmitirTokenConRecordatorio`; `AgendarTurnoConRecordatorio` queda solo para el alta de recepción (DD-32)
+  - La falla al programar se propaga sin traducir (500 `ERROR_INTERNO` por HTTP), sin deshacer el turno y sin emitir token
+- **Dependencias**: `C-10`, `C-12`, `C-14`
+- **Governance**: ALTO
+- **Leer antes**:
+  - `knowledge-base/09_decisiones_y_supuestos.md` §DD-21, §DD-32
+  - `knowledge-base/05_reglas_de_negocio.md` §RN-22, §RN-25, §RN-26
+
+---
+
 ## Riesgos
 
 | # | Riesgo | Impacto | Mitigación | Changes afectados |
