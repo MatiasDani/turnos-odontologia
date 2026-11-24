@@ -82,11 +82,12 @@ export interface SistemaRecordatorios {
   readonly repoRecordatorios: RecordatorioRepositorioEnMemoria;
   readonly hasher: HasherSha256;
   readonly servicioTokens: ServicioTokens;
+  readonly tokens: TokenGestionRepositorioEnMemoria;
   readonly notificador: NotificadorFalso;
   readonly recordatorios: RecordatoriosEmail;
   /** Alta de recepción con recordatorio (decorador sobre `AgendarTurno`). */
   readonly agendarTurno: AgendarTurnoConRecordatorio;
-  /** Reserva online con el decorador inyectado como `agendar`. */
+  /** Reserva online con `recordatorios` inyectado como puerto (DD-32); `agendar` es el alta simple. */
   readonly reservarOnline: ReservarOnline;
   readonly cancelarTurno: CancelarTurno;
   readonly confirmarTurno: ConfirmarTurno;
@@ -118,10 +119,11 @@ export function crearSistemaRecordatorios(opciones: OpcionesSistemaRecordatorios
     bloqueos: new BloqueoRepositorioEnMemoria(datos.bloqueos),
     turnos,
   };
+  const tokens = new TokenGestionRepositorioEnMemoria();
   const servicioTokens = new ServicioTokens({
     generador: new GeneradorTokenCrypto(),
     hasher,
-    tokens: new TokenGestionRepositorioEnMemoria(),
+    tokens,
     turnos,
     reloj,
   });
@@ -166,7 +168,8 @@ export function crearSistemaRecordatorios(opciones: OpcionesSistemaRecordatorios
     consultorios: repos.consultorios,
     ids: new GeneradorIdConPrefijo('pn-'),
     consultar: new ConsultarDisponibilidad(repos),
-    agendar: agendarTurno,
+    agendar: new AgendarTurno({ ...repos, ids: new GeneradorIdConPrefijo('tu-') }),
+    recordatorios: recordatoriosConWaMe ?? recordatorios,
     tokens: servicioTokens,
   });
   const notificador = new NotificadorFalso();
@@ -192,6 +195,7 @@ export function crearSistemaRecordatorios(opciones: OpcionesSistemaRecordatorios
     repoRecordatorios,
     hasher,
     servicioTokens,
+    tokens,
     notificador,
     recordatorios,
     agendarTurno,

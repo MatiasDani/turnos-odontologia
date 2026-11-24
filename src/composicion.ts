@@ -23,7 +23,6 @@ import { ConsultarGestionDesdeToken } from './application/consultar-gestion-desd
 import { ConfirmarDesdeEnlace } from './application/confirmar-desde-enlace.js';
 import { ConfirmarTurno } from './application/confirmar-turno.js';
 import { ConsultarDisponibilidad } from './application/consultar-disponibilidad.js';
-import { EmitirTokenConRecordatorio } from './application/emitir-token-con-recordatorio.js';
 import type { GeneradorId } from './application/puertos/generador-id.js';
 import type { Reloj } from './application/puertos/reloj.js';
 import type { TurnoRepositorio } from './application/puertos/repositorios.js';
@@ -66,6 +65,8 @@ export interface OpcionesComposicion {
   /** Generador de ids de turnos y pacientes; por defecto UUID. */
   readonly ids?: GeneradorId;
   readonly horasAntesRecordatorio?: number;
+  /** Repositorio de recordatorios a usar (tests: uno que falla); por defecto en memoria. */
+  readonly repoRecordatorios?: RecordatorioRepositorioEnMemoria;
 }
 
 /**
@@ -86,7 +87,7 @@ export function componerNucleo(opciones: OpcionesComposicion) {
     bloqueos: new BloqueoRepositorioEnMemoria([...datos.bloqueos]),
     turnos,
   };
-  const repoRecordatorios = new RecordatorioRepositorioEnMemoria();
+  const repoRecordatorios = opciones.repoRecordatorios ?? new RecordatorioRepositorioEnMemoria();
   const recordatorios = new RecordatoriosEmail({
     recordatorios: repoRecordatorios,
     turnos,
@@ -102,7 +103,8 @@ export function componerNucleo(opciones: OpcionesComposicion) {
     reloj,
   });
   const consultarDisponibilidad = new ConsultarDisponibilidad(repos);
-  // El recordatorio se programa al emitir el token (ver EmitirTokenConRecordatorio), no en el alta.
+  // El recordatorio de la reserva lo programa `ReservarOnline` (puerto `recordatorios`, DD-32), con el
+  // paciente ya guardado y antes de emitir el token; por eso el alta es `AgendarTurno` simple.
   const agendar = new AgendarTurno({ ...repos, ids });
   const reservarOnline = new ReservarOnline({
     reloj,
@@ -114,7 +116,8 @@ export function componerNucleo(opciones: OpcionesComposicion) {
     ids,
     consultar: consultarDisponibilidad,
     agendar,
-    tokens: new EmitirTokenConRecordatorio(servicioTokens, recordatorios),
+    recordatorios,
+    tokens: servicioTokens,
   });
   const resolver = new ResolverTurnoDesdeToken({
     tokens: servicioTokens,

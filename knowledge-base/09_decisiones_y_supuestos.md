@@ -185,7 +185,7 @@ C-02 **reutiliza** el `Reloj` (no lo redefine) y C-05 **extiende** `PacienteRepo
 ### DD-21 — Recordatorio por e-mail: programación, barrido, confirmación por enlace y SMTP
 **Decisión** (2026-11-22, explore de C-12, Franco Petri):
 - **Puerto `Recordatorios`**: suma `programar(turnoId)` idempotente (RN-25) a `cancelarPendientes(turnoId)`. No hay un `reprogramar` aparte: C-03 llama a `programar` después de mover el turno. El adaptador real persiste en un `RecordatorioRepositorio` (con adaptador en memoria) y reemplaza al no-op sin modificar `CancelarTurno` (DD-19).
-- **Enganche al alta**: decorador `AgendarTurnoConRecordatorio` con la misma interfaz que `AgendarTurno`: ejecuta el alta y luego `programar`. Se inyecta en `ReservarOnline` como `agendar` y lo usa también el alta de recepción. No se modifica código de C-01 ni de C-10. Si `programar` falla, el error se propaga y el turno creado no se deshace (mismo criterio que DD-19).
+- **Enganche al alta**: decorador `AgendarTurnoConRecordatorio` con la misma interfaz que `AgendarTurno`: ejecuta el alta y luego `programar`. Se inyecta en `ReservarOnline` como `agendar` y lo usa también el alta de recepción. *(Enmendado por DD-32: la reserva online ya no usa el decorador; lo usa solo el alta de recepción.)* No se modifica código de C-01 ni de C-10. Si `programar` falla, el error se propaga y el turno creado no se deshace (mismo criterio que DD-19).
 - **Envío**: caso de uso `EnviarRecordatoriosPendientes` (barrido, RN-25) con `Reloj` inyectado y la anticipación por configuración. Por cada recordatorio a enviar: `ServicioTokens.rotar(turnoId)` (DD-15), arma el mensaje con `BASE_URL_PUBLICA` y lo entrega al puerto `Notificador`. El proceso que ejecuta el barrido periódicamente (cron o `setInterval`) queda para la integración HTTP (C-14).
 - **Confirmación por enlace**: caso de uso público `ConfirmarDesdeEnlace(token)`: resuelve con `ServicioTokens.resolver` (C-10); token inválido, vencido o de un turno cancelado → error público genérico (patrón de RN-22); turno `reservado` → `ConfirmarTurno` (C-04, actor paciente); turno ya `confirmado` → éxito sin cambios; otro estado → error público genérico.
 - **Fallos**: envío fallido → `fallido` con `motivoFallo`, sin reintento; caso de uso `ListarRecordatoriosFallidos` para la recepción. Un pendiente que quedó colgado porque falló `cancelarPendientes` nunca se envía: el barrido revalida el estado del turno y lo marca `cancelado`.
@@ -299,6 +299,18 @@ C-02 **reutiliza** el `Reloj` (no lo redefine) y C-05 **extiende** `PacienteRepo
 **Alternativas consideradas**: no exponer la confirmación (mostrar siempre "Confirmar"); aceptar `profesionalId` y reasignar sillón en el servidor (cambia C-11/C-03).
 **Justificación**: muestra al paciente lo que ya sabe de su propio turno sin datos ajenos; ofrecer solo horarios que la reprogramación puede concretar evita rechazos sorpresivos.
 **Trade-offs aceptados**: el paciente no puede cambiar de profesional online; un pequeño corrimiento dentro del propio horario no se ofrece.
+
+### DD-32 — La reserva online programa sus recordatorios con un puerto obligatorio
+**Decisión** (2026-11-23, propose y apply de `programar-recordatorio-reserva-online`, Matías Ibañez; gobernanza ALTO aprobada):
+- **Puerto obligatorio**: `ReservarOnlineDependencias.recordatorios: Pick<Recordatorios, 'programar'>`, sin valor por defecto. Quien no quiera recordatorios inyecta `RecordatoriosNoOp`; olvidarlo no compila.
+- **Orden**: alta del turno, guardar el paciente nuevo, `recordatorios.programar(turno.id)` y recién después `tokens.emitir`. `programar` queda fuera de `agendarConReintento`, así que su error nunca se traduce a `HORARIO_NO_DISPONIBLE`.
+- **Falla**: el error de `programar` se propaga sin traducir (RN-22: error inesperado; la ruta HTTP responde 500 `ERROR_INTERNO`). El turno y el paciente nuevo quedan guardados y no se emite token (DD-19, DD-21).
+- **Eliminación**: se borra `EmitirTokenConRecordatorio` (D13 de C-14) y la composición inyecta el puerto en `ReservarOnline` con `AgendarTurno` simple.
+- **Decorador**: `AgendarTurnoConRecordatorio` queda solo para el alta de recepción; no se inyecta en `ReservarOnline` (programar dentro del alta falla para un DNI nuevo, porque el paciente se guarda después).
+**Contexto**: bug de integración C-10 + C-12 registrado en `10_preguntas_abiertas.md`; C-14 lo había rodeado programando al emitir el token.
+**Alternativas consideradas**: dependencia opcional con no-op por defecto (repite la causa del bug); tolerar un paciente inexistente en el decorador (no programa nada para el DNI nuevo); guardar el paciente antes del alta (rompe "sin pacientes huérfanos"); programar después de emitir el token (deja un token que nadie recibe si falla).
+**Justificación**: un único punto de programación válido para ambos canales (e-mail y `wa.me`), con el compilador obligando a cada composición a decidir.
+**Trade-offs aceptados**: ante una falla de programación queda un turno sin token y el reintento del paciente recibe `RESERVA_DUPLICADA`; el cableado real sigue sin `RecordatoriosConWaMe` (pregunta abierta, C-13/C-15).
 
 ## Supuestos inferidos
 
