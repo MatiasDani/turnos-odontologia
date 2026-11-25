@@ -11,6 +11,7 @@ import {
   tokenDelBarrido,
   type SistemaGestion,
 } from '../fixtures/sistema-gestion.js';
+import { actores } from '../fixtures/actores.js';
 
 const TURNO_ID = 't-base';
 
@@ -68,7 +69,7 @@ describe('Resolución previa del token', () => {
 
   test('Token de un turno cancelado', async () => {
     const { sistema, token } = await sistemaConToken();
-    await sistema.cancelarTurno.ejecutar({ turnoId: TURNO_ID, actor: { rol: 'recepcion' } });
+    await sistema.cancelarTurno.ejecutar({ turnoId: TURNO_ID, actor: actores.recepcion });
     await expect(rechazo(sistema.consultarDesdeToken.ejecutar({ token }))).resolves.toBeInstanceOf(ErrorEnlacePublico);
   });
 });
@@ -124,7 +125,7 @@ describe('Cancelación con anticipación suficiente', () => {
     await sistema.cancelarDesdeToken.ejecutar({ token });
     await expect(
       sistema.agendarTurno.ejecutar({
-        actor: { rol: 'recepcion' },
+        actor: actores.recepcion,
         pacienteId: 'pa2',
         profesionalId: 'p1',
         sillonId: 's1',

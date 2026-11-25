@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'vitest';
 import { barrido, crearSistemaWaMe, agendarRecepcion, DOMINGO, waMeDe } from '../fixtures/sistema-wa-me.js';
+import { actores } from '../fixtures/actores.js';
 
 describe('Independencia de canales', () => {
   test('Programar el e-mail no sobrescribe el `wa.me`', async () => {
@@ -47,7 +48,7 @@ describe('Independencia de canales', () => {
   test('Cancelar el turno anula ambos canales', async () => {
     const sistema = crearSistemaWaMe();
     const turno = await agendarRecepcion(sistema);
-    await sistema.cancelarTurno.ejecutar({ turnoId: turno.id, actor: { rol: 'recepcion' } });
+    await sistema.cancelarTurno.ejecutar({ turnoId: turno.id, actor: actores.recepcion });
     const estados = (await sistema.repoRecordatorios.listarPorTurno(turno.id)).map((r) => r.estado);
     expect(estados).toEqual(['cancelado', 'cancelado']);
   });
@@ -57,7 +58,7 @@ describe('Independencia de canales', () => {
     const turno = await agendarRecepcion(sistema);
     const [waMe] = await waMeDe(sistema, turno.id);
     if (waMe === undefined) throw new Error('falta el wa.me');
-    await sistema.marcarEnviado.ejecutar({ recordatorioId: waMe.id });
+    await sistema.marcarEnviado.ejecutar({ actor: actores.recepcion, recordatorioId: waMe.id });
     expect(sistema.notificador.enviados).toHaveLength(0);
   });
 });

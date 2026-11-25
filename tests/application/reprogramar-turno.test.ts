@@ -1,7 +1,7 @@
 // Escenarios de openspec/changes/c03-reprogramar-turno-atomico/specs/reprogramacion-turnos/spec.md.
 // Cada test lleva el nombre exacto de su `#### Scenario:` (regla dura 8); un `describe` por requisito.
 import { describe, expect, test } from 'vitest';
-import { RecursoNoEncontradoError, ReglaNegocioError } from '../../src/domain/errores.js';
+import { AccesoDenegadoError, RecursoNoEncontradoError, ReglaNegocioError } from '../../src/domain/errores.js';
 import {
   crearSistemaReprogramacion,
   rechazo,
@@ -9,6 +9,7 @@ import {
   turnoBaseCancelacion,
 } from '../fixtures/sistema.js';
 import { crearEntorno, crearTurno, local, LUNES, MARTES, MIERCOLES } from '../fixtures/seed.js';
+import { actores } from '../fixtures/actores.js';
 
 const DOMINGO = '2026-11-22';
 const martes = (hhmm: string) => local(MARTES, hhmm);
@@ -113,6 +114,21 @@ describe('Anticipación mínima del paciente', () => {
       inicio: martes('10:00'),
     });
   });
+
+  test('Odontólogo no puede reprogramar', async () => {
+    const sistema = crearSistemaReprogramacion({ turnos: [base()], ahora: local(LUNES, '08:00') });
+    const error = await reprogramar(sistema, { turnoId: 't-base', inicio: martes('10:00'), rol: 'odontologo' }).then(
+      () => undefined,
+      (e: unknown) => e,
+    );
+    expect(error).toBeInstanceOf(AccesoDenegadoError);
+    expect(error).toMatchObject({ rol: 'odontologo' });
+    await expect(sistema.turnos.obtenerPorId('t-base')).resolves.toMatchObject({
+      inicio: local(LUNES, '09:00'),
+      profesionalId: 'p1',
+      sillonId: 's1',
+    });
+  });
 });
 
 describe('Validación del nuevo horario', () => {
@@ -210,7 +226,7 @@ describe('Atomicidad y liberación del horario original', () => {
     });
     const error = await rechazo(
       sistema.agendarTurno.ejecutar({
-        actor: { rol: 'recepcion' },
+        actor: actores.recepcion,
         pacienteId: 'pa2',
         profesionalId: 'p1',
         sillonId: 's1',
@@ -225,7 +241,7 @@ describe('Atomicidad y liberación del horario original', () => {
     const sistema = crearSistemaReprogramacion({ turnos: [base()] });
     await reprogramar(sistema, { turnoId: 't-base', inicio: martes('10:00') });
     const nuevo = await sistema.agendarTurno.ejecutar({
-      actor: { rol: 'recepcion' },
+      actor: actores.recepcion,
       pacienteId: 'pa2',
       profesionalId: 'p1',
       sillonId: 's1',

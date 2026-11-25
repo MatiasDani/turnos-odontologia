@@ -4,6 +4,7 @@ import type { CancelarTurnoInput } from './cancelar-turno-input.js';
 import type { Recordatorios } from './puertos/recordatorios.js';
 import type { Reloj } from './puertos/reloj.js';
 import type { TurnoRepositorio } from './puertos/repositorios.js';
+import { autorizar, autorizarSobre } from '../domain/permisos/autorizar.js';
 
 export type { CancelarTurnoInput } from './cancelar-turno-input.js';
 
@@ -22,13 +23,18 @@ export class CancelarTurno {
 
   async ejecutar(input: CancelarTurnoInput): Promise<Turno> {
     const { turnos, reloj, recordatorios } = this.deps;
-    const { rol } = input.actor;
+    const { actor } = input;
+    const { rol } = actor;
+    // Control de acceso antes de leer nada (C-09, DD-33): el odontólogo no cancela.
+    autorizar(actor, 'turno.cancelar');
     // Un único instante para RN-08 y para `canceladoEn`, leído antes de la sección crítica.
     const ahora = reloj.ahora();
 
     // Sección crítica (RN-12): las reglas se evalúan sobre el estado real del turno al modificarlo.
     // Un turno inexistente lo informa el repositorio con RecursoNoEncontradoError.
     const cancelado = await turnos.actualizarSi(input.turnoId, (actual) => {
+      // Alcance "propio" sobre el estado real del turno, antes de RN-10 y RN-08 (C-09, DD-33).
+      autorizarSobre(actor, 'turno.cancelar', { profesionalId: actual.profesionalId, turnoId: actual.id });
       const violacion = evaluarCancelacion(actual, rol, ahora);
       return violacion === null ? { ok: true, turno: cancelar(actual, rol, ahora) } : { ok: false, violacion };
     });

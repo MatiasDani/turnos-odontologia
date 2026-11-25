@@ -1,9 +1,10 @@
 // Escenarios de openspec/changes/cancelar-turno-liberando-horario/specs/cancelacion-turnos/spec.md.
 // Cada test lleva el nombre exacto de su `#### Scenario:` (regla dura 8); un `describe` por requisito.
 import { describe, expect, test } from 'vitest';
-import { RecursoNoEncontradoError, ReglaNegocioError } from '../../src/domain/errores.js';
+import { AccesoDenegadoError, RecursoNoEncontradoError, ReglaNegocioError } from '../../src/domain/errores.js';
 import { cancelar, crearSistemaCancelacion, rechazo, turnoBaseCancelacion } from '../fixtures/sistema.js';
 import { local, LUNES } from '../fixtures/seed.js';
+import { actores } from '../fixtures/actores.js';
 
 const DOMINGO = '2026-11-22';
 
@@ -117,7 +118,7 @@ describe('Anticipación mínima del paciente', () => {
   });
 });
 
-describe('Personal del consultorio sin restricción de anticipación', () => {
+describe('Recepción y administrador sin restricción de anticipación', () => {
   test('Recepción con menos de 24 h puede cancelar', async () => {
     const sistema = crearSistemaCancelacion({ turnos: [turnoBaseCancelacion()], ahora: local(LUNES, '08:00') });
     await expect(cancelar(sistema, { turnoId: 't-base', rol: 'recepcion' })).resolves.toMatchObject({
@@ -134,19 +135,19 @@ describe('Personal del consultorio sin restricción de anticipación', () => {
     });
   });
 
-  test('Odontólogo con menos de 24 h puede cancelar', async () => {
+  test('Odontólogo no puede cancelar', async () => {
     const sistema = crearSistemaCancelacion({ turnos: [turnoBaseCancelacion()], ahora: local(LUNES, '08:00') });
-    await expect(cancelar(sistema, { turnoId: 't-base', rol: 'odontologo' })).resolves.toMatchObject({
-      estado: 'cancelado',
-      canceladoPor: 'odontologo',
-    });
+    const error = await rechazo(cancelar(sistema, { turnoId: 't-base', rol: 'odontologo' }));
+    expect(error).toBeInstanceOf(AccesoDenegadoError);
+    expect(error).toMatchObject({ rol: 'odontologo' });
+    expect((await sistema.turnos.obtenerPorId('t-base'))?.estado).toBe('confirmado');
   });
 });
 
 describe('Cancelar libera el horario', () => {
   const turnoNuevo = (sistema: ReturnType<typeof crearSistemaCancelacion>) =>
     sistema.agendarTurno.ejecutar({
-      actor: { rol: 'recepcion' },
+      actor: actores.recepcion,
       pacienteId: 'pa2',
       profesionalId: 'p1',
       sillonId: 's1',
@@ -174,7 +175,7 @@ describe('Cancelar libera el horario', () => {
     const sistema = crearSistemaCancelacion({ turnos: [turnoBaseCancelacion()] });
     const consultaDelLunes = () =>
       sistema.consultarDisponibilidad.ejecutar({
-        actor: { rol: 'recepcion' },
+        actor: actores.recepcion,
         prestacionId: 'pr1',
         rango: { desde: local(LUNES, '00:00'), hasta: local('2026-11-24', '00:00') },
         ahora: local(DOMINGO, '08:00'),

@@ -7,9 +7,9 @@ Hoy cualquier rol puede ejecutar casi cualquier caso de uso: el `Actor` solo tra
 ## What Changes
 
 - **Usuarios internos** (`Usuario`): administrador, recepción u odontólogo, con e-mail único normalizado, clave con hash scrypt (nunca en texto plano ni en logs, RN-D-03), `profesionalId` obligatorio solo para el odontólogo y baja lógica. El paciente no tiene usuario: sigue operando con el token de su turno (C-10/C-11).
-- **Política de clave** (RN-31 nueva): entre 10 y 128 caracteres; se valida al crear el usuario y al restablecer la clave.
+- **Política de clave** (RN-32 nueva): entre 10 y 128 caracteres; se valida al crear el usuario y al restablecer la clave.
 - **Gestión de usuarios solo por el administrador**: crear, desactivar, reactivar y restablecer la clave, con un administrador inicial creado al arrancar desde variables de entorno con valores ficticios en `.env.example`.
-- **Inicio de sesión** con e-mail y clave que devuelve un JWT firmado (HS256, librería `jose`, `JWT_SECRET` por entorno) que vence a las 8 h (RN-32 nueva). Ante cualquier falla (e-mail inexistente, clave incorrecta, usuario inactivo) responde el mismo error genérico, sin revelar cuál fue.
+- **Inicio de sesión** con e-mail y clave que devuelve un JWT firmado (HS256, librería `jose`, `JWT_SECRET` por entorno) que vence a las 8 h (RN-33 nueva). Ante cualquier falla (e-mail inexistente, clave incorrecta, usuario inactivo) responde el mismo error genérico, sin revelar cuál fue.
 - **Resolución de la sesión en cada pedido**: el token solo identifica al usuario; el `Actor` se arma con los datos actuales del usuario, así que desactivarlo o cambiarle el rol tiene efecto inmediato.
 - **`Actor` con identidad (BREAKING para el código que lo construye)**: pasa a ser un tipo discriminado por rol. Administrador y recepción llevan `usuarioId`; el odontólogo, `usuarioId` y `profesionalId` obligatorios; el paciente, opcionalmente el `turnoId` de su token.
 - **Política de permisos única** (`autorizar(actor, accion, recurso?)`) con la matriz de `03_actores_y_roles.md` completa, aplicada **en los casos de uso** y antes de las reglas de negocio. Reemplaza las tres funciones sueltas sin cambiar lo que ya permiten. Cierra las dos preguntas abiertas de C-09:
@@ -38,7 +38,7 @@ Hoy cualquier rol puede ejecutar casi cualquier caso de uso: el `Actor` solo tra
 - Dependencias: `jose` (runtime, JWT). scrypt viene con `node:crypto`.
 - Variables de entorno: `JWT_SECRET` (obligatoria, 32 caracteres o más), `ADMIN_EMAIL_INICIAL` y `ADMIN_CLAVE_INICIAL` (opcionales), documentadas en `.env.example` con valores ficticios.
 - Equipo: los casos de uso de recordatorios de C-12 y C-13 (Franco y Luka) cambian de firma; los tests de C-02, C-03 y C-01 que usaban al odontólogo como actor de cancelar, reprogramar o agendar se ajustan a la matriz.
-- KB actualizada en este propose: matriz completa (`03`), `Usuario` (`04`), RN-31 y RN-32 (`05`), variables de entorno (`08`), DD-33 a DD-37 (`09`), preguntas abiertas cerradas (`10`).
+- KB actualizada en este propose: matriz completa (`03`), `Usuario` (`04`), RN-32 y RN-33 (`05`), variables de entorno (`08`), DD-33 a DD-37 (`09`), preguntas abiertas cerradas (`10`).
 - Governance **CRÍTICO**: no se implementa nada hasta la aprobación humana explícita del propose; el apply se hace con checkpoints y revisión de seguridad.
 
 ## Non-goals

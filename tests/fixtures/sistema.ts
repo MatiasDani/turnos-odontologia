@@ -34,6 +34,7 @@ import type { Rol } from '../../src/domain/actor.js';
 import type { Hueco } from '../../src/domain/disponibilidad/hueco.js';
 import type { Turno } from '../../src/domain/turno.js';
 import { crearEntorno, crearTurno, type Entorno, LUNES, local } from './seed.js';
+import { actorDeRol } from './actores.js';
 
 /** Ids deterministas: t-1, t-2, ... */
 export class GeneradorIdSecuencial implements GeneradorId {
@@ -111,7 +112,7 @@ export interface Solicitud {
 /** Agenda con valores por defecto: recepción, pa1, p1, s1, pr1, lunes. */
 export function agendar(sistema: Sistema, s: Solicitud): Promise<Turno> {
   return sistema.agendarTurno.ejecutar({
-    actor: { rol: s.rol ?? 'recepcion' },
+    actor: actorDeRol(s.rol ?? 'recepcion'),
     pacienteId: s.pacienteId ?? 'pa1',
     profesionalId: s.profesionalId ?? 'p1',
     sillonId: s.sillonId ?? 's1',
@@ -143,7 +144,7 @@ export interface Consulta {
 export function consultar(sistema: Sistema, c: Consulta = {}): Promise<readonly Hueco[]> {
   const desde = local(c.dia ?? LUNES, '00:00');
   const input: ConsultarDisponibilidadInput = {
-    actor: { rol: c.rol ?? 'recepcion' },
+    actor: actorDeRol(c.rol ?? 'recepcion'),
     prestacionId: c.prestacionId ?? 'pr1',
     rango: c.rango ?? { desde, hasta: new Date(desde.getTime() + DIA_EN_MS) },
     ahora: c.ahora ?? AHORA_POR_DEFECTO,
@@ -355,7 +356,7 @@ export function crearSistemaCancelacion(opciones: OpcionesSistemaCancelacion = {
 
 /** Cancela con el rol indicado (por defecto recepción). */
 export function cancelar(sistema: SistemaCancelacion, c: { turnoId: string; rol?: Rol }): Promise<Turno> {
-  return sistema.cancelarTurno.ejecutar({ turnoId: c.turnoId, actor: { rol: c.rol ?? 'recepcion' } });
+  return sistema.cancelarTurno.ejecutar({ turnoId: c.turnoId, actor: actorDeRol(c.rol ?? 'recepcion', { turnoId: c.turnoId }) });
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -365,17 +366,17 @@ type CambioDeEstado = { turnoId: string; rol?: Rol };
 
 /** Confirma con el rol indicado (por defecto recepción). */
 export function confirmar(sistema: SistemaCancelacion, c: CambioDeEstado): Promise<Turno> {
-  return sistema.confirmarTurno.ejecutar({ turnoId: c.turnoId, actor: { rol: c.rol ?? 'recepcion' } });
+  return sistema.confirmarTurno.ejecutar({ turnoId: c.turnoId, actor: actorDeRol(c.rol ?? 'recepcion', { turnoId: c.turnoId }) });
 }
 
 /** Marca atendido con el rol indicado (por defecto recepción). */
 export function marcarAtendido(sistema: SistemaCancelacion, c: CambioDeEstado): Promise<Turno> {
-  return sistema.marcarAtendido.ejecutar({ turnoId: c.turnoId, actor: { rol: c.rol ?? 'recepcion' } });
+  return sistema.marcarAtendido.ejecutar({ turnoId: c.turnoId, actor: actorDeRol(c.rol ?? 'recepcion', { turnoId: c.turnoId }) });
 }
 
 /** Marca ausente con el rol indicado (por defecto recepción). */
 export function marcarAusente(sistema: SistemaCancelacion, c: CambioDeEstado): Promise<Turno> {
-  return sistema.marcarAusente.ejecutar({ turnoId: c.turnoId, actor: { rol: c.rol ?? 'recepcion' } });
+  return sistema.marcarAusente.ejecutar({ turnoId: c.turnoId, actor: actorDeRol(c.rol ?? 'recepcion', { turnoId: c.turnoId }) });
 }
 
 /** Espera un rechazo y devuelve el error; falla si la promesa se resuelve. */
@@ -447,7 +448,7 @@ export type PedidoReprogramacion = {
 export function reprogramar(sistema: SistemaReprogramacion, p: PedidoReprogramacion): Promise<Turno> {
   return sistema.reprogramarTurno.ejecutar({
     turnoId: p.turnoId,
-    actor: { rol: p.rol ?? 'recepcion' },
+    actor: actorDeRol(p.rol ?? 'recepcion', { turnoId: p.turnoId }),
     inicio: p.inicio,
     ...(p.profesionalId === undefined ? {} : { profesionalId: p.profesionalId }),
     ...(p.sillonId === undefined ? {} : { sillonId: p.sillonId }),

@@ -17,7 +17,10 @@ export interface CancelarTurnoDesdeTokenInput {
   readonly token: string;
 }
 
-const ACTOR_PACIENTE: Actor = { rol: 'paciente' };
+/** Actor paciente acotado al turno que resolvió su token (C-09, DD-33). */
+function pacienteDelTurno(turnoId: string): Actor {
+  return { rol: 'paciente', turnoId };
+}
 
 /**
  * Cancelación del propio turno (US-010, RN-08, RN-09). Comprueba la anticipación antes de delegar
@@ -33,7 +36,7 @@ export class CancelarTurnoDesdeToken {
       throw new ErrorGestionTurnoPublica('CONTACTAR_CONSULTORIO');
     }
     try {
-      await deps.cancelar.ejecutar({ turnoId: turno.id, actor: ACTOR_PACIENTE });
+      await deps.cancelar.ejecutar({ turnoId: turno.id, actor: pacienteDelTurno(turno.id) });
     } catch (error) {
       traducirErrorGestion(error);
     }

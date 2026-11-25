@@ -34,6 +34,7 @@ Cancelar y reprogramar SHALL estar permitido al administrador y a recepción sob
 - **AND** `t-base` sigue el martes a las 09:00
 
 #### Scenario: Paciente cancela su propio turno
+- **GIVEN** `ahora` es el lunes 2026-11-23 a las 08:00 (25 h antes de `t-base`, RN-08)
 - **WHEN** el paciente de `t-base` cancela `t-base`
 - **THEN** `t-base` queda `cancelado` con `canceladoPor: 'paciente'`
 

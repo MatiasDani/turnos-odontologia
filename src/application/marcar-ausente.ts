@@ -12,6 +12,6 @@ export class MarcarAusente {
   constructor(private readonly deps: CambiarEstadoTurnoDependencias) {}
 
   ejecutar(input: CambiarEstadoTurnoInput): Promise<Turno> {
-    return aplicarCambioDeEstado(this.deps, input.turnoId, 'ausente');
+    return aplicarCambioDeEstado(this.deps, input, 'ausente');
   }
 }

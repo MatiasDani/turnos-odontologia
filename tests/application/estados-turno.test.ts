@@ -1,7 +1,7 @@
 // Escenarios de openspec/changes/gestionar-estados-turno/specs/estados-turno/spec.md.
 // Cada test lleva el nombre exacto de su `#### Scenario:` (regla dura 8); un `describe` por requisito.
 import { describe, expect, test } from 'vitest';
-import { RecursoNoEncontradoError, ReglaNegocioError } from '../../src/domain/errores.js';
+import { AccesoDenegadoError, RecursoNoEncontradoError, ReglaNegocioError } from '../../src/domain/errores.js';
 import type { EstadoTurno, Turno } from '../../src/domain/turno.js';
 import {
   cancelar,
@@ -14,6 +14,7 @@ import {
   turnoBaseCancelacion,
 } from '../fixtures/sistema.js';
 import { local, LUNES, MIERCOLES } from '../fixtures/seed.js';
+import { actores } from '../fixtures/actores.js';
 
 const DOMINGO = '2026-11-22';
 const MARTES = '2026-11-24';
@@ -113,6 +114,16 @@ describe('Cierre de un turno confirmado', () => {
     const ausente = await marcarAusente(sistema, { turnoId: 't-base', rol: 'recepcion' });
     expect(ausente).toMatchObject({ estado: 'ausente', ...DATOS_DEL_TURNO_BASE });
     await expect(sistema.turnos.obtenerPorId('t-base')).resolves.toEqual(ausente);
+  });
+
+  test('Odontólogo de otro profesional no cierra el turno', async () => {
+    const sistema = sistemaCon([base()]);
+    const error = await sistema.marcarAtendido
+      .ejecutar({ turnoId: 't-base', actor: actores.odontologo('p2') })
+      .then(() => undefined, (e: unknown) => e);
+    expect(error).toBeInstanceOf(AccesoDenegadoError);
+    expect(error).toMatchObject({ rol: 'odontologo' });
+    await expect(sistema.turnos.obtenerPorId('t-base')).resolves.toMatchObject({ estado: 'confirmado' });
   });
 });
 
@@ -216,7 +227,7 @@ describe('Orden de evaluación de los rechazos', () => {
 describe('La ausencia libera el horario', () => {
   function agendarPa2(sistema: SistemaCancelacion, sillonId: string): Promise<Turno> {
     return sistema.agendarTurno.ejecutar({
-      actor: { rol: 'recepcion' },
+      actor: actores.recepcion,
       pacienteId: 'pa2',
       profesionalId: 'p1',
       sillonId,

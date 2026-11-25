@@ -40,6 +40,7 @@ import { RelojFijo } from './reloj-fijo.js';
 import { crearEntorno, type Entorno, LUNES, local } from './seed.js';
 import { AHORA_POR_DEFECTO, GeneradorIdConPrefijo } from './sistema.js';
 import { TurnoRepositorioDePrueba } from './turno-repositorio-de-prueba.js';
+import { actores } from './actores.js';
 
 export const DOMINGO = '2026-11-22';
 export const EMAIL_PA1 = 'carla.prueba@demo.test';
@@ -222,7 +223,7 @@ export interface AltaRecepcion {
 /** Alta de recepción con los valores del turno base: `pa1`, `p1`, `s1`, `pr1`, lunes 09:00. */
 export function agendarRecepcion(sistema: SistemaRecordatorios, alta: AltaRecepcion = {}): Promise<Turno> {
   return sistema.agendarTurno.ejecutar({
-    actor: { rol: 'recepcion' },
+    actor: actores.recepcion,
     pacienteId: alta.pacienteId ?? 'pa1',
     profesionalId: 'p1',
     sillonId: 's1',

@@ -3,6 +3,7 @@ import { AgendaDiaria } from '../../src/application/agenda-diaria.js';
 import { AccesoDenegadoError } from '../../src/domain/errores.js';
 import { crearTurno, LUNES, local, MARTES } from '../fixtures/seed.js';
 import { crearSistemaBloqueo } from '../fixtures/sistema.js';
+import { actores, actorDeRol } from '../fixtures/actores.js';
 
 test('Recepción consulta la agenda de un día', async () => {
   // 1. Preparo los datos ficticios.
@@ -33,7 +34,7 @@ test('Recepción consulta la agenda de un día', async () => {
   });
 
   const resultado = await agenda.ejecutar({
-    actor: { rol: 'recepcion' },
+    actor: actores.recepcion,
     fecha: LUNES,
   });
 
@@ -65,7 +66,7 @@ test('El odontólogo consulta solo su propia agenda', async () => {
   });
 
   const resultado = await agenda.ejecutar({
-    actor: { rol: 'odontologo', profesionalId: 'p1' },
+    actor: actores.odontologo('p1'),
     fecha: LUNES,
   });
 
@@ -97,7 +98,7 @@ test.each(['recepcion', 'administrador'] as const)(
       bloqueos: sistema.bloqueos,
     });
 
-    const resultado = await agenda.ejecutar({ actor: { rol }, fecha: LUNES });
+    const resultado = await agenda.ejecutar({ actor: actorDeRol(rol), fecha: LUNES });
 
     expect(resultado.turnos.map((turno) => turno.id).sort()).toEqual(['turno-p1', 'turno-p2']);
     expect(resultado.bloqueos.map((bloqueo) => bloqueo.id).sort()).toEqual(['bloqueo-p1', 'bloqueo-p2']);
@@ -124,7 +125,7 @@ test.each([
   });
   const agenda = new AgendaDiaria({ turnos: sistema.turnos, bloqueos: sistema.bloqueos });
 
-  const resultado = await agenda.ejecutar({ actor: { rol: 'recepcion' }, fecha: LUNES, ...filtros });
+  const resultado = await agenda.ejecutar({ actor: actores.recepcion, fecha: LUNES, ...filtros });
 
   expect(resultado.turnos.map((turno) => turno.id).sort()).toEqual(idsTurnos);
   expect(resultado.bloqueos.map((bloqueo) => bloqueo.id).sort()).toEqual(idsBloqueos);
@@ -135,7 +136,7 @@ test('El odontólogo no puede filtrar por otro profesional', async () => {
   const agenda = new AgendaDiaria({ turnos: sistema.turnos, bloqueos: sistema.bloqueos });
 
   await expect(agenda.ejecutar({
-    actor: { rol: 'odontologo', profesionalId: 'p1' },
+    actor: actores.odontologo('p1'),
     fecha: LUNES,
     profesionalId: 'p2',
   })).rejects.toBeInstanceOf(AccesoDenegadoError);

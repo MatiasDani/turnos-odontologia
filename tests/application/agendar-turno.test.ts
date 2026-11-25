@@ -4,6 +4,7 @@ import { crearTurno, LUNES, local, MIERCOLES, SABADO } from '../fixtures/seed.js
 import { RecursoNoEncontradoError, ReglaNegocioError } from '../../src/domain/errores.js';
 import { crearEntorno } from '../fixtures/seed.js';
 import { agendar, crearSistema } from '../fixtures/sistema.js';
+import { actores } from '../fixtures/actores.js';
 
 describe('Ocupación conjunta de profesional y sillón', () => {
   test('Distinto profesional y sillón en el mismo horario', async () => {
@@ -176,15 +177,15 @@ describe('Duración efectiva del turno', () => {
   });
 });
 
-describe('Ajuste de duración solo por personal del consultorio', () => {
+describe('Ajuste de duración por recepción y administrador', () => {
   test('Paciente informa duración distinta', async () => {
     await expect(
       agendar(crearSistema(), { rol: 'paciente', prestacionId: 'pr1', hora: '09:00', duracion: 45 }),
     ).rejects.toMatchObject({ codigo: 'RN-16' });
   });
 
-  test('Odontólogo ajusta la duración', async () => {
-    const turno = await agendar(crearSistema(), { rol: 'odontologo', prestacionId: 'pr2', hora: '09:00', duracion: 60 });
+  test('Recepción ajusta la duración', async () => {
+    const turno = await agendar(crearSistema(), { rol: 'recepcion', prestacionId: 'pr2', hora: '09:00', duracion: 60 });
     expect(turno.fin).toEqual(local(LUNES, '10:00'));
     expect(turno.duracionMinutos).toBe(60);
   });
@@ -201,7 +202,7 @@ describe('Horario de atención en la zona del consultorio', () => {
 
   test('Instante UTC convertido a hora local', async () => {
     const turno = await crearSistema().agendarTurno.ejecutar({
-      actor: { rol: 'recepcion' },
+      actor: actores.recepcion,
       pacienteId: 'pa1',
       profesionalId: 'p1',
       sillonId: 's1',
@@ -214,7 +215,7 @@ describe('Horario de atención en la zona del consultorio', () => {
   test('Instante UTC fuera de horario local', async () => {
     await expect(
       crearSistema().agendarTurno.ejecutar({
-        actor: { rol: 'recepcion' },
+        actor: actores.recepcion,
         pacienteId: 'pa1',
         profesionalId: 'p1',
         sillonId: 's1',
@@ -305,7 +306,7 @@ describe('Estado inicial según el origen', () => {
     expect(turno).toMatchObject({ estado: 'reservado', origen: 'online' });
   });
 
-  test.each(['odontologo', 'administrador'] as const)('alta interna por %s nace confirmado', async (rol) => {
+  test.each(['administrador'] as const)('alta interna por %s nace confirmado', async (rol) => {
     const turno = await agendar(crearSistema(), { rol, hora: '09:00' });
     expect(turno).toMatchObject({ estado: 'confirmado', origen: 'recepcion' });
   });

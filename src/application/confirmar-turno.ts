@@ -12,6 +12,6 @@ export class ConfirmarTurno {
   constructor(private readonly deps: CambiarEstadoTurnoDependencias) {}
 
   ejecutar(input: CambiarEstadoTurnoInput): Promise<Turno> {
-    return aplicarCambioDeEstado(this.deps, input.turnoId, 'confirmado');
+    return aplicarCambioDeEstado(this.deps, input, 'confirmado');
   }
 }

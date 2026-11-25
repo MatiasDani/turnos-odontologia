@@ -55,7 +55,7 @@ El e-mail del usuario SHALL guardarse sin espacios en los extremos y en minúscu
 - **THEN** se rechaza con configuración inválida en el campo `email`
 
 ### Requirement: Política de clave
-La clave de un usuario MUST tener entre 10 y 128 caracteres, ambos inclusive (RN-31). Se valida al crear el usuario y al restablecer la clave; una clave fuera de rango MUST rechazarse con configuración inválida en el campo `clave`, sin registrar ni cambiar nada.
+La clave de un usuario MUST tener entre 10 y 128 caracteres, ambos inclusive (RN-32). Se valida al crear el usuario y al restablecer la clave; una clave fuera de rango MUST rechazarse con configuración inválida en el campo `clave`, sin registrar ni cambiar nada.
 
 #### Scenario: Clave de 10 caracteres aceptada
 - **WHEN** el administrador crea el usuario `recepcion2@demo.test` con rol `recepcion` y la clave `abcdefghij`
@@ -176,7 +176,7 @@ Un e-mail inexistente, una clave incorrecta o un usuario inactivo MUST rechazars
 - **THEN** se rechaza con credenciales inválidas y el mismo mensaje que con una clave incorrecta
 
 ### Requirement: Vencimiento de la sesión
-Una sesión SHALL vencer 8 h después de iniciada (RN-32): es válida mientras el instante actual sea anterior al vencimiento y MUST rechazarse con sesión inválida desde el vencimiento en adelante.
+Una sesión SHALL vencer 8 h después de iniciada (RN-33): es válida mientras el instante actual sea anterior al vencimiento y MUST rechazarse con sesión inválida desde el vencimiento en adelante.
 
 #### Scenario: Sesión válida un segundo antes de vencer
 - **GIVEN** `u-rec` inició sesión el lunes a las 10:00
