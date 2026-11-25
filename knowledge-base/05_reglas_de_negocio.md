@@ -126,6 +126,11 @@ Definición operativa: un turno es **activo** si su estado es `reservado`, `conf
 - **RN-28** *(decisión de explore C-05, 2026-11-23, DD-26; resuelve SU-09)*: el horario propio del profesional prevalece **por día de la semana**: si el profesional tiene al menos un tramo propio para el `diaSemana` del turno, ese día solo valen sus tramos; si no tiene, valen los tramos del consultorio. Rige en todo lugar donde se evalúa el horario (alta, disponibilidad y reprogramación), con RN-07 y RN-17 aplicados sobre los tramos resultantes. Un profesional sin horario propio se comporta exactamente como antes de C-05.
 - **RN-29** *(decisión de explore C-05, 2026-11-23, DD-27)*: validez de la configuración. Una prestación tiene `duracionMinutos` entero > 0 y múltiplo de 5 (alineado con RN-06). Un tramo de `HorarioAtencion` tiene `diaSemana` entero de 0 a 6, `desde` y `hasta` con formato `HH:mm` de 24 h (00:00 a 23:59) y `desde < hasta`, y no puede solaparse (intervalo semiabierto, RN-05) con otro tramo del mismo día y del mismo ámbito (el del consultorio, o el del mismo profesional); tramos contiguos son válidos. Los nombres (y el apellido del profesional) son obligatorios: se recortan los espacios de los extremos y el resultado no puede quedar vacío ni superar 80 caracteres; la matrícula es opcional, pero si se informa sigue la misma regla. Igual que en RN-13, estas comprobaciones son validación de entrada: se informan con un error de configuración inválida que indica el campo, sin ampliar `CodigoRN`.
 
+## Dominio: Acceso del personal (US-013)
+
+- **RN-31** *(decisión del propose de C-09, 2026-11-25, DD-35)*: la clave de un usuario interno tiene entre 10 y 128 caracteres, ambos inclusive. Se valida al crear el usuario y al restablecer la clave; fuera de rango se rechaza como configuración inválida en el campo `clave`, sin repetir la clave en el error.
+- **RN-32** *(decisión del propose de C-09, 2026-11-25, DD-37)*: la sesión de un usuario interno vence 8 h después de iniciada; es válida solo mientras `ahora < vencimiento` (con `ahora` del `Reloj`). En cada uso se toman el rol y el profesional actuales del usuario: un usuario inactivo no tiene sesión válida.
+
 ## Dominio: Datos y cumplimiento (restricciones del checklist, punto 9)
 
 - **RN-D-01** *(restricción)*: nunca se almacenan datos reales de pacientes en el repositorio, tests, fixtures, ejemplos ni capturas; solo datos ficticios.
@@ -135,5 +140,5 @@ Definición operativa: un turno es **activo** si su estado es `reservado`, `conf
 ## Dominio: Excepciones globales
 
 - Ninguna regla de agenda (RN-01 a RN-07, RN-17, RN-18) admite excepción por rol ni por canal (RN-04).
-- RN-08 se aplica solo al paciente; la recepción y el administrador pueden cancelar o reprogramar con cualquier anticipación, siempre respetando RN-01 a RN-07, RN-17 y RN-18. Hasta C-09, el caso de uso de cancelación trata al odontólogo como a la recepción (DD-19).
+- RN-08 se aplica solo al paciente; la recepción y el administrador pueden cancelar o reprogramar con cualquier anticipación, siempre respetando RN-01 a RN-07, RN-17 y RN-18. Desde C-09 el odontólogo no cancela ni reprograma (DD-34).
 - Bloqueo creado sobre turnos existentes: sin regla confirmada (pregunta abierta; ver DD-06 como suposición provisoria).
