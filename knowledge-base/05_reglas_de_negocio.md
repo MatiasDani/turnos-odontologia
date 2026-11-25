@@ -133,6 +133,11 @@ Definición operativa: un turno es **activo** si su estado es `reservado`, `conf
 - **RN-32** *(decisión del propose de C-09, 2026-11-25, DD-35)*: la clave de un usuario interno tiene entre 10 y 128 caracteres, ambos inclusive. Se valida al crear el usuario y al restablecer la clave; fuera de rango se rechaza como configuración inválida en el campo `clave`, sin repetir la clave en el error.
 - **RN-33** *(decisión del propose de C-09, 2026-11-25, DD-37)*: la sesión de un usuario interno vence 8 h después de iniciada; es válida solo mientras `ahora < vencimiento` (con `ahora` del `Reloj`). En cada uso se toman el rol y el profesional actuales del usuario: un usuario inactivo no tiene sesión válida.
 
+## Dominio: Pacientes desde recepción (Flujo 1, C-15)
+
+- **RN-34** *(decisión del propose de C-15, 2026-11-25, DD-40)*: la búsqueda de pacientes del personal exige 3 caracteres o más (sin contar espacios de los extremos), ignora mayúsculas y tildes, busca por prefijo de DNI si el texto son solo dígitos y si no por nombre o apellido, devuelve como máximo 10 resultados ordenados por apellido y nombre (informando si hay más) y cada resultado lleva solo id, nombre, apellido, DNI y teléfono. Solo recepción y administrador.
+- **RN-35** *(decisión del propose de C-15, 2026-11-25, DD-40)*: el alta rápida de un paciente desde recepción usa las mismas validaciones y normalizaciones que la reserva online (DD-14, DD-17) y rechaza con `RN-35` un DNI que ya existe, informando ese paciente y sin modificar sus datos.
+
 ## Dominio: Datos y cumplimiento (restricciones del checklist, punto 9)
 
 - **RN-D-01** *(restricción)*: nunca se almacenan datos reales de pacientes en el repositorio, tests, fixtures, ejemplos ni capturas; solo datos ficticios.
