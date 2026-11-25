@@ -312,6 +312,39 @@ C-02 **reutiliza** el `Reloj` (no lo redefine) y C-05 **extiende** `PacienteRepo
 **Justificación**: un único punto de programación válido para ambos canales (e-mail y `wa.me`), con el compilador obligando a cada composición a decidir.
 **Trade-offs aceptados**: ante una falla de programación queda un turno sin token y el reintento del paciente recibe `RESERVA_DUPLICADA`; el cableado real sigue sin `RecordatoriosConWaMe` (pregunta abierta, C-13/C-15).
 
+### DD-33 — Actor con identidad y política de permisos única
+**Decisión** (2026-11-25, propose de C-09, Lautaro Medina): el `Actor` pasa a ser un tipo discriminado por rol (`administrador`/`recepcion` con `usuarioId`; `odontologo` con `usuarioId` y `profesionalId` obligatorios; `paciente` con `turnoId` opcional). Los permisos viven en una tabla pura rol × acción (`src/domain/permisos/`) con celdas `si`, `propio` o `no`, y se aplican en los casos de uso con `autorizar` (antes de leer datos) y `autorizarSobre` (después de leer el recurso y antes de las reglas RN). Las funciones de C-05 y C-06 y el control de la agenda de C-08 delegan en esta política sin cambiar su comportamiento. El rechazo sigue siendo `AccesoDenegadoError` sin código RN (DD-28).
+**Contexto**: tres funciones sueltas de control de acceso, un `profesionalId` opcional para todos los roles y casos de uso de turnos sin control.
+**Alternativas consideradas**: chequear solo en HTTP; decoradores por caso de uso; mantener funciones por caso.
+**Justificación**: la KB exige el control en los casos de uso (`08`); una tabla única es auditable y testeable fila por fila; el compilador impide actores incoherentes.
+**Trade-offs aceptados**: cambia el tipo `Actor` en tests de todo el equipo (se migran con helpers de fixture).
+
+### DD-34 — Permisos del odontólogo y de la confirmación
+**Decisión** (2026-11-25, propose de C-09, Lautaro Medina; resuelve dos preguntas abiertas): el odontólogo **no** da turnos, ni cancela, reprograma o confirma (eso es de recepción y administrador); **sí** marca atendido o ausente, solo los turnos de su profesional; consulta disponibilidad y ve y bloquea solo su agenda. Confirmar lo pueden el administrador, la recepción y el paciente sobre el turno de su enlace. El paciente no cierra turnos.
+**Contexto**: la matriz no tenía fila para cambiar el estado; C-02 y C-03 trataban al odontólogo como a la recepción (DD-19, DD-22).
+**Alternativas consideradas**: permitir al odontólogo cancelar o reprogramar sus propios turnos.
+**Justificación**: respeta la matriz y el discovery (la secretaria gestiona la agenda) y deja al odontólogo lo que solo él sabe: si atendió al paciente.
+**Trade-offs aceptados**: cambian escenarios de C-01, C-02 y C-03 donde el odontólogo agendaba o cancelaba.
+
+### DD-35 — Usuarios internos gestionados por el administrador
+**Decisión** (2026-11-25, propose de C-09, Lautaro Medina): solo el administrador crea, desactiva, reactiva y restablece la clave de usuarios; no se puede desactivar al último administrador activo. Política de clave RN-31. Al arrancar sin usuarios se crea un administrador desde `ADMIN_EMAIL_INICIAL` y `ADMIN_CLAVE_INICIAL` (ambas o ninguna). El usuario no cambia su propia clave en el MVP.
+**Contexto**: la matriz da al administrador CRUD de Usuario; los repositorios son en memoria.
+**Alternativas consideradas**: usuarios fijos en el seed; autoalta.
+**Justificación**: cumple la matriz y evita credenciales en el código (regla dura 9).
+**Trade-offs aceptados**: sin rutas HTTP ni UI para gestionar usuarios en el MVP.
+
+### DD-36 — Hash de claves con scrypt
+**Decisión** (2026-11-25, propose de C-09, Lautaro Medina): scrypt de `node:crypto` con sal aleatoria de 16 bytes, clave derivada de 64 bytes, N = 2^15, r = 8, p = 1, formato autodescriptivo `scrypt$N$r$p$sal$hash` y comparación con `timingSafeEqual`.
+**Alternativas consideradas**: argon2 (paquete nativo que puede romper `npm ci` en las máquinas del equipo); bcrypt (corta en 72 bytes).
+**Justificación**: sin dependencias, adaptativo, cumple RN-D-03; el formato permite subir el costo sin invalidar claves.
+**Trade-offs aceptados**: algo menos resistente a GPU que argon2.
+
+### DD-37 — Sesión con JWT y resolución en cada pedido
+**Decisión** (2026-11-25, propose de C-09, Lautaro Medina): JWT HS256 firmado con `JWT_SECRET` (≥ 32 caracteres) usando la librería `jose`; solo lleva `sub`, `iat`, `exp`, `iss` y `aud`; vence a las 8 h (RN-32). En cada pedido se verifica con la hora del `Reloj` y se arma el actor con los datos actuales del usuario. Errores públicos: `CREDENCIALES_INVALIDAS` 401 (mismo mensaje para e-mail inexistente, clave incorrecta o usuario inactivo), `SESION_INVALIDA` 401 y `ACCESO_DENEGADO` 403. Rutas `POST /auth/login`, `GET /auth/sesion` y un `preHandler` para las rutas internas de C-15.
+**Alternativas consideradas**: token opaco guardado como hash (permite cerrar sesión, pero contradice la KB); `jsonwebtoken`; JWT hecho a mano.
+**Justificación**: respeta la KB, no guarda estado de sesión y la resolución por pedido hace efectiva la desactivación de un usuario.
+**Trade-offs aceptados**: no hay cierre de sesión anticipado; sin límite de intentos de login en el MVP (pregunta abierta).
+
 ## Supuestos inferidos
 
 ### SU-01 — E-mail + `wa.me` es suficiente frente a WhatsApp automático

@@ -18,16 +18,22 @@ Leyenda: C crear, R leer, U actualizar, D eliminar/cancelar, `-` sin acceso, "pr
 
 | Recurso | Administrador | Recepción | Odontólogo | Paciente |
 |---|---|---|---|---|
-| Turno (alta) | CRU | CRU | `-` (**Suposición**: solo lectura de los propios) | C (vía reserva online) |
-| Turno (cancelar/reprogramar) | siempre | siempre (incluye < 24 h) | `-` | propio, solo con >= 24 h (RN-08) |
+| Turno (alta) | CRU | CRU | `-` (no da turnos; DD-34) | C (vía reserva online) |
+| Turno (cancelar/reprogramar) | siempre | siempre (incluye < 24 h) | `-` (DD-34) | propio, solo con >= 24 h (RN-08) |
+| Turno (confirmar) | sí | sí | `-` (DD-34) | propio, por su enlace |
+| Turno (marcar atendido o ausente) | sí | sí | solo los de su profesional (DD-34) | `-` |
+| Disponibilidad (huecos) | sí | sí | sí | sí (ruta pública) |
 | Agenda (lectura) | toda | toda | propia | `-` (solo disponibilidad pública y su turno) |
 | BloqueoHorario | CRUD | CRUD | CRUD propios | `-` |
 | Profesional, Sillón, Prestación, HorarioAtención | CRUD | R | R | R (solo catálogo público de prestaciones) |
 | Paciente (datos de contacto) | CRUD | CRU | R de sus turnos | RU propio |
 | Usuario / Rol | CRUD | `-` | `-` | `-` |
-| Recordatorios | R | RU (marcar enviado, generar `wa.me`) | `-` | `-` |
+| Recordatorios | R (listar `wa.me` pendientes y fallidos) | RU (listar y marcar enviado) | `-` | `-` |
 
 Reglas transversales de permisos:
+
+- **Dónde se aplica** (DD-33): en los casos de uso, con una única política `autorizar(actor, accion)` / `autorizarSobre(actor, accion, recurso)`. Si el rol no puede hacer la acción se rechaza antes de leer datos; si depende del recurso ("propio"), después de leerlo y antes de cualquier regla RN. El rechazo es `AccesoDenegadoError` sin código RN (DD-28), con el rol y la acción, nunca con datos del recurso.
+- **Identidad del actor** (DD-33): el actor interno sale de la sesión del usuario (DD-37); el odontólogo siempre trae su `profesionalId`. El paciente no tiene usuario: su actor lo arman las rutas públicas y, cuando opera sobre un turno, trae el `turnoId` de su token.
 
 - **Ningún rol puede forzar un solapamiento** (RN-04); el administrador tampoco.
 - Si el odontólogo puede dar un turno sobre su propio bloqueo es una pregunta abierta (ver `10_preguntas_abiertas.md`). Por defecto, no (RN-07).

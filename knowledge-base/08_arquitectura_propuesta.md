@@ -76,7 +76,7 @@ Luego: cancelar, reprogramar, disponibilidad, reserva online, recordatorios.
 
 ## Seguridad
 
-- **Autenticación**: usuarios internos con e-mail y clave con hash (algoritmo adaptativo, p. ej. scrypt/argon2; a confirmar); sesión por token firmado (JWT) en la API. Pacientes: token de gestión no adivinable por turno, de 32 bytes aleatorios, almacenado solo como hash SHA-256 en la entidad `TokenGestion` (DD-15, RN-21).
+- **Autenticación**: usuarios internos con e-mail y clave con hash (scrypt de `node:crypto`, DD-36); sesión por token firmado (JWT) en la API. Pacientes: token de gestión no adivinable por turno, de 32 bytes aleatorios, almacenado solo como hash SHA-256 en la entidad `TokenGestion` (DD-15, RN-21).
 - **Autorización**: RBAC según `03_actores_y_roles.md`, aplicado en los casos de uso (no solo en la capa HTTP).
 - **Validación de input**: esquemas en la frontera (validador puro en `src/adapters/http/` desde C-10, DD-13; Fastify schemas si se integra HTTP); el dominio revalida invariantes.
 - **Datos personales**: mínimo dato necesario; sin datos clínicos en el MVP; sin datos reales en el repositorio; Ley 25.326 y Ley 26.529 como restricciones (RN-D-02).
@@ -92,7 +92,8 @@ Luego: cancelar, reprogramar, disponibilidad, reserva online, recordatorios.
 | `HOST` | Interfaz donde escucha el servidor (C-14) | `127.0.0.1` | N |
 | `LOG_LEVEL` | Nivel de log de Fastify; los logs nunca incluyen tokens ni datos personales (C-14) | `info` | N |
 | `TZ_CONSULTORIO` | Zona horaria por defecto | `America/Argentina/Buenos_Aires` | N |
-| `JWT_SECRET` | Secreto de firma de sesiones | `cambiar-en-local` | Y |
+| `JWT_SECRET` | Secreto de firma de sesiones (HS256); obligatorio, 32 caracteres o más (C-09, DD-37) | `cambiar-en-local-por-32-caracteres-o-mas` | Y |
+| `ADMIN_EMAIL_INICIAL` / `ADMIN_CLAVE_INICIAL` | Administrador que se crea al arrancar si no hay usuarios; ambas o ninguna (C-09, DD-35) | `admin@demo.test` / `cambiar-en-local` | Y |
 | `SMTP_HOST` / `SMTP_PORT` | Servidor de e-mail (free tier); TLS directo solo con el puerto 465 | `smtp.ethereal.email` / `587` | N |
 | `SMTP_USER` / `SMTP_PASS` | Credenciales del e-mail; `SMTP_USER` es también el remitente. Obligatorias al usar SMTP | (vacío en ejemplo) | Y |
 | `BASE_URL_PUBLICA` | Base para enlaces de reserva y gestión | `http://localhost:3000` | N |

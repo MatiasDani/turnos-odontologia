@@ -92,6 +92,7 @@ Usuario     0..1 ── 1 Profesional        (un usuario odontólogo se vincula 
 ### Usuario
 - `id`, `consultorioId`, `email`, `hashClave: string` (nunca en texto plano), `rolId`, `profesionalId?`, `activo`.
 - Constraint: `email` único. Los pacientes no tienen usuario en el MVP: operan con el token de su turno (**Suposición**; DD-15).
+- Precisión *(propose de C-09, 2026-11-25, DD-35)*: el rol es `administrador`, `recepcion` u `odontologo` (nunca `paciente`); `profesionalId` es obligatorio para el odontólogo y no existe para los demás; el `email` se guarda recortado y en minúsculas y es único entre activos e inactivos; `hashClave` tiene formato `scrypt$N$r$p$sal$hash` (DD-36) y nunca sale de la capa de aplicación; `activo` implementa la baja lógica. En el MVP el rol se guarda como texto en el usuario (sin entidad `Rol` persistida).
 
 ### Rol
 - `id`, `nombre: 'administrador' | 'odontologo' | 'recepcion' | 'paciente'`.
