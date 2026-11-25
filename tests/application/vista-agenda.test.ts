@@ -6,6 +6,7 @@ import { VistaAgenda } from '../../src/application/vista-agenda.js';
 import {
   BloqueoRepositorioEnMemoria,
   ConsultorioRepositorioEnMemoria,
+  HorarioAtencionRepositorioEnMemoria,
   PrestacionRepositorioEnMemoria,
   ProfesionalRepositorioEnMemoria,
   SillonRepositorioEnMemoria,
@@ -35,7 +36,7 @@ function sistema(turnos: Turno[] = [], bloqueos: BloqueoHorario[] = []) {
   };
   return {
     vista: new VistaAgenda({ agendaDiaria, agendaSemanal: new AgendaSemanal(agendaDiaria), ...catalogo }),
-    catalogo: new ListarCatalogoInterno({ ...catalogo, consultorios: new ConsultorioRepositorioEnMemoria([e.consultorio]), consultorioId: 'c1' }),
+    catalogo: new ListarCatalogoInterno({ ...catalogo, consultorios: new ConsultorioRepositorioEnMemoria([e.consultorio]), horarios: new HorarioAtencionRepositorioEnMemoria(e.horarios), consultorioId: 'c1' }),
   };
 }
 
@@ -111,6 +112,10 @@ describe('Catálogo interno', () => {
     expect(c.profesionales.map((p) => p.id)).toEqual(['p1', 'p2']);
     expect(c.sillones.map((s) => s.id)).toEqual(['s1', 's2']);
     expect(c.prestaciones.find((p) => p.id === 'pr1')).toEqual({ id: 'pr1', nombre: 'Consulta/control', duracionMinutos: 30 });
+    expect(c.horarios.filter((h) => h.diaSemana === 1)).toEqual([
+      { diaSemana: 1, desde: '09:00', hasta: '13:00' },
+      { diaSemana: 1, desde: '15:00', hasta: '19:00' },
+    ]);
   });
 
   test('el paciente no ve el catálogo interno', async () => {

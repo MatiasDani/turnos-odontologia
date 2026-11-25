@@ -20,6 +20,7 @@ import type { AgendarTurno } from '../../application/agendar-turno.js';
 import { ReglaNegocioError } from '../../domain/errores.js';
 import type { Turno } from '../../domain/turno.js';
 import { actorDe, crearExigirSesion } from './autenticacion.js';
+import { encontrarRaizDelProyecto, leerEstatico, leerPagina } from './estaticos.js';
 import { MENSAJES_RN } from './errores-http.js';
 import type { Resultado } from './validadores.js';
 import {
@@ -68,9 +69,22 @@ const sinCache = (reply: FastifyReply): FastifyReply => reply.header('cache-cont
  * API interna `/interno/*` (C-15, DD-41): todas las rutas exigen la sesión de C-09 y leen el actor
  * con `actorDe`; los permisos los decide cada caso de uso. Fechas e instantes viajan en ISO UTC.
  */
-export function rutasRecepcion(casos: CasosDeUsoRecepcion) {
+export function rutasRecepcion(casos: CasosDeUsoRecepcion, opciones: { readonly raiz?: string } = {}) {
   const exigirSesion = crearExigirSesion(casos.resolverSesion);
+  const raiz = opciones.raiz ?? encontrarRaizDelProyecto();
   return (app: FastifyInstance, _opts: unknown, hecho: (error?: Error) => void): void => {
+    // Páginas estáticas sin datos (la sesión la verifica la API) y estáticos en lista blanca (DD-38).
+    const pagina = (archivo: 'recepcion/login.html' | 'recepcion/agenda.html') => async (_r: FastifyRequest, reply: FastifyReply) =>
+      sinCache(reply).type('text/html; charset=utf-8').send(await leerPagina(raiz, archivo));
+    app.get('/recepcion', pagina('recepcion/agenda.html'));
+    app.get('/recepcion/login', pagina('recepcion/login.html'));
+    app.get('/recepcion/assets/:archivo', async (request, reply) => {
+      const { archivo } = request.params as { archivo: string };
+      const estatico = await leerEstatico(raiz, 'recepcion', archivo);
+      if (estatico === undefined) return reply.callNotFound();
+      return reply.header('cache-control', 'no-cache').type(estatico.tipo).send(estatico.contenido);
+    });
+
     app.register(
       (interno, _o, listo) => {
         interno.addHook('preHandler', exigirSesion);
