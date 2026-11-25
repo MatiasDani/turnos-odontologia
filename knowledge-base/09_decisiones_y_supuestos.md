@@ -347,6 +347,29 @@ C-02 **reutiliza** el `Reloj` (no lo redefine) y C-05 **extiende** `PacienteRepo
 **Trade-offs aceptados**: no hay cierre de sesión anticipado; sin límite de intentos de login en el MVP (pregunta abierta).
 **Precisiones del apply** (2026-11-25, C-09): mensajes públicos fijos `CREDENCIALES_INVALIDAS` "E-mail o clave incorrectos.", `SESION_INVALIDA` "Tu sesión no es válida o venció. Iniciá sesión de nuevo." y `ACCESO_DENEGADO` "No tenés permiso para hacer esto." (el cuerpo nunca lleva rol, acción ni recurso); `POST /auth/login` responde `{ token, usuario: { id, email, rol, profesionalId?, venceEn } }` y `GET /auth/sesion` `{ usuario }`, ambos con `cache-control: no-store`; la cabecera aceptada es solo `Authorization: Bearer <jwt>`; el `preHandler` `crearExigirSesion` deja el actor en `request.actor` y las rutas lo leen con `actorDe(request)`. `JWT_SECRET` y el administrador inicial se leen con `leerConfiguracionAutenticacion`, separada de `leerConfiguracionServidor`, y `npm start` no arranca sin `JWT_SECRET`. `IniciarSesion` verifica un hash de relleno cuando el e-mail no existe.
 
+### DD-38 — Interfaz de recepción sin framework y sesión en `sessionStorage`
+**Decisión** (2026-11-25, explore y propose de C-15, Lautaro Medina): la interfaz `/recepcion` sigue la técnica de C-14 (HTML y módulos ES con `// @ts-check`, sin build, componentes del design system rev. 1 sin cambios) y guarda el token de sesión solo en `sessionStorage` de la pestaña: recargar conserva la sesión, cerrar la pestaña o "Salir" la borra, y un 401 vuelve al login. Nunca en `localStorage` ni en la URL.
+**Alternativas consideradas**: token solo en memoria (cada recarga pide login); cookie `HttpOnly` (requiere CSRF y cambiar C-09); React con build.
+**Justificación**: la CSP estricta sin inline, el vencimiento de 8 h y la resolución por pedido de C-09 acotan el riesgo de XSS; la secretaria no pierde la sesión con F5.
+**Trade-offs aceptados**: un script inyectado podría leer el token mientras la pestaña está abierta.
+
+### DD-39 — Semana de un solo recurso
+**Decisión** (2026-11-25, explore de C-15, Lautaro Medina): la vista semana muestra un profesional o un sillón por vez (columnas = días), elegido en un selector; el odontólogo ve siempre la suya. La vista día muestra todos los sillones o todos los profesionales.
+**Alternativas consideradas**: semana de todos los recursos (más de 15 columnas, ilegible a 1440 px); vista de 3 días.
+**Justificación**: patrón de las agendas de referencia del discovery (D.2); la ocupación global se ve en el día.
+
+### DD-40 — Pacientes desde recepción y vista de agenda con nombres
+**Decisión** (2026-11-25, explore y propose de C-15, Lautaro Medina): recepción busca pacientes (RN-34) y los da de alta con los datos mínimos de la reserva online, rechazando DNI repetidos (RN-35); acciones `paciente.buscar` y `paciente.crear` solo para recepción y administrador. La agenda se sirve como una vista que agrega a cada turno los nombres del paciente, la prestación, el profesional y el sillón, sin DNI ni teléfono; esos datos se piden aparte para el detalle.
+**Alternativas consideradas**: solo búsqueda (sin alta); el navegador cruza ids con listas completas de pacientes.
+**Justificación**: Flujo 1 ("paciente existente o alta rápida"); mínimo dato (RN-D-02): el navegador recibe solo lo que muestra.
+**Trade-offs aceptados**: la búsqueda filtra en memoria (suficiente para 1 a 5 profesionales; con PostgreSQL será una consulta).
+
+### DD-41 — API interna `/interno/*` con un POST por acción
+**Decisión** (2026-11-25, propose de C-15, Lautaro Medina): las rutas internas exigen la sesión de C-09, usan un `POST` por acción (`/interno/turnos/:id/cancelar`, `/confirmar`, `/atendido`, `/ausente`, `/reprogramar`), validan con funciones puras (`DATOS_INVALIDOS` con campos) y traducen `ReglaNegocioError` a 409 con el código RN, un mensaje fijo por código y el conflicto; no encontrado a 404 y configuración inválida a 400. El alta interna usa `AgendarTurnoConRecordatorio`.
+**Alternativas consideradas**: `PATCH` del estado; reutilizar los errores públicos de C-10.
+**Justificación**: cada ruta corresponde a un caso de uso y a una acción de la matriz; recepción necesita saber qué regla falló y con qué turno.
+**Trade-offs aceptados**: muchas rutas pequeñas; un test garantiza que las rutas públicas nunca exponen códigos RN.
+
 ## Supuestos inferidos
 
 ### SU-01 — E-mail + `wa.me` es suficiente frente a WhatsApp automático

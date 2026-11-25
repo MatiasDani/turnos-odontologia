@@ -27,6 +27,7 @@ Leyenda: C crear, R leer, U actualizar, D eliminar/cancelar, `-` sin acceso, "pr
 | BloqueoHorario | CRUD | CRUD | CRUD propios | `-` |
 | Profesional, Sillón, Prestación, HorarioAtención | CRUD | R | R | R (solo catálogo público de prestaciones) |
 | Paciente (datos de contacto) | CRUD | CRU | R de sus turnos | RU propio |
+| Paciente: búsqueda y alta rápida (C-15) | sí | sí | `-` (en la agenda ve solo el nombre de sus pacientes) | `-` |
 | Usuario / Rol | CRUD | `-` | `-` | `-` |
 | Recordatorios | R (listar `wa.me` pendientes y fallidos) | RU (listar y marcar enviado) | `-` | `-` |
 
