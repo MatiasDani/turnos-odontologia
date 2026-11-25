@@ -16,7 +16,7 @@
 - [x] 2.2 RED/GREEN/TRIANGULATE `Accion`, `MATRIZ` y `autorizar` (`src/domain/permisos/`, design D3): test tabular de las 13 acciones × 4 roles contra la tabla del design; verificar `tests/domain/permisos/autorizar.test.ts` en verde
 - [x] 2.3 RED/GREEN/TRIANGULATE `autorizarSobre`: odontólogo propio y ajeno, paciente con su `turnoId`, con otro y sin `turnoId`, celdas `si` que no miran el recurso; el mensaje del error no contiene datos del recurso; verificar en verde y que `src/domain` no importa infraestructura ni usa `new Date()` / `Date.now()`
 - [x] 2.4 Hacer que `exigirAdministrador`, `exigirPermisoBloqueo`, `exigirPermisoLiberarBloqueo` y el control de `AgendaDiaria`/`AgendaSemanal` deleguen en `autorizar`/`autorizarSobre` (design D4); verificar que las suites de C-05, C-06 y C-08 siguen en verde SIN modificar sus casos
-- [ ] 2.5 **CHECKPOINT 1**: mostrar la matriz implementada y el diff de `src/domain/permisos/`; esperar la revisión antes de tocar casos de uso
+- [x] 2.5 **CHECKPOINT 1**: mostrar la matriz implementada y el diff de `src/domain/permisos/`; esperar la revisión antes de tocar casos de uso
 
 ## 3. Control de acceso en los casos de uso de turnos
 
@@ -33,7 +33,7 @@
 
 - [x] 4.1 Sumar `actor` a la entrada de `ListarRecordatoriosPendientesWaMe`, `ListarRecordatoriosFallidos` y `MarcarRecordatorioEnviado` (design D5) y actualizar sus fixtures (`sistema-recordatorios.ts`, `sistema-wa-me.ts`) con `actores.recepcion`; verificar `npm run typecheck` y las suites de C-12 y C-13 en verde sin cambiar sus títulos
 - [x] 4.2 RED/GREEN escenarios de "Recordatorios por rol"; verificar que `EnviarRecordatoriosPendientes` sigue sin actor y su suite en verde
-- [ ] 4.3 **CHECKPOINT 2**: suite completa en verde; mostrar la lista de casos de uso protegidos contra la matriz y avisar a Franco y Luka del cambio de firma; esperar la revisión
+- [x] 4.3 **CHECKPOINT 2**: suite completa en verde; mostrar la lista de casos de uso protegidos contra la matriz y avisar a Franco y Luka del cambio de firma; esperar la revisión
 
 ## 5. Usuarios y claves
 
@@ -50,7 +50,7 @@
 - [x] 6.2 RED/GREEN `IniciarSesion`: escenarios de "Inicio de sesión" y "Falla de inicio de sesión genérica"; verificar con un espía que con un e-mail inexistente igual se llama a `verificar` del hasher (hash de relleno); verificar en verde
 - [x] 6.3 RED/GREEN `ResolverSesion`: escenarios de "Vencimiento de la sesión" y "Sesión resuelta con los datos actuales del usuario", y que el `Actor` del odontólogo trae su `profesionalId` guardado; verificar en verde
 - [x] 6.4 Leer y validar `JWT_SECRET` (obligatoria, ≥ 32 caracteres) en `configuracion-servidor.ts`, con el error que nombra la variable sin su valor; agregar las tres variables con valores ficticios a `.env.example` (la tabla de `08_arquitectura_propuesta.md` ya se actualizó en el propose); verificar los tests de configuración en verde y que `.env` sigue ignorado por git
-- [ ] 6.5 **CHECKPOINT 3** (revisión de seguridad): mostrar hasher, emisor, `IniciarSesion` y `ResolverSesion`; revisar juntos que ninguna clave, hash ni token llegue a logs, errores o respuestas; esperar la aprobación
+- [x] 6.5 **CHECKPOINT 3** (revisión de seguridad): mostrar hasher, emisor, `IniciarSesion` y `ResolverSesion`; revisar juntos que ninguna clave, hash ni token llegue a logs, errores o respuestas; esperar la aprobación
 
 ## 7. HTTP y composición
 
