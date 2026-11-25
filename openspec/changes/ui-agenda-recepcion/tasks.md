@@ -6,7 +6,7 @@
 
 ## 1. Mockup y baseline
 
-- [ ] 1.1 Aprobación de los mockups de `mockups/` (índice en `mockups/index.html`, capturas en `mockups/previews/`) por el owner; registrar la fecha en `design-system/README.md` si cambia algo del sistema (no se espera)
+- [x] 1.1 Aprobación de los mockups de `mockups/` (**aprobado por Lautaro Medina el 2026-11-25**, "mockup aprobado") (índice en `mockups/index.html`, capturas en `mockups/previews/`) por el owner; registrar la fecha en `design-system/README.md` si cambia algo del sistema (no se espera)
 - [ ] 1.2 SAFETY NET: `npm ci`, `npm test`, `npm run typecheck` y `npm run test:ui`; registrar el baseline en verde; si algo falla, detenerse y reportarlo como falla preexistente
 - [ ] 1.3 Verificar que la KB ya tiene RN-34 y RN-35 (`05`), DD-38 a DD-41 (`09`), las filas de pacientes de la matriz (`03`) y la pregunta abierta de alta de usuarios (`10`), como exige la regla dura 6
 
