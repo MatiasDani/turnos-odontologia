@@ -4,6 +4,7 @@ import type { CasosDeUsoPublicos } from './casos-de-uso.js';
 import { MENSAJE_NO_ENCONTRADO, traducirError } from './errores-http.js';
 import { encontrarRaizDelProyecto } from './estaticos.js';
 import { serializadoresDeLog } from './logs.js';
+import { rutasAutenticacion, type CasosDeUsoAutenticacion } from './autenticacion.js';
 import { rutasPublicasPaciente } from './rutas-publicas-paciente.js';
 
 /** Límite del cuerpo de un pedido (D2). */
@@ -27,6 +28,8 @@ export interface OpcionesApp {
   readonly rutas?: readonly FastifyPluginCallback[];
   /** Raíz del proyecto para la UI y el design system; por defecto se detecta. */
   readonly raiz?: string;
+  /** Login y sesión del personal (C-09): registra `/auth/login` y `/auth/sesion`. */
+  readonly autenticacion?: CasosDeUsoAutenticacion;
 }
 
 function prefiereHtml(accept: string | undefined): boolean {
@@ -86,6 +89,8 @@ export function crearApp(casos: CasosDeUsoPublicos, opciones: OpcionesApp = {}):
     return reply.code(404).send({ error: { codigo: 'NO_ENCONTRADO', mensaje: MENSAJE_NO_ENCONTRADO } });
   });
 
+  app.decorateRequest('actor', null);
+  if (opciones.autenticacion !== undefined) void app.register(rutasAutenticacion(opciones.autenticacion));
   void app.register(rutasPublicasPaciente(casos, { raiz: opciones.raiz ?? encontrarRaizDelProyecto() }));
   for (const modulo of opciones.rutas ?? []) void app.register(modulo);
   return app;

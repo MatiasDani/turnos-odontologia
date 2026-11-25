@@ -61,3 +61,15 @@ const TOKEN = /^[A-Za-z0-9_-]{43}$/;
 export function esTokenConForma(token: string): boolean {
   return TOKEN.test(token);
 }
+
+/** Cuerpo de `POST /auth/login` (C-09): objeto con `email` y `clave` de texto no vacío. */
+export function validarPedidoLogin(cuerpo: unknown): Resultado<{ readonly email: string; readonly clave: string }> {
+  if (!esObjetoPlano(cuerpo)) return { ok: false, campos: ['pedido'] };
+  const email = cuerpo['email'];
+  const clave = cuerpo['clave'];
+  const campos: string[] = [];
+  if (!esTextoNoVacio(email)) campos.push('email');
+  if (typeof clave !== 'string' || clave === '') campos.push('clave');
+  if (campos.length > 0 || typeof email !== 'string' || typeof clave !== 'string') return { ok: false, campos };
+  return { ok: true, valor: { email, clave } };
+}

@@ -54,16 +54,16 @@
 
 ## 7. HTTP y composición
 
-- [ ] 7.1 RED/GREEN mapeo en `errores-http.ts`: `ACCESO_DENEGADO` 403, `SESION_INVALIDA` 401, `CREDENCIALES_INVALIDAS` 401 con mensajes fijos y sin rol, acción ni recurso en el cuerpo; verificar `tests/adapters/http/errores-http.test.ts` en verde
-- [ ] 7.2 RED/GREEN `POST /auth/login` y validación del cuerpo (`fastify.inject`): escenarios de "Ruta HTTP de inicio de sesión"; verificar en verde
-- [ ] 7.3 RED/GREEN `crearExigirSesion` y `GET /auth/sesion`: escenarios de "Protección HTTP de las rutas internas", con una ruta interna de prueba registrada por `opciones.rutas` que exige administrador; verificar en verde
-- [ ] 7.4 RED/GREEN "Sin secretos en los logs" con el log activo en un stream de prueba; verificar en verde
-- [ ] 7.5 Cablear en `componerSistema` y `main.ts` (design D10): el administrador inicial se crea antes de `listen` y `crearApp` recibe `autenticacion`; verificar con `npm run build` y arrancando el servidor con un `.env` local ficticio que `POST /auth/login` responde 200 con el administrador inicial y que las rutas públicas de C-14 siguen funcionando
+- [x] 7.1 RED/GREEN mapeo en `errores-http.ts`: `ACCESO_DENEGADO` 403, `SESION_INVALIDA` 401, `CREDENCIALES_INVALIDAS` 401 con mensajes fijos y sin rol, acción ni recurso en el cuerpo; verificar `tests/adapters/http/errores-http.test.ts` en verde
+- [x] 7.2 RED/GREEN `POST /auth/login` y validación del cuerpo (`fastify.inject`): escenarios de "Ruta HTTP de inicio de sesión"; verificar en verde
+- [x] 7.3 RED/GREEN `crearExigirSesion` y `GET /auth/sesion`: escenarios de "Protección HTTP de las rutas internas", con una ruta interna de prueba registrada por `opciones.rutas` que exige administrador; verificar en verde
+- [x] 7.4 RED/GREEN "Sin secretos en los logs" con el log activo en un stream de prueba; verificar en verde
+- [x] 7.5 Cablear en `componerSistema` y `main.ts` (design D10): el administrador inicial se crea antes de `listen` y `crearApp` recibe `autenticacion`; verificar con `npm run build` y arrancando el servidor con un `.env` local ficticio que `POST /auth/login` responde 200 con el administrador inicial y que las rutas públicas de C-14 siguen funcionando
 
 ## 8. Integración y cierre
 
-- [ ] 8.1 Suite completa, `npm run typecheck`, `npm run build` y `openspec validate autenticacion-y-roles --strict` en verde; `grep` de `any`, `new Date()`/`Date.now()` en `src/domain` y de claves o tokens literales fuera de los tests (reglas duras 1, 3 y 9)
-- [ ] 8.2 Actualizar la KB con lo que el apply haya precisado (por ejemplo, mensajes públicos finales) y marcar las preguntas de `10_preguntas_abiertas.md` como resueltas por C-09; verificar que `03` y el código coinciden fila por fila
+- [x] 8.1 Suite completa, `npm run typecheck`, `npm run build` y `openspec validate autenticacion-y-roles --strict` en verde; `grep` de `any`, `new Date()`/`Date.now()` en `src/domain` y de claves o tokens literales fuera de los tests (reglas duras 1, 3 y 9)
+- [x] 8.2 Actualizar la KB con lo que el apply haya precisado (por ejemplo, mensajes públicos finales) y marcar las preguntas de `10_preguntas_abiertas.md` como resueltas por C-09; verificar que `03` y el código coinciden fila por fila
 - [ ] 8.3 **CHECKPOINT 4**: pedir la revisión de seguridad de un par (Alejo o Mara, como revisores de los changes CRÍTICOS) sobre el PR antes de archivar
 
 ## Workflow follow-up

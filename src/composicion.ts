@@ -1,3 +1,12 @@
+import { EmisorSesionJose } from './adapters/crypto/emisor-sesion-jose.js';
+import { HasherClavesScrypt } from './adapters/crypto/hasher-claves-scrypt.js';
+import { UsuarioRepositorioEnMemoria } from './adapters/persistence/en-memoria/usuario-repositorio.js';
+import { CrearAdministradorInicial } from './application/crear-administrador-inicial.js';
+import { GestionarUsuarios } from './application/gestionar-usuarios.js';
+import { IniciarSesion } from './application/iniciar-sesion.js';
+import { ResolverSesion } from './application/resolver-sesion.js';
+import type { ProfesionalRepositorio } from './application/puertos/repositorios.js';
+import type { UsuarioRepositorio } from './application/puertos/usuarios.js';
 import { GeneradorTokenCrypto } from './adapters/crypto/generador-token-crypto.js';
 import { HasherSha256 } from './adapters/crypto/hasher-sha256.js';
 import {
@@ -210,3 +219,34 @@ export function componerSistema(opciones: OpcionesComposicion) {
 }
 
 export type SistemaCompuesto = ReturnType<typeof componerSistema>;
+
+export interface OpcionesAutenticacion {
+  readonly reloj: Reloj;
+  /** `JWT_SECRET` ya validado (DD-37). */
+  readonly jwtSecret: string;
+  readonly consultorioId: string;
+  readonly profesionales: Pick<ProfesionalRepositorio, 'obtenerPorId'>;
+  /** Por defecto en memoria y vacío (el administrador inicial sale del entorno). */
+  readonly usuarios?: UsuarioRepositorio;
+  readonly ids?: GeneradorId;
+  /** N de scrypt; solo los tests lo bajan (DD-36). */
+  readonly costoHash?: number;
+}
+
+/** Usuarios, claves y sesión del personal (C-09, design D10). */
+export function componerAutenticacion(opciones: OpcionesAutenticacion) {
+  const usuarios = opciones.usuarios ?? new UsuarioRepositorioEnMemoria();
+  const hasher = new HasherClavesScrypt(opciones.costoHash === undefined ? {} : { costo: opciones.costoHash });
+  const emisor = new EmisorSesionJose(opciones.jwtSecret);
+  const ids = opciones.ids ?? new GeneradorIdUuid();
+  const { reloj, consultorioId, profesionales } = opciones;
+  return {
+    usuarios,
+    gestionarUsuarios: new GestionarUsuarios({ usuarios, profesionales, hasher, ids, consultorioId }),
+    administradorInicial: new CrearAdministradorInicial({ usuarios, hasher, ids, consultorioId }),
+    casos: {
+      iniciarSesion: new IniciarSesion({ usuarios, hasher, emisor, reloj }),
+      resolverSesion: new ResolverSesion({ usuarios, emisor, reloj }),
+    },
+  };
+}

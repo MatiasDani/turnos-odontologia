@@ -1,3 +1,5 @@
+import { CredencialesInvalidasError, SesionInvalidaError } from '../../application/errores-autenticacion.js';
+import { AccesoDenegadoError } from '../../domain/errores.js';
 import { ErrorEnlacePublico } from '../../application/errores-enlace-publico.js';
 import { ErrorGestionTurnoPublica } from '../../application/errores-gestion-turno-publica.js';
 import { ErrorReservaPublica } from '../../application/errores-reserva-publica.js';
@@ -16,7 +18,14 @@ const ESTADO_POR_CODIGO: Readonly<Record<string, number>> = {
   PROFESIONAL_NO_DISPONIBLE: 422,
   LIMITE_DE_TURNOS: 422,
   CONTACTAR_CONSULTORIO: 422,
+  // C-09 (DD-37)
+  CREDENCIALES_INVALIDAS: 401,
+  SESION_INVALIDA: 401,
+  ACCESO_DENEGADO: 403,
 };
+
+/** Mensaje fijo del acceso denegado: nunca expone el rol, la acción ni el recurso (RN-D-02). */
+export const MENSAJE_ACCESO_DENEGADO = 'No tenés permiso para hacer esto.';
 
 export interface CuerpoError {
   readonly error: {
@@ -71,6 +80,12 @@ export function traducirError(error: unknown): RespuestaError {
       inesperado: false,
       cuerpo: { error: { codigo: error.codigo, mensaje: error.message } },
     };
+  }
+  if (error instanceof CredencialesInvalidasError || error instanceof SesionInvalidaError) {
+    return { estado: 401, inesperado: false, cuerpo: { error: { codigo: error.codigo, mensaje: error.message } } };
+  }
+  if (error instanceof AccesoDenegadoError) {
+    return { estado: 403, inesperado: false, cuerpo: { error: { codigo: 'ACCESO_DENEGADO', mensaje: MENSAJE_ACCESO_DENEGADO } } };
   }
   if (esErrorDeParseoDeFastify(error)) {
     const publico = new ErrorReservaPublica('DATOS_INVALIDOS', { campos: ['pedido'] });

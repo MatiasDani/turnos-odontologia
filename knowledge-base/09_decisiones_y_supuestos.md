@@ -318,6 +318,7 @@ C-02 **reutiliza** el `Reloj` (no lo redefine) y C-05 **extiende** `PacienteRepo
 **Alternativas consideradas**: chequear solo en HTTP; decoradores por caso de uso; mantener funciones por caso.
 **Justificación**: la KB exige el control en los casos de uso (`08`); una tabla única es auditable y testeable fila por fila; el compilador impide actores incoherentes.
 **Trade-offs aceptados**: cambia el tipo `Actor` en tests de todo el equipo (se migran con helpers de fixture).
+**Precisiones del apply** (2026-11-25, C-09): la política expone `autorizar`/`autorizarSobre` (lanzan `AccesoDenegadoError` con la acción como operación) y `permite`/`permiteSobre` (booleanas, para que C-05, C-06 y C-08 conserven sus mensajes); en cancelar, reprogramar y los cambios de estado el alcance "propio" se verifica dentro de `actualizarSi` sobre el turno releído; los tests arman actores con `tests/fixtures/actores.ts`. Las reglas de C-09 quedaron como RN-32 y RN-33 porque C-06 ya usaba RN-31 en el código (registrada en `05` en este apply).
 
 ### DD-34 — Permisos del odontólogo y de la confirmación
 **Decisión** (2026-11-25, propose de C-09, Lautaro Medina; resuelve dos preguntas abiertas): el odontólogo **no** da turnos, ni cancela, reprograma o confirma (eso es de recepción y administrador); **sí** marca atendido o ausente, solo los turnos de su profesional; consulta disponibilidad y ve y bloquea solo su agenda. Confirmar lo pueden el administrador, la recepción y el paciente sobre el turno de su enlace. El paciente no cierra turnos.
@@ -344,6 +345,7 @@ C-02 **reutiliza** el `Reloj` (no lo redefine) y C-05 **extiende** `PacienteRepo
 **Alternativas consideradas**: token opaco guardado como hash (permite cerrar sesión, pero contradice la KB); `jsonwebtoken`; JWT hecho a mano.
 **Justificación**: respeta la KB, no guarda estado de sesión y la resolución por pedido hace efectiva la desactivación de un usuario.
 **Trade-offs aceptados**: no hay cierre de sesión anticipado; sin límite de intentos de login en el MVP (pregunta abierta).
+**Precisiones del apply** (2026-11-25, C-09): mensajes públicos fijos `CREDENCIALES_INVALIDAS` "E-mail o clave incorrectos.", `SESION_INVALIDA` "Tu sesión no es válida o venció. Iniciá sesión de nuevo." y `ACCESO_DENEGADO` "No tenés permiso para hacer esto." (el cuerpo nunca lleva rol, acción ni recurso); `POST /auth/login` responde `{ token, usuario: { id, email, rol, profesionalId?, venceEn } }` y `GET /auth/sesion` `{ usuario }`, ambos con `cache-control: no-store`; la cabecera aceptada es solo `Authorization: Bearer <jwt>`; el `preHandler` `crearExigirSesion` deja el actor en `request.actor` y las rutas lo leen con `actorDe(request)`. `JWT_SECRET` y el administrador inicial se leen con `leerConfiguracionAutenticacion`, separada de `leerConfiguracionServidor`, y `npm start` no arranca sin `JWT_SECRET`. `IniciarSesion` verifica un hash de relleno cuando el e-mail no existe.
 
 ## Supuestos inferidos
 
