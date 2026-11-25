@@ -425,7 +425,7 @@ Carriles: **A** = núcleo y reserva online (Matías: C-01 → C-07 → C-10); **
   - `knowledge-base/08_arquitectura_propuesta.md` §Estructura de directorios (adapters/http)
 
 ### [C-15] `ui-agenda-recepcion`
-- **Estado**: `[ ]` pendiente
+- **Estado**: `[x]` completado (archivado 2026-11-25)
 - **Owner**: Lautaro Medina (52043)
 - **Scope**:
   - Vista diaria y semanal de la agenda por profesional y por sillón (C-08), con estados, bloqueos y filtros
