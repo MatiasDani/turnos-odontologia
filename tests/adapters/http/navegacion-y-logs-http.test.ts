@@ -11,6 +11,37 @@ afterEach(async () => {
 
 const HTML = { accept: 'text/html,application/xhtml+xml' };
 
+/**
+ * Valores de las líneas de log (JSON de pino) donde un dato del paciente podría filtrarse.
+ * Los textos se devuelven tal cual; los números solo como entero exacto, para que dígitos
+ * de campos como `responseTime` (13.300000011920929) o `time` no den falsos positivos.
+ * `hostname` es metadato de pino ajeno a la petición.
+ */
+function valoresDeLog(lineas: readonly string[]): string[] {
+  const valores: string[] = [];
+  const recorrer = (valor: unknown, clave: string): void => {
+    if (typeof valor === 'string') {
+      if (clave !== 'hostname') valores.push(valor);
+    } else if (typeof valor === 'number') {
+      if (Number.isInteger(valor)) valores.push(`=${String(valor)}`);
+    } else if (Array.isArray(valor)) {
+      for (const v of valor) recorrer(v, clave);
+    } else if (typeof valor === 'object' && valor !== null) {
+      for (const [k, v] of Object.entries(valor)) {
+        valores.push(k);
+        recorrer(v, k);
+      }
+    }
+  };
+  for (const linea of lineas) recorrer(JSON.parse(linea) as unknown, '');
+  return valores;
+}
+
+/** ¿Aparece el dato en algún texto del log o como número entero exacto? */
+function apareceEnLog(lineas: readonly string[], dato: string): boolean {
+  return valoresDeLog(lineas).some((v) => v === `=${dato}` || (!v.startsWith('=') && v.includes(dato)));
+}
+
 describe('Navegación segura de los enlaces', () => {
   test('Abrir el enlace de confirmación no confirma el turno', async () => {
     sistema = await crearSistemaHttp();
@@ -88,8 +119,14 @@ describe('Logs sin token ni datos personales', () => {
     await sistema.post('/public/reservas', cuerpoReserva({}, { dni: '12' }));
     const log = sistema.lineasDeLog.join('\n');
     expect(log).toContain('/public/reservas');
-    for (const dato of ['30000001', 'Paciente', 'Ficticio', '1100000000', 'paciente1@ejemplo.test', ok.json().token]) {
+    // Texto y token: sobre el log crudo, sin excepciones.
+    for (const dato of ['Paciente', 'Ficticio', 'paciente1@ejemplo.test', ok.json().token]) {
       expect(log).not.toContain(dato);
+    }
+    // DNI y teléfono son solo dígitos: se buscan en los valores parseados para no confundirlos
+    // con los decimales de `responseTime` o el epoch de `time`.
+    for (const dato of ['30000001', '1100000000']) {
+      expect(apareceEnLog(sistema.lineasDeLog, dato), dato).toBe(false);
     }
   });
 
@@ -106,5 +143,17 @@ describe('redactarUrl', () => {
     expect(redactarUrl('/public/turnos/abc/confirmar?x=1')).toBe('/public/turnos/[redactado]/confirmar');
     expect(redactarUrl('/public/prestaciones?a=b')).toBe('/public/prestaciones');
     expect(redactarUrl('/public/turnos/')).toBe('/public/turnos/');
+  });
+});
+
+describe('apareceEnLog (auxiliar de los tests de logs)', () => {
+  test('detecta el dato en textos y como entero, pero no dentro de decimales ni del epoch', () => {
+    const limpia = JSON.stringify({ level: 30, time: 1730000000123, responseTime: 13.300000011920929, msg: 'request completed' });
+    const conDecimal = JSON.stringify({ responseTime: 0.1100000000123, req: { url: '/public/reservas' } });
+    expect(apareceEnLog([limpia, conDecimal], '30000001')).toBe(false);
+    expect(apareceEnLog([conDecimal], '1100000000')).toBe(false);
+    expect(apareceEnLog([JSON.stringify({ req: { url: '/x?dni=30000001' } })], '30000001')).toBe(true);
+    expect(apareceEnLog([JSON.stringify({ err: { message: 'tel 1100000000 inválido' } })], '1100000000')).toBe(true);
+    expect(apareceEnLog([JSON.stringify({ paciente: { dni: 30000001 } })], '30000001')).toBe(true);
   });
 });
