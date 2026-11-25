@@ -103,7 +103,13 @@ export type CampoConfiguracion =
   | 'diaSemana'
   | 'desde'
   | 'hasta'
-  | 'tramo';
+  | 'tramo'
+  // Usuarios internos (C-09, DD-35)
+  | 'email'
+  | 'clave'
+  | 'rol'
+  | 'profesionalId'
+  | 'usuarioId';
 
 /**
  * Dato de configuración inválido (RN-29, DD-27). Sin código RN: es validación de entrada, como

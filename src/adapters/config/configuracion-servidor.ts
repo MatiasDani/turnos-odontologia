@@ -25,3 +25,35 @@ export function leerConfiguracionServidor(env: VariablesEntorno): ConfiguracionS
     baseUrlPublica: env['BASE_URL_PUBLICA'] === undefined ? `http://${host}:${puerto}` : urlHttp(env, 'BASE_URL_PUBLICA'),
   };
 }
+
+export interface ConfiguracionAutenticacion {
+  /** Secreto de firma de las sesiones (`JWT_SECRET`, DD-37). */
+  readonly jwtSecret: string;
+  /** Administrador a crear en el primer arranque (`ADMIN_EMAIL_INICIAL` y `ADMIN_CLAVE_INICIAL`, DD-35). */
+  readonly adminInicial?: { readonly email: string; readonly clave: string };
+}
+
+const LARGO_MINIMO_SECRETO = 32;
+
+/**
+ * `JWT_SECRET` obligatoria de 32 caracteres o más; `ADMIN_EMAIL_INICIAL` y `ADMIN_CLAVE_INICIAL`,
+ * ambas o ninguna. Los errores nombran la variable y nunca muestran su valor (regla dura 9).
+ */
+export function leerConfiguracionAutenticacion(env: VariablesEntorno): ConfiguracionAutenticacion {
+  const jwtSecret = env['JWT_SECRET'];
+  if (jwtSecret === undefined || jwtSecret.trim() === '') {
+    throw new ConfiguracionInvalidaError('JWT_SECRET', 'es obligatoria');
+  }
+  if (jwtSecret.length < LARGO_MINIMO_SECRETO) {
+    throw new ConfiguracionInvalidaError('JWT_SECRET', `debe tener ${LARGO_MINIMO_SECRETO} caracteres o más`);
+  }
+  const email = env['ADMIN_EMAIL_INICIAL']?.trim() || undefined;
+  const clave = env['ADMIN_CLAVE_INICIAL'] || undefined;
+  if (email !== undefined && clave === undefined) {
+    throw new ConfiguracionInvalidaError('ADMIN_CLAVE_INICIAL', 'es obligatoria si se define ADMIN_EMAIL_INICIAL');
+  }
+  if (clave !== undefined && email === undefined) {
+    throw new ConfiguracionInvalidaError('ADMIN_EMAIL_INICIAL', 'es obligatoria si se define ADMIN_CLAVE_INICIAL');
+  }
+  return { jwtSecret, ...(email !== undefined && clave !== undefined ? { adminInicial: { email, clave } } : {}) };
+}
