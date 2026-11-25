@@ -25,12 +25,12 @@
 
 ## 4. API interna
 
-- [ ] 4.1 RED/GREEN validadores y serializadores internos (`validadores-internos.ts`, `serializadores-internos.ts`): fecha `YYYY-MM-DD`, `inicio` ISO con zona, ids, cuerpos de turno, reprogramación, bloqueo y paciente; serialización ISO UTC; verificar `tests/adapters/http/validadores-internos.test.ts` en verde
-- [ ] 4.2 RED/GREEN mapeo de `ReglaNegocioError` (409 con mensaje fijo por código y `conflicto`/`turnos`/`paciente`), `RecursoNoEncontradoError` (404), `ConfiguracionInvalidaError` y `ConsultaInvalidaError` (400) en `errores-http.ts`; agregar el test de que ninguna ruta `/public/*` responde 409 con un código `RN-XX`; verificar las suites HTTP de C-14 en verde
-- [ ] 4.3 RED/GREEN `rutasRecepcion` (plugin con `crearExigirSesion`) y fixture `tests/fixtures/sistema-http-recepcion.ts`: escenarios de "Sesión obligatoria en las rutas internas", "Agenda del día", "Agenda de la semana de un recurso" y "Catálogo interno"; verificar en verde
-- [ ] 4.4 RED/GREEN escenarios de "Disponibilidad interna", "Pacientes por HTTP" y "Turnos por HTTP" (`POST /interno/turnos` con `AgendarTurnoConRecordatorio`); verificar en verde
-- [ ] 4.5 RED/GREEN escenarios de "Reglas de negocio por HTTP", "Bloqueos por HTTP", "Recordatorios wa.me por HTTP" y "Mínimo dato en las respuestas internas"; verificar en verde
-- [ ] 4.6 Cablear `rutasRecepcion` en `composicion.ts` y `main.ts` y sumar pacientes y turnos ficticios a `seed-demo.ts` (design D6); verificar con `npm run build` y el servidor real que `GET /interno/agenda` responde con sesión del administrador inicial
+- [x] 4.1 RED/GREEN validadores y serializadores internos (`validadores-internos.ts`, `serializadores-internos.ts`): fecha `YYYY-MM-DD`, `inicio` ISO con zona, ids, cuerpos de turno, reprogramación, bloqueo y paciente; serialización ISO UTC; verificar `tests/adapters/http/validadores-internos.test.ts` en verde
+- [x] 4.2 RED/GREEN mapeo de `ReglaNegocioError` (409 con mensaje fijo por código y `conflicto`/`turnos`/`paciente`), `RecursoNoEncontradoError` (404), `ConfiguracionInvalidaError` y `ConsultaInvalidaError` (400) en `errores-http.ts`; agregar el test de que ninguna ruta `/public/*` responde 409 con un código `RN-XX`; verificar las suites HTTP de C-14 en verde
+- [x] 4.3 RED/GREEN `rutasRecepcion` (plugin con `crearExigirSesion`) y fixture `tests/fixtures/sistema-http-recepcion.ts`: escenarios de "Sesión obligatoria en las rutas internas", "Agenda del día", "Agenda de la semana de un recurso" y "Catálogo interno"; verificar en verde
+- [x] 4.4 RED/GREEN escenarios de "Disponibilidad interna", "Pacientes por HTTP" y "Turnos por HTTP" (`POST /interno/turnos` con `AgendarTurnoConRecordatorio`); verificar en verde
+- [x] 4.5 RED/GREEN escenarios de "Reglas de negocio por HTTP", "Bloqueos por HTTP", "Recordatorios wa.me por HTTP" y "Mínimo dato en las respuestas internas"; verificar en verde
+- [x] 4.6 Cablear `rutasRecepcion` en `composicion.ts` y `main.ts` y sumar pacientes y turnos ficticios a `seed-demo.ts` (design D6); verificar con `npm run build` y el servidor real que `GET /interno/agenda` responde con sesión del administrador inicial
 
 ## 5. Interfaz de recepción
 

@@ -1,6 +1,6 @@
 import type { BloqueoHorario } from '../domain/bloqueo-horario.js';
 import { ConsultaInvalidaError } from '../domain/errores.js';
-import type { EstadoTurno, OrigenTurno, Turno } from '../domain/turno.js';
+import { esActivo, type EstadoTurno, type OrigenTurno, type Turno } from '../domain/turno.js';
 import type { AgendaDiaria, ConsultaAgendaDiaria } from './agenda-diaria.js';
 import type { AgendaSemanal } from './agenda-semanal.js';
 import type { PacienteRepositorio, PrestacionRepositorio, ProfesionalRepositorio, SillonRepositorio } from './puertos/repositorios.js';
@@ -93,6 +93,22 @@ export class VistaAgenda {
     const dias = await this.deps.agendaSemanal.ejecutar(consulta);
     const buscadores = this.buscadores();
     return { dias: await Promise.all(dias.map((dia) => this.enriquecer(buscadores, dia))) };
+  }
+
+  /** Un turno suelto con sus nombres (respuesta de las acciones de recepción). */
+  async turno(turno: Turno): Promise<TurnoVista> {
+    const dia = await this.enriquecer(this.buscadores(), {
+      fecha: '',
+      turnos: [{ ...turno, ocupa: esActivo(turno.estado) }],
+      bloqueos: [],
+    });
+    return dia.turnos[0] as TurnoVista;
+  }
+
+  /** Un bloqueo suelto con sus nombres. */
+  async bloqueo(bloqueo: BloqueoHorario): Promise<BloqueoVista> {
+    const dia = await this.enriquecer(this.buscadores(), { fecha: '', turnos: [], bloqueos: [bloqueo] });
+    return dia.bloqueos[0] as BloqueoVista;
   }
 
   private buscadores() {

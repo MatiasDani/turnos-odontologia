@@ -11,17 +11,22 @@ describe('Reserva online con recordatorio (composición)', () => {
     const s = await crearSistemaPublico();
     const r = await reservarDesdePedido(pedidoBase({ inicio: '2026-11-24T09:00:00-03:00' }), s.reservarOnline);
     const recordatorios = await s.repoRecordatorios.listarPorTurno(r.turnoId);
-    expect(recordatorios).toHaveLength(1);
-    expect(recordatorios[0]).toMatchObject({ canal: 'email', estado: 'pendiente' });
+    const email = recordatorios.filter((x) => x.canal === 'email');
+    expect(email).toHaveLength(1);
+    expect(email[0]).toMatchObject({ canal: 'email', estado: 'pendiente' });
+    // Desde C-15 la composición cablea el canal wa.me de C-13 (spec recordatorio-wa-me).
+    expect(recordatorios.filter((x) => x.canal === 'wa_me')).toHaveLength(1);
     await expect(s.servicioTokens.resolver(r.token)).resolves.toBe(r.turnoId);
   });
 
-  test('un paciente nuevo sin e-mail reserva sin recordatorio', async () => {
+  test('un paciente nuevo sin e-mail reserva sin recordatorio por e-mail', async () => {
     const s = await crearSistemaPublico();
     const r = await reservarDesdePedido(
       pedidoBase({ inicio: '2026-11-24T09:00:00-03:00' }, { email: undefined }),
       s.reservarOnline,
     );
-    expect(await s.repoRecordatorios.listarPorTurno(r.turnoId)).toEqual([]);
+    const recordatorios = await s.repoRecordatorios.listarPorTurno(r.turnoId);
+    expect(recordatorios.filter((x) => x.canal === 'email')).toEqual([]);
+    expect(recordatorios.map((x) => x.canal)).toEqual(['wa_me']);
   });
 });

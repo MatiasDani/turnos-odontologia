@@ -1,5 +1,5 @@
 import type { Actor } from '../domain/actor.js';
-import { ConsultaInvalidaError, type PacienteResumen } from '../domain/errores.js';
+import { ConsultaInvalidaError, RecursoNoEncontradoError, type PacienteResumen } from '../domain/errores.js';
 import type { Paciente } from '../domain/paciente.js';
 import { autorizar } from '../domain/permisos/autorizar.js';
 import { coincidePaciente, normalizarBusqueda, normalizarTexto, RESULTADOS_MAXIMOS } from '../domain/reglas/pacientes-recepcion.js';
@@ -45,5 +45,17 @@ export class BuscarPacientes {
       pacientes: coincidencias.slice(0, RESULTADOS_MAXIMOS).map(aResumen),
       hayMas: coincidencias.length > RESULTADOS_MAXIMOS,
     };
+  }
+}
+
+/** Datos de contacto de un paciente para el detalle del turno (C-15): solo recepción y administrador. */
+export class ResumenPaciente {
+  constructor(private readonly deps: { readonly pacientes: Pick<PacienteRepositorio, 'obtenerPorId'> }) {}
+
+  async ejecutar(input: { readonly actor: Actor; readonly pacienteId: string }): Promise<PacienteResumen> {
+    autorizar(input.actor, 'paciente.buscar');
+    const paciente = await this.deps.pacientes.obtenerPorId(input.pacienteId);
+    if (paciente === undefined) throw new RecursoNoEncontradoError('paciente', input.pacienteId);
+    return aResumen(paciente);
   }
 }

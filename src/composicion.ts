@@ -1,3 +1,17 @@
+import type { CasosDeUsoRecepcion } from './adapters/http/rutas-recepcion.js';
+import { AgendarTurnoConRecordatorio } from './application/agendar-turno-con-recordatorio.js';
+import { AltaRapidaPaciente } from './application/alta-rapida-paciente.js';
+import { BloquearHorario } from './application/bloquear-horario.js';
+import { BuscarPacientes, ResumenPaciente } from './application/buscar-pacientes.js';
+import { DisponibilidadInterna } from './application/disponibilidad-interna.js';
+import { LiberarBloqueo } from './application/liberar-bloqueo.js';
+import { ListarCatalogoInterno } from './application/listar-catalogo-interno.js';
+import { ListarRecordatoriosPendientesWaMe } from './application/listar-recordatorios-wa-me-pendientes.js';
+import { MarcarAtendido } from './application/marcar-atendido.js';
+import { MarcarAusente } from './application/marcar-ausente.js';
+import { MarcarRecordatorioEnviado } from './application/marcar-recordatorio-enviado.js';
+import { VistaAgenda } from './application/vista-agenda.js';
+import { RecordatoriosConWaMe } from './application/recordatorios-wa-me.js';
 import { EmisorSesionJose } from './adapters/crypto/emisor-sesion-jose.js';
 import { HasherClavesScrypt } from './adapters/crypto/hasher-claves-scrypt.js';
 import { UsuarioRepositorioEnMemoria } from './adapters/persistence/en-memoria/usuario-repositorio.js';
@@ -99,10 +113,22 @@ export function componerNucleo(opciones: OpcionesComposicion) {
     turnos,
   };
   const repoRecordatorios = opciones.repoRecordatorios ?? new RecordatorioRepositorioEnMemoria();
-  const recordatorios = new RecordatoriosEmail({
+  const recordatoriosEmail = new RecordatoriosEmail({
     recordatorios: repoRecordatorios,
     turnos,
     pacientes,
+    ids,
+    config: { horasAntes: opciones.horasAntesRecordatorio ?? 24 },
+  });
+  // C-15: el canal wa.me (C-13) queda cableado para que recepción vea sus pendientes.
+  const recordatorios = new RecordatoriosConWaMe({
+    recordatorios: recordatoriosEmail,
+    repoRecordatorios,
+    turnos,
+    pacientes,
+    profesionales: repos.profesionales,
+    prestaciones: repos.prestaciones,
+    consultorios: repos.consultorios,
     ids,
     config: { horasAntes: opciones.horasAntesRecordatorio ?? 24 },
   });
@@ -142,9 +168,15 @@ export function componerNucleo(opciones: OpcionesComposicion) {
   const reprogramarTurno = new ReprogramarTurno({ ...repos, reloj, recordatorios });
   return {
     reloj,
+    ids,
     repos,
     pacientes,
     repoRecordatorios,
+    recordatorios,
+    agendar,
+    confirmarTurno,
+    cancelarTurno,
+    reprogramarTurno,
     servicioTokens,
     consultarDisponibilidad,
     agendaDiaria,
@@ -248,5 +280,44 @@ export function componerAutenticacion(opciones: OpcionesAutenticacion) {
       iniciarSesion: new IniciarSesion({ usuarios, hasher, emisor, reloj }),
       resolverSesion: new ResolverSesion({ usuarios, emisor, reloj }),
     },
+  };
+}
+
+/**
+ * API interna de recepción (C-15, DD-41): arma los casos de uso de `/interno/*` sobre el núcleo.
+ * Los casos de uso de C-01 a C-13 se reutilizan sin cambios.
+ */
+export function componerRecepcion(
+  nucleo: ReturnType<typeof componerNucleo>,
+  opciones: { readonly resolverSesion: Pick<ResolverSesion, 'ejecutar'>; readonly consultorioId: string },
+): CasosDeUsoRecepcion {
+  const { repos, pacientes, reloj, ids, repoRecordatorios } = nucleo;
+  const { resolverSesion, consultorioId } = opciones;
+  return {
+    resolverSesion,
+    vista: new VistaAgenda({
+      agendaDiaria: nucleo.agendaDiaria,
+      agendaSemanal: nucleo.agendaSemanal,
+      pacientes,
+      profesionales: repos.profesionales,
+      sillones: repos.sillones,
+      prestaciones: repos.prestaciones,
+    }),
+    catalogo: new ListarCatalogoInterno({ ...repos, consultorioId }),
+    disponibilidad: new DisponibilidadInterna({ consultar: nucleo.consultarDisponibilidad, consultorios: repos.consultorios, reloj, consultorioId }),
+    buscarPacientes: new BuscarPacientes({ pacientes }),
+    resumenPaciente: new ResumenPaciente({ pacientes }),
+    altaPaciente: new AltaRapidaPaciente({ pacientes, ids }),
+    agendar: new AgendarTurnoConRecordatorio(nucleo.agendar, nucleo.recordatorios),
+    cancelar: nucleo.cancelarTurno,
+    confirmar: nucleo.confirmarTurno,
+    atendido: new MarcarAtendido({ turnos: repos.turnos, reloj }),
+    ausente: new MarcarAusente({ turnos: repos.turnos, reloj }),
+    reprogramar: nucleo.reprogramarTurno,
+    bloquear: new BloquearHorario({ bloqueos: repos.bloqueos, turnos: repos.turnos, generadorId: ids }),
+    liberar: new LiberarBloqueo({ bloqueos: repos.bloqueos }),
+    listarWaMe: new ListarRecordatoriosPendientesWaMe({ recordatorios: repoRecordatorios }),
+    marcarEnviado: new MarcarRecordatorioEnviado({ recordatorios: repoRecordatorios, reloj }),
+    turnos: repos.turnos,
   };
 }
