@@ -1,4 +1,5 @@
 import { RecursoNoEncontradoError, ReglaNegocioError } from '../domain/errores.js';
+import { autorizar } from '../domain/permisos/autorizar.js';
 import { crearIntervalo } from '../domain/intervalo.js';
 import { duracionEfectiva } from '../domain/reglas/duracion.js';
 import { validarAlta, type EntradaValidacion } from '../domain/reglas/validar-alta.js';
@@ -39,6 +40,8 @@ export class AgendarTurno {
 
   async ejecutar(input: AgendarTurnoInput): Promise<Turno> {
     const { deps } = this;
+    // Control de acceso antes de leer nada (C-09, DD-33): el odontólogo no da turnos.
+    autorizar(input.actor, 'turno.agendar');
 
     // Fase asíncrona: carga de entidades (la inexistencia se detecta antes de toda regla).
     const profesional = await obtenerOFallar('profesional', input.profesionalId, deps.profesionales.obtenerPorId(input.profesionalId));

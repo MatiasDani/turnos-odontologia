@@ -341,7 +341,7 @@ describe('Lista de recordatorios fallidos para la recepción', () => {
     await agendarRecepcion(sistema, { hora: '11:00' });
     sistema.notificador.fallarEnIntento(1, new Error('rechazo puntual'));
     await barrido(sistema, DOMINGO, '10:00');
-    const lista = await sistema.listarFallidos.ejecutar();
+    const lista = await sistema.listarFallidos.ejecutar({ actor: actores.recepcion });
     expect(lista).toHaveLength(1);
     expect(lista[0]).toMatchObject({
       turnoId: fallido.id,

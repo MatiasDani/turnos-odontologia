@@ -15,7 +15,10 @@ export interface ReprogramarTurnoDesdeTokenDependencias {
   readonly reprogramar: Pick<ReprogramarTurno, 'ejecutar'>;
 }
 
-const ACTOR_PACIENTE: Actor = { rol: 'paciente' };
+/** Actor paciente acotado al turno que resolvió su token (C-09, DD-33). */
+function pacienteDelTurno(turnoId: string): Actor {
+  return { rol: 'paciente', turnoId };
+}
 
 function esFechaValida(valor: Date): boolean {
   return valor instanceof Date && !Number.isNaN(valor.getTime());
@@ -41,7 +44,7 @@ export class ReprogramarTurnoDesdeToken {
     try {
       movido = await deps.reprogramar.ejecutar({
         turnoId: turno.id,
-        actor: ACTOR_PACIENTE,
+        actor: pacienteDelTurno(turno.id),
         inicio: input.inicio,
         ...(input.profesionalId === undefined ? {} : { profesionalId: input.profesionalId }),
         ...(input.prestacionId === undefined ? {} : { prestacionId: input.prestacionId }),

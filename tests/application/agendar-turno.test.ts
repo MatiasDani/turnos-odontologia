@@ -177,15 +177,15 @@ describe('Duración efectiva del turno', () => {
   });
 });
 
-describe('Ajuste de duración solo por personal del consultorio', () => {
+describe('Ajuste de duración por recepción y administrador', () => {
   test('Paciente informa duración distinta', async () => {
     await expect(
       agendar(crearSistema(), { rol: 'paciente', prestacionId: 'pr1', hora: '09:00', duracion: 45 }),
     ).rejects.toMatchObject({ codigo: 'RN-16' });
   });
 
-  test('Odontólogo ajusta la duración', async () => {
-    const turno = await agendar(crearSistema(), { rol: 'odontologo', prestacionId: 'pr2', hora: '09:00', duracion: 60 });
+  test('Recepción ajusta la duración', async () => {
+    const turno = await agendar(crearSistema(), { rol: 'recepcion', prestacionId: 'pr2', hora: '09:00', duracion: 60 });
     expect(turno.fin).toEqual(local(LUNES, '10:00'));
     expect(turno.duracionMinutos).toBe(60);
   });
@@ -306,7 +306,7 @@ describe('Estado inicial según el origen', () => {
     expect(turno).toMatchObject({ estado: 'reservado', origen: 'online' });
   });
 
-  test.each(['odontologo', 'administrador'] as const)('alta interna por %s nace confirmado', async (rol) => {
+  test.each(['administrador'] as const)('alta interna por %s nace confirmado', async (rol) => {
     const turno = await agendar(crearSistema(), { rol, hora: '09:00' });
     expect(turno).toMatchObject({ estado: 'confirmado', origen: 'recepcion' });
   });

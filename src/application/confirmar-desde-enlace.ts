@@ -23,7 +23,10 @@ export interface ConfirmacionDesdeEnlace {
   readonly fin: Date;
 }
 
-const ACTOR_PACIENTE: Actor = { rol: 'paciente' };
+/** Actor paciente acotado al turno que resolvió su token (C-09, DD-33). */
+function pacienteDelTurno(turnoId: string): Actor {
+  return { rol: 'paciente', turnoId };
+}
 
 function respuesta(turno: Pick<Turno, 'inicio' | 'fin'>): ConfirmacionDesdeEnlace {
   return { estado: 'confirmado', inicio: turno.inicio, fin: turno.fin };
@@ -46,7 +49,7 @@ export class ConfirmarDesdeEnlace {
     if (turno.estado === 'confirmado') return respuesta(turno);
     if (turno.estado !== 'reservado') throw new ErrorEnlacePublico();
     try {
-      return respuesta(await deps.confirmar.ejecutar({ turnoId, actor: ACTOR_PACIENTE }));
+      return respuesta(await deps.confirmar.ejecutar({ turnoId, actor: pacienteDelTurno(turnoId) }));
     } catch (error) {
       // Otra confirmación ganó la carrera: el turno quedó confirmado, que es lo pedido.
       if (error instanceof ReglaNegocioError && error.codigo === 'RN-10' && error.estadoActual === 'confirmado') {

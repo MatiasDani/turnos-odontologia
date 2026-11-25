@@ -1,3 +1,5 @@
+import type { Actor } from '../domain/actor.js';
+import { autorizar } from '../domain/permisos/autorizar.js';
 import type { RecordatorioRepositorio } from './puertos/repositorios.js';
 
 /** Vista mínima que ve la recepción: sin datos del paciente, del turno ni tokens (DD-18, DD-24). */
@@ -13,10 +15,16 @@ export interface ListarRecordatoriosPendientesWaMeDependencias {
 }
 
 /** Todos los `wa_me` pendientes, ordenados por `programadoPara` (RN-26). */
+/** Entrada: quién lista (C-09, DD-33). */
+export interface ListarRecordatoriosPendientesWaMeInput {
+  readonly actor: Actor;
+}
+
 export class ListarRecordatoriosPendientesWaMe {
   constructor(private readonly deps: ListarRecordatoriosPendientesWaMeDependencias) {}
 
-  async ejecutar(): Promise<readonly RecordatorioWaMePendiente[]> {
+  async ejecutar(input: ListarRecordatoriosPendientesWaMeInput): Promise<readonly RecordatorioWaMePendiente[]> {
+    autorizar(input.actor, 'recordatorio.listar');
     const pendientes = (await this.deps.recordatorios.listarPorEstado('pendiente'))
       .filter((recordatorio) => recordatorio.canal === 'wa_me')
       .sort((a, b) => a.programadoPara.getTime() - b.programadoPara.getTime());

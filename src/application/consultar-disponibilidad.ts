@@ -1,3 +1,4 @@
+import { autorizar } from '../domain/permisos/autorizar.js';
 import { ConsultaInvalidaError, RecursoNoEncontradoError, ReglaNegocioError } from '../domain/errores.js';
 import type { Hueco } from '../domain/disponibilidad/hueco.js';
 import type { BloqueoHorario } from '../domain/bloqueo-horario.js';
@@ -57,6 +58,7 @@ export class ConsultarDisponibilidad {
 
   async ejecutar(input: ConsultarDisponibilidadInput): Promise<readonly Hueco[]> {
     const { deps } = this;
+    autorizar(input.actor, 'disponibilidad.consultar');
     const paso = validarConsulta(input);
 
     const prestacion = await deps.prestaciones.obtenerPorId(input.prestacionId);

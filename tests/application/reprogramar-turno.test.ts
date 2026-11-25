@@ -1,7 +1,7 @@
 // Escenarios de openspec/changes/c03-reprogramar-turno-atomico/specs/reprogramacion-turnos/spec.md.
 // Cada test lleva el nombre exacto de su `#### Scenario:` (regla dura 8); un `describe` por requisito.
 import { describe, expect, test } from 'vitest';
-import { RecursoNoEncontradoError, ReglaNegocioError } from '../../src/domain/errores.js';
+import { AccesoDenegadoError, RecursoNoEncontradoError, ReglaNegocioError } from '../../src/domain/errores.js';
 import {
   crearSistemaReprogramacion,
   rechazo,
@@ -112,6 +112,21 @@ describe('Anticipación mínima del paciente', () => {
     const sistema = crearSistemaReprogramacion({ turnos: [base()], ahora: local(LUNES, '08:00') });
     await expect(reprogramar(sistema, { turnoId: 't-base', inicio: martes('10:00') })).resolves.toMatchObject({
       inicio: martes('10:00'),
+    });
+  });
+
+  test('Odontólogo no puede reprogramar', async () => {
+    const sistema = crearSistemaReprogramacion({ turnos: [base()], ahora: local(LUNES, '08:00') });
+    const error = await reprogramar(sistema, { turnoId: 't-base', inicio: martes('10:00'), rol: 'odontologo' }).then(
+      () => undefined,
+      (e: unknown) => e,
+    );
+    expect(error).toBeInstanceOf(AccesoDenegadoError);
+    expect(error).toMatchObject({ rol: 'odontologo' });
+    await expect(sistema.turnos.obtenerPorId('t-base')).resolves.toMatchObject({
+      inicio: local(LUNES, '09:00'),
+      profesionalId: 'p1',
+      sillonId: 's1',
     });
   });
 });

@@ -20,19 +20,19 @@
 
 ## 3. Control de acceso en los casos de uso de turnos
 
-- [ ] 3.1 RED/GREEN `AgendarTurno`: escenarios de "Alta de turnos por rol" (`specs/control-acceso`) y "Ajuste de duración por recepción y administrador" y "Estado inicial según el origen" (`specs/agenda-turnos`); renombrar en `agendar-turno.test.ts` el test "Odontólogo ajusta la duración" a "Recepción ajusta la duración"; verificar en verde junto con las suites de C-01, C-07 y C-10
-- [ ] 3.2 RED/GREEN `CancelarTurno` con `autorizar` antes de leer y `autorizarSobre` dentro de la sección crítica: escenarios de cancelación de "Cancelación y reprogramación por rol" y "Recepción y administrador sin restricción de anticipación" (`specs/cancelacion-turnos`); reemplazar el test "Odontólogo con menos de 24 h puede cancelar" por "Odontólogo no puede cancelar"; verificar en verde con las suites de C-02 y C-11
-- [ ] 3.3 RED/GREEN `ReprogramarTurno`: escenarios de reprogramación de "Cancelación y reprogramación por rol" y "Odontólogo no puede reprogramar" (`specs/reprogramacion-turnos`); verificar en verde con las suites de C-03 y C-11
-- [ ] 3.4 RED/GREEN `ConfirmarTurno`, `MarcarAtendido` y `MarcarAusente`: escenarios de "Confirmación por rol", "Cierre del turno por rol" y "Odontólogo de otro profesional no cierra el turno" (`specs/estados-turno`); verificar en verde con las suites de C-04 y C-12
-- [ ] 3.5 Flujos públicos con actor paciente acotado: `cancelar-turno-desde-token`, `reprogramar-turno-desde-token` y `confirmar-desde-enlace` pasan `{ rol: 'paciente', turnoId }` del turno resuelto; `reservar-online` y `horarios-del-dia` siguen sin `turnoId`; RED/GREEN de "Paciente cancela su propio turno" y "Paciente no cancela un turno ajeno"; verificar que las suites de C-10, C-11, C-12 y C-14 (incluida la HTTP) siguen en verde
-- [ ] 3.6 RED/GREEN escenarios de "El acceso se evalúa antes que las reglas de negocio" y "Error de acceso denegado"; validar con una mutación (mover `autorizarSobre` después de RN-10) que "El alcance propio prevalece sobre el estado" falla; verificar en verde
-- [ ] 3.7 RED/GREEN `ConsultarDisponibilidad` con `autorizar(actor, 'disponibilidad.consultar')`: escenario "Odontólogo consulta disponibilidad"; verificar en verde con las suites de C-07 y C-14
-- [ ] 3.8 RED/GREEN escenarios de "Bloqueos y agenda conservan sus permisos"; verificar en verde
+- [x] 3.1 RED/GREEN `AgendarTurno`: escenarios de "Alta de turnos por rol" (`specs/control-acceso`) y "Ajuste de duración por recepción y administrador" y "Estado inicial según el origen" (`specs/agenda-turnos`); renombrar en `agendar-turno.test.ts` el test "Odontólogo ajusta la duración" a "Recepción ajusta la duración"; verificar en verde junto con las suites de C-01, C-07 y C-10
+- [x] 3.2 RED/GREEN `CancelarTurno` con `autorizar` antes de leer y `autorizarSobre` dentro de la sección crítica: escenarios de cancelación de "Cancelación y reprogramación por rol" y "Recepción y administrador sin restricción de anticipación" (`specs/cancelacion-turnos`); reemplazar el test "Odontólogo con menos de 24 h puede cancelar" por "Odontólogo no puede cancelar"; verificar en verde con las suites de C-02 y C-11
+- [x] 3.3 RED/GREEN `ReprogramarTurno`: escenarios de reprogramación de "Cancelación y reprogramación por rol" y "Odontólogo no puede reprogramar" (`specs/reprogramacion-turnos`); verificar en verde con las suites de C-03 y C-11
+- [x] 3.4 RED/GREEN `ConfirmarTurno`, `MarcarAtendido` y `MarcarAusente`: escenarios de "Confirmación por rol", "Cierre del turno por rol" y "Odontólogo de otro profesional no cierra el turno" (`specs/estados-turno`); verificar en verde con las suites de C-04 y C-12
+- [x] 3.5 Flujos públicos con actor paciente acotado: `cancelar-turno-desde-token`, `reprogramar-turno-desde-token` y `confirmar-desde-enlace` pasan `{ rol: 'paciente', turnoId }` del turno resuelto; `reservar-online` y `horarios-del-dia` siguen sin `turnoId`; RED/GREEN de "Paciente cancela su propio turno" y "Paciente no cancela un turno ajeno"; verificar que las suites de C-10, C-11, C-12 y C-14 (incluida la HTTP) siguen en verde
+- [x] 3.6 RED/GREEN escenarios de "El acceso se evalúa antes que las reglas de negocio" y "Error de acceso denegado"; validar con una mutación (mover `autorizarSobre` después de RN-10) que "El alcance propio prevalece sobre el estado" falla; verificar en verde
+- [x] 3.7 RED/GREEN `ConsultarDisponibilidad` con `autorizar(actor, 'disponibilidad.consultar')`: escenario "Odontólogo consulta disponibilidad"; verificar en verde con las suites de C-07 y C-14
+- [x] 3.8 RED/GREEN escenarios de "Bloqueos y agenda conservan sus permisos"; verificar en verde
 
 ## 4. Recordatorios con actor
 
-- [ ] 4.1 Sumar `actor` a la entrada de `ListarRecordatoriosPendientesWaMe`, `ListarRecordatoriosFallidos` y `MarcarRecordatorioEnviado` (design D5) y actualizar sus fixtures (`sistema-recordatorios.ts`, `sistema-wa-me.ts`) con `actores.recepcion`; verificar `npm run typecheck` y las suites de C-12 y C-13 en verde sin cambiar sus títulos
-- [ ] 4.2 RED/GREEN escenarios de "Recordatorios por rol"; verificar que `EnviarRecordatoriosPendientes` sigue sin actor y su suite en verde
+- [x] 4.1 Sumar `actor` a la entrada de `ListarRecordatoriosPendientesWaMe`, `ListarRecordatoriosFallidos` y `MarcarRecordatorioEnviado` (design D5) y actualizar sus fixtures (`sistema-recordatorios.ts`, `sistema-wa-me.ts`) con `actores.recepcion`; verificar `npm run typecheck` y las suites de C-12 y C-13 en verde sin cambiar sus títulos
+- [x] 4.2 RED/GREEN escenarios de "Recordatorios por rol"; verificar que `EnviarRecordatoriosPendientes` sigue sin actor y su suite en verde
 - [ ] 4.3 **CHECKPOINT 2**: suite completa en verde; mostrar la lista de casos de uso protegidos contra la matriz y avisar a Franco y Luka del cambio de firma; esperar la revisión
 
 ## 5. Usuarios y claves

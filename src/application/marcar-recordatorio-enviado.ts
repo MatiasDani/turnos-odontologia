@@ -1,11 +1,17 @@
+import type { Actor } from '../domain/actor.js';
+import { autorizar } from '../domain/permisos/autorizar.js';
 import { ErrorMarcarRecordatorio } from '../domain/errores-recordatorio.js';
 import type { Recordatorio } from '../domain/recordatorio.js';
 import { marcarEnviado } from '../domain/reglas/recordatorio-wa-me.js';
 import type { Reloj } from './puertos/reloj.js';
 import type { RecordatorioRepositorio } from './puertos/repositorios.js';
 
-/** Entrada mínima: el id del recordatorio; el reloj se inyecta en el constructor (RN-08). */
+/**
+ * Entrada: quién marca (solo recepción, C-09) y el id del recordatorio; el reloj se inyecta en el
+ * constructor (RN-08).
+ */
 export interface MarcarRecordatorioEnviadoInput {
+  readonly actor: Actor;
   readonly recordatorioId: string;
 }
 
@@ -22,6 +28,7 @@ export class MarcarRecordatorioEnviado {
   constructor(private readonly deps: MarcarRecordatorioEnviadoDependencias) {}
 
   async ejecutar(input: MarcarRecordatorioEnviadoInput): Promise<Recordatorio> {
+    autorizar(input.actor, 'recordatorio.marcarEnviado');
     const recordatorio = await this.deps.recordatorios.obtenerPorId(input.recordatorioId);
     if (recordatorio === undefined) throw new ErrorMarcarRecordatorio('RECORDATORIO_NO_ENCONTRADO');
     if (recordatorio.canal !== 'wa_me') throw new ErrorMarcarRecordatorio('ESTADO_NO_ENVIABLE');

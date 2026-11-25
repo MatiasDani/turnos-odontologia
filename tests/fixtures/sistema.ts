@@ -356,7 +356,7 @@ export function crearSistemaCancelacion(opciones: OpcionesSistemaCancelacion = {
 
 /** Cancela con el rol indicado (por defecto recepción). */
 export function cancelar(sistema: SistemaCancelacion, c: { turnoId: string; rol?: Rol }): Promise<Turno> {
-  return sistema.cancelarTurno.ejecutar({ turnoId: c.turnoId, actor: actorDeRol(c.rol ?? 'recepcion') });
+  return sistema.cancelarTurno.ejecutar({ turnoId: c.turnoId, actor: actorDeRol(c.rol ?? 'recepcion', { turnoId: c.turnoId }) });
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -366,17 +366,17 @@ type CambioDeEstado = { turnoId: string; rol?: Rol };
 
 /** Confirma con el rol indicado (por defecto recepción). */
 export function confirmar(sistema: SistemaCancelacion, c: CambioDeEstado): Promise<Turno> {
-  return sistema.confirmarTurno.ejecutar({ turnoId: c.turnoId, actor: actorDeRol(c.rol ?? 'recepcion') });
+  return sistema.confirmarTurno.ejecutar({ turnoId: c.turnoId, actor: actorDeRol(c.rol ?? 'recepcion', { turnoId: c.turnoId }) });
 }
 
 /** Marca atendido con el rol indicado (por defecto recepción). */
 export function marcarAtendido(sistema: SistemaCancelacion, c: CambioDeEstado): Promise<Turno> {
-  return sistema.marcarAtendido.ejecutar({ turnoId: c.turnoId, actor: actorDeRol(c.rol ?? 'recepcion') });
+  return sistema.marcarAtendido.ejecutar({ turnoId: c.turnoId, actor: actorDeRol(c.rol ?? 'recepcion', { turnoId: c.turnoId }) });
 }
 
 /** Marca ausente con el rol indicado (por defecto recepción). */
 export function marcarAusente(sistema: SistemaCancelacion, c: CambioDeEstado): Promise<Turno> {
-  return sistema.marcarAusente.ejecutar({ turnoId: c.turnoId, actor: actorDeRol(c.rol ?? 'recepcion') });
+  return sistema.marcarAusente.ejecutar({ turnoId: c.turnoId, actor: actorDeRol(c.rol ?? 'recepcion', { turnoId: c.turnoId }) });
 }
 
 /** Espera un rechazo y devuelve el error; falla si la promesa se resuelve. */
@@ -448,7 +448,7 @@ export type PedidoReprogramacion = {
 export function reprogramar(sistema: SistemaReprogramacion, p: PedidoReprogramacion): Promise<Turno> {
   return sistema.reprogramarTurno.ejecutar({
     turnoId: p.turnoId,
-    actor: actorDeRol(p.rol ?? 'recepcion'),
+    actor: actorDeRol(p.rol ?? 'recepcion', { turnoId: p.turnoId }),
     inicio: p.inicio,
     ...(p.profesionalId === undefined ? {} : { profesionalId: p.profesionalId }),
     ...(p.sillonId === undefined ? {} : { sillonId: p.sillonId }),

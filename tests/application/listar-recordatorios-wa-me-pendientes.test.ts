@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest';
 import { local } from '../fixtures/seed.js';
 import { agendarRecepcion, crearSistemaWaMe, DOMINGO, waMeDe } from '../fixtures/sistema-wa-me.js';
+import { actores } from '../fixtures/actores.js';
 
 describe('Lista de `wa.me` pendientes para recepción', () => {
   test('Lista ordenada por `programadoPara`', async () => {
@@ -12,7 +13,7 @@ describe('Lista de `wa.me` pendientes para recepción', () => {
     if (waTemprano === undefined || waTarde === undefined) throw new Error('faltan los wa.me');
     await sistema.repoRecordatorios.guardar({ ...waTemprano, programadoPara: local(DOMINGO, '10:00') });
     await sistema.repoRecordatorios.guardar({ ...waTarde, programadoPara: local(DOMINGO, '09:00') });
-    const lista = await sistema.listarPendientesWaMe.ejecutar();
+    const lista = await sistema.listarPendientesWaMe.ejecutar({ actor: actores.recepcion });
     expect(lista.map((r) => r.turnoId)).toEqual([tarde.id, temprano.id]);
   });
 
@@ -23,7 +24,7 @@ describe('Lista de `wa.me` pendientes para recepción', () => {
     const [yaEnviado] = await waMeDe(sistema, otro.id);
     if (yaEnviado === undefined) throw new Error('falta el wa.me');
     await sistema.repoRecordatorios.guardar({ ...yaEnviado, estado: 'enviado', enviadoEn: local(DOMINGO, '09:00') });
-    const lista = await sistema.listarPendientesWaMe.ejecutar();
+    const lista = await sistema.listarPendientesWaMe.ejecutar({ actor: actores.recepcion });
     expect(lista).toHaveLength(1);
     expect(lista[0]?.turnoId).toBe(turno.id);
     expect(lista[0]?.id).not.toBe(yaEnviado.id);
@@ -32,12 +33,12 @@ describe('Lista de `wa.me` pendientes para recepción', () => {
   test('La lista no expone datos ajenos', async () => {
     const sistema = crearSistemaWaMe();
     await agendarRecepcion(sistema);
-    const lista = await sistema.listarPendientesWaMe.ejecutar();
+    const lista = await sistema.listarPendientesWaMe.ejecutar({ actor: actores.recepcion });
     expect(Object.keys(lista[0] ?? {}).sort()).toEqual(['enlaceWaMe', 'id', 'programadoPara', 'turnoId']);
   });
 
   test('Sin pendientes devuelve lista vacía', async () => {
     const sistema = crearSistemaWaMe();
-    expect(await sistema.listarPendientesWaMe.ejecutar()).toEqual([]);
+    expect(await sistema.listarPendientesWaMe.ejecutar({ actor: actores.recepcion })).toEqual([]);
   });
 });

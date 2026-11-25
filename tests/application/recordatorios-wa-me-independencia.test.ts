@@ -58,7 +58,7 @@ describe('Independencia de canales', () => {
     const turno = await agendarRecepcion(sistema);
     const [waMe] = await waMeDe(sistema, turno.id);
     if (waMe === undefined) throw new Error('falta el wa.me');
-    await sistema.marcarEnviado.ejecutar({ recordatorioId: waMe.id });
+    await sistema.marcarEnviado.ejecutar({ actor: actores.recepcion, recordatorioId: waMe.id });
     expect(sistema.notificador.enviados).toHaveLength(0);
   });
 });

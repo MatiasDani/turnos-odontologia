@@ -12,6 +12,6 @@ export class MarcarAtendido {
   constructor(private readonly deps: CambiarEstadoTurnoDependencias) {}
 
   ejecutar(input: CambiarEstadoTurnoInput): Promise<Turno> {
-    return aplicarCambioDeEstado(this.deps, input.turnoId, 'atendido');
+    return aplicarCambioDeEstado(this.deps, input, 'atendido');
   }
 }

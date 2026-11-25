@@ -1,3 +1,4 @@
+import { autorizar, autorizarSobre } from '../domain/permisos/autorizar.js';
 import { RecursoNoEncontradoError, ReglaNegocioError } from '../domain/errores.js';
 import { crearIntervalo } from '../domain/intervalo.js';
 import { duracionEfectiva } from '../domain/reglas/duracion.js';
@@ -47,10 +48,14 @@ export class ReprogramarTurno {
 
   async ejecutar(input: ReprogramarTurnoInput): Promise<Turno> {
     const { deps } = this;
+    // Control de acceso antes de leer nada (C-09, DD-33): el odontólogo no reprograma.
+    autorizar(input.actor, 'turno.reprogramar');
     const ahora = deps.reloj.ahora();
 
     // Un turno inexistente se detecta antes que cualquier regla de negocio.
     const turnoActual = await obtenerOFallar('turno', input.turnoId, deps.turnos.obtenerPorId(input.turnoId));
+    // Alcance "propio" (paciente: el turno de su token), antes de RN-10 y RN-08.
+    autorizarSobre(input.actor, 'turno.reprogramar', { profesionalId: turnoActual.profesionalId, turnoId: turnoActual.id });
     const violacionInicial = evaluarReprogramacion(turnoActual, input.actor.rol, ahora);
     if (violacionInicial !== null) throw new ReglaNegocioError(violacionInicial);
 
@@ -120,6 +125,7 @@ export class ReprogramarTurno {
           return { ok: false, violacion: { codigo: 'RN-10', estadoActual: actual.estado } };
         }
 
+        autorizarSobre(input.actor, 'turno.reprogramar', { profesionalId: actual.profesionalId, turnoId: actual.id });
         const violacion = evaluarReprogramacion(actual, input.actor.rol, ahora);
         if (violacion !== null) return { ok: false, violacion };
 
