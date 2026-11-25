@@ -64,7 +64,7 @@
 
 - [x] 8.1 Suite completa, `npm run typecheck`, `npm run build` y `openspec validate autenticacion-y-roles --strict` en verde; `grep` de `any`, `new Date()`/`Date.now()` en `src/domain` y de claves o tokens literales fuera de los tests (reglas duras 1, 3 y 9)
 - [x] 8.2 Actualizar la KB con lo que el apply haya precisado (por ejemplo, mensajes públicos finales) y marcar las preguntas de `10_preguntas_abiertas.md` como resueltas por C-09; verificar que `03` y el código coinciden fila por fila
-- [ ] 8.3 **CHECKPOINT 4**: pedir la revisión de seguridad de un par (Alejo o Mara, como revisores de los changes CRÍTICOS) sobre el PR antes de archivar
+- [x] 8.3 **CHECKPOINT 4**: pedir la revisión de seguridad de un par (Alejo o Mara, como revisores de los changes CRÍTICOS) sobre el PR antes de archivar
 
 ## Workflow follow-up
 

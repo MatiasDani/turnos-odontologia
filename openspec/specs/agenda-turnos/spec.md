@@ -113,17 +113,6 @@ El `fin` del turno SHALL ser `inicio + duración efectiva`: la `duracionMinutos`
 - **WHEN** se agenda un turno de `p1` en `s2` con `pr1` el lunes a las 09:00 con duración 45
 - **THEN** se rechaza con `RN-02`
 
-### Requirement: Ajuste de duración solo por personal del consultorio
-Solo los roles recepción, odontólogo y administrador SHALL poder informar una duración distinta de la de la prestación. Si el actor es paciente e informa una duración distinta, el alta MUST rechazarse con `RN-16`.
-
-#### Scenario: Paciente informa duración distinta
-- **WHEN** un paciente agenda un turno con `pr1` el lunes a las 09:00 con duración 45
-- **THEN** se rechaza con `RN-16`
-
-#### Scenario: Odontólogo ajusta la duración
-- **WHEN** un odontólogo agenda un turno con `pr2` el lunes a las 09:00 con duración 60
-- **THEN** el turno tiene fin 10:00 y duración 60 minutos
-
 ### Requirement: Horario de atención en la zona del consultorio
 El turno MUST comenzar dentro de un tramo del horario de atención del día, interpretado en la zona horaria IANA del consultorio, y no terminar después del cierre del último tramo del día; si no, se rechaza con `RN-07` (RN-07, DD-09).
 
@@ -201,7 +190,7 @@ El sistema MUST rechazar con `RN-18` un turno cuyo profesional, sillón o presta
 - **THEN** se rechaza con `RN-18`
 
 ### Requirement: Estado inicial según el origen
-Un turno creado por recepción, odontólogo o administrador SHALL nacer en estado `confirmado` con origen `recepcion`; uno creado por un paciente SHALL nacer `reservado` con origen `online` (DD-11).
+Un turno creado por recepción o administrador SHALL nacer en estado `confirmado` con origen `recepcion`; uno creado por un paciente SHALL nacer `reservado` con origen `online` (DD-11). El odontólogo no da turnos (control de acceso, C-09).
 
 #### Scenario: Alta interna nace confirmado
 - **WHEN** recepción agenda un turno válido el lunes a las 09:00
@@ -273,3 +262,14 @@ Si el profesional del turno tiene al menos un tramo de horario propio para el d�
 - **GIVEN** `p2` tiene tramos propios el lunes de 08:00 a 10:00 y de 16:00 a 18:00
 - **WHEN** se agenda un turno de `p2` en `s1` con `pr1` el lunes a las 09:45
 - **THEN** se rechaza con `RN-17`
+
+### Requirement: Ajuste de duración por recepción y administrador
+Solo recepción y administrador SHALL poder informar una duración distinta de la de la prestación al dar un turno; el odontólogo no da turnos (control de acceso, C-09). Si el actor es paciente e informa una duración distinta, el alta MUST rechazarse con `RN-16`.
+
+#### Scenario: Paciente informa duración distinta
+- **WHEN** un paciente agenda un turno con `pr1` el lunes a las 09:00 con duración 45
+- **THEN** se rechaza con `RN-16`
+
+#### Scenario: Recepción ajusta la duración
+- **WHEN** recepción agenda un turno con `pr2` el lunes a las 09:00 con duración 60
+- **THEN** el turno tiene fin 10:00 y duración 60 minutos

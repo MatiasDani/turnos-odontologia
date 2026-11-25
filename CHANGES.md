@@ -287,7 +287,7 @@ Carriles: **A** = núcleo y reserva online (Matías: C-01 → C-07 → C-10); **
 ## FASE 3 — Acceso y roles
 
 ### [C-09] `autenticacion-y-roles`
-- **Estado**: `[ ]` pendiente
+- **Estado**: `[x]` completado (archivado 2026-11-25)
 - **Owner**: Lautaro Medina (52043)
 - **Scope**:
   - Entidades `Usuario` (con `profesionalId?`) y `Rol` (administrador, odontólogo, recepción, paciente); clave con hash adaptativo (scrypt/argon2, a confirmar) — nunca en texto plano ni en logs (RN-D-03)

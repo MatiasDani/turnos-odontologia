@@ -64,21 +64,6 @@ El paciente SHALL poder cancelar solo si faltan 24 h o más para el `inicio` del
 - **WHEN** `ahora` es el lunes 2026-11-23 a las 08:00 y el paciente cancela el turno base
 - **THEN** se rechaza con `RN-08`
 
-### Requirement: Personal del consultorio sin restricción de anticipación
-Recepción, odontólogo y administrador SHALL poder cancelar con cualquier anticipación; RN-08 MUST aplicarse solo al paciente (RN-08). El control de qué rol puede cancelar no forma parte de esta capacidad.
-
-#### Scenario: Recepción con menos de 24 h puede cancelar
-- **WHEN** `ahora` es el lunes 2026-11-23 a las 08:00 y recepción cancela el turno base
-- **THEN** el turno queda `cancelado` con `canceladoPor: 'recepcion'`
-
-#### Scenario: Administrador con menos de 24 h puede cancelar
-- **WHEN** `ahora` es el lunes 2026-11-23 a las 08:00 y el administrador cancela el turno base
-- **THEN** el turno queda `cancelado` con `canceladoPor: 'administrador'`
-
-#### Scenario: Odontólogo con menos de 24 h puede cancelar
-- **WHEN** `ahora` es el lunes 2026-11-23 a las 08:00 y el odontólogo cancela el turno base
-- **THEN** el turno queda `cancelado` con `canceladoPor: 'odontologo'`
-
 ### Requirement: Orden de evaluación de los rechazos
 Ante varias violaciones se MUST informar solo la primera según el orden: turno inexistente, `RN-10`, `RN-08` (DD-19).
 
@@ -124,3 +109,19 @@ Al concretarse una cancelación el sistema SHALL pedir la cancelación de los re
 - **WHEN** el pedido de cancelar recordatorios falla y recepción cancela el turno base
 - **THEN** la operación informa el error
 - **AND** el turno queda `cancelado`
+
+### Requirement: Recepción y administrador sin restricción de anticipación
+Recepción y administrador SHALL poder cancelar con cualquier anticipación; RN-08 MUST aplicarse solo al paciente (RN-08). El odontólogo no cancela turnos: qué rol puede cancelar lo define el control de acceso (C-09).
+
+#### Scenario: Recepción con menos de 24 h puede cancelar
+- **WHEN** `ahora` es el lunes 2026-11-23 a las 08:00 y recepción cancela el turno base
+- **THEN** el turno queda `cancelado` con `canceladoPor: 'recepcion'`
+
+#### Scenario: Administrador con menos de 24 h puede cancelar
+- **WHEN** `ahora` es el lunes 2026-11-23 a las 08:00 y el administrador cancela el turno base
+- **THEN** el turno queda `cancelado` con `canceladoPor: 'administrador'`
+
+#### Scenario: Odontólogo no puede cancelar
+- **WHEN** `ahora` es el lunes 2026-11-23 a las 08:00 y el odontólogo de `p1` cancela el turno base
+- **THEN** se rechaza con acceso denegado para el rol `odontologo`
+- **AND** el turno sigue `confirmado`

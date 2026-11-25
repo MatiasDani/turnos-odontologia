@@ -28,10 +28,10 @@ Confirmar un turno `reservado` SHALL dejarlo en estado `confirmado`, sin restric
 - **THEN** el turno queda `confirmado`
 
 ### Requirement: Cierre de un turno confirmado
-Marcar un turno `confirmado` como atendido SHALL dejarlo en estado `atendido`, y marcarlo como ausente SHALL dejarlo en estado `ausente`. El turno MUST conservar su id, paciente, recursos e intervalo. La operación devuelve el turno modificado (US-006, Flujo 7).
+Marcar un turno `confirmado` como atendido SHALL dejarlo en estado `atendido`, y marcarlo como ausente SHALL dejarlo en estado `ausente`. El turno MUST conservar su id, paciente, recursos e intervalo. La operación devuelve el turno modificado (US-006, Flujo 7). El odontólogo solo cierra los turnos de su propio profesional (control de acceso, C-09).
 
 #### Scenario: Odontólogo marca atendido un turno confirmado
-- **WHEN** el odontólogo marca atendido el turno base
+- **WHEN** el odontólogo de `p1` marca atendido el turno base
 - **THEN** el turno queda `atendido`
 - **AND** conserva su id, `pa1`, `p1`, `s1`, `pr1` y el intervalo de 09:00 a 09:30
 
@@ -39,6 +39,11 @@ Marcar un turno `confirmado` como atendido SHALL dejarlo en estado `atendido`, y
 - **WHEN** recepción marca ausente el turno base
 - **THEN** el turno queda `ausente`
 - **AND** conserva su id, `pa1`, `p1`, `s1`, `pr1` y el intervalo de 09:00 a 09:30
+
+#### Scenario: Odontólogo de otro profesional no cierra el turno
+- **WHEN** el odontólogo de `p2` marca atendido el turno base
+- **THEN** se rechaza con acceso denegado para el rol `odontologo`
+- **AND** el turno sigue `confirmado`
 
 ### Requirement: Solo transiciones de estado permitidas
 Solo se SHALL confirmar un turno `reservado` y solo se SHALL cerrar (atendido o ausente) un turno `confirmado`. Cualquier otra transición, incluida repetir la misma, MUST rechazarse con `RN-10` informando el estado actual del turno, sin modificarlo (RN-10, DD-20).
