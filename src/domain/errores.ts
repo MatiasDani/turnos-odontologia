@@ -15,7 +15,8 @@ export type CodigoRN =
   | 'RN-18'
   | 'RN-24'
   | 'RN-27'
-  | 'RN-31';
+  | 'RN-31'
+  | 'RN-35';
 export type RecursoBloqueado = 'profesional' | 'sillon';
 
 /** Resultado de una regla pura que no se cumple. */
@@ -28,6 +29,17 @@ export interface Violacion {
   readonly recursoBloqueado?: RecursoBloqueado;
   /** Estado del turno que impide la transición pedida (RN-10). */
   readonly estadoActual?: EstadoTurno;
+  /** Paciente que ya tiene el DNI del alta rápida (RN-35, C-15). */
+  readonly pacienteExistente?: PacienteResumen;
+}
+
+/** Lo que el personal ve de un paciente al buscarlo o darlo de alta (RN-34). */
+export interface PacienteResumen {
+  readonly id: string;
+  readonly nombre: string;
+  readonly apellido: string;
+  readonly dni: string;
+  readonly telefono: string;
 }
 
 export class ReglaNegocioError extends Error {
@@ -37,6 +49,7 @@ export class ReglaNegocioError extends Error {
   readonly bloqueoEnConflicto?: BloqueoHorario;
   readonly recursoBloqueado?: RecursoBloqueado;
   readonly estadoActual?: EstadoTurno;
+  readonly pacienteExistente?: PacienteResumen;
 
   constructor(violacion: Violacion) {
     super(`Regla de negocio violada: ${violacion.codigo}`);
@@ -47,6 +60,7 @@ export class ReglaNegocioError extends Error {
     if (violacion.bloqueoEnConflicto !== undefined) this.bloqueoEnConflicto = violacion.bloqueoEnConflicto;
     if (violacion.recursoBloqueado !== undefined) this.recursoBloqueado = violacion.recursoBloqueado;
     if (violacion.estadoActual !== undefined) this.estadoActual = violacion.estadoActual;
+    if (violacion.pacienteExistente !== undefined) this.pacienteExistente = violacion.pacienteExistente;
   }
 }
 
@@ -67,10 +81,10 @@ export class RecursoNoEncontradoError extends Error {
  * por eso no amplía `CodigoRN`.
  */
 export class ConsultaInvalidaError extends Error {
-  readonly campo: 'rango' | 'paso';
+  readonly campo: 'rango' | 'paso' | 'texto' | 'recurso';
   readonly motivo: string;
 
-  constructor(campo: 'rango' | 'paso', motivo: string) {
+  constructor(campo: 'rango' | 'paso' | 'texto' | 'recurso', motivo: string) {
     super(`Consulta inválida (${campo}): ${motivo}`);
     this.name = 'ConsultaInvalidaError';
     this.campo = campo;
@@ -109,7 +123,11 @@ export type CampoConfiguracion =
   | 'clave'
   | 'rol'
   | 'profesionalId'
-  | 'usuarioId';
+  | 'usuarioId'
+  // Alta rápida de pacientes (C-15, RN-35)
+  | 'dni'
+  | 'telefono'
+  | 'consentimientoContacto';
 
 /**
  * Dato de configuración inválido (RN-29, DD-27). Sin código RN: es validación de entrada, como
@@ -119,12 +137,15 @@ export class ConfiguracionInvalidaError extends Error {
   readonly campo: CampoConfiguracion;
   readonly motivo: string;
   readonly tramoEnConflicto?: HorarioAtencion;
+  /** Todos los campos inválidos, en orden, cuando se validan juntos (alta rápida de pacientes, C-15). */
+  readonly campos: readonly CampoConfiguracion[];
 
-  constructor(campo: CampoConfiguracion, motivo: string, tramoEnConflicto?: HorarioAtencion) {
+  constructor(campo: CampoConfiguracion, motivo: string, tramoEnConflicto?: HorarioAtencion, campos?: readonly CampoConfiguracion[]) {
     super(`Configuración inválida (${campo}): ${motivo}`);
     this.name = 'ConfiguracionInvalidaError';
     this.campo = campo;
     this.motivo = motivo;
+    this.campos = campos ?? [campo];
     if (tramoEnConflicto !== undefined) this.tramoEnConflicto = tramoEnConflicto;
   }
 }

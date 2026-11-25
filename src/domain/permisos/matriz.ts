@@ -22,4 +22,6 @@ export const MATRIZ: Readonly<Record<Accion, Readonly<Record<Rol, Permiso>>>> = 
   'recordatorio.listar': { administrador: 'si', recepcion: 'si', odontologo: 'no', paciente: 'no' },
   'recordatorio.marcarEnviado': { administrador: 'no', recepcion: 'si', odontologo: 'no', paciente: 'no' },
   'usuario.gestionar': { administrador: 'si', recepcion: 'no', odontologo: 'no', paciente: 'no' },
+  'paciente.buscar': { administrador: 'si', recepcion: 'si', odontologo: 'no', paciente: 'no' },
+  'paciente.crear': { administrador: 'si', recepcion: 'si', odontologo: 'no', paciente: 'no' },
 };

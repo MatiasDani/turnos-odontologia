@@ -7,21 +7,21 @@
 ## 1. Mockup y baseline
 
 - [x] 1.1 Aprobación de los mockups de `mockups/` (**aprobado por Lautaro Medina el 2026-11-25**, "mockup aprobado") (índice en `mockups/index.html`, capturas en `mockups/previews/`) por el owner; registrar la fecha en `design-system/README.md` si cambia algo del sistema (no se espera)
-- [ ] 1.2 SAFETY NET: `npm ci`, `npm test`, `npm run typecheck` y `npm run test:ui`; registrar el baseline en verde; si algo falla, detenerse y reportarlo como falla preexistente
-- [ ] 1.3 Verificar que la KB ya tiene RN-34 y RN-35 (`05`), DD-38 a DD-41 (`09`), las filas de pacientes de la matriz (`03`) y la pregunta abierta de alta de usuarios (`10`), como exige la regla dura 6
+- [x] 1.2 SAFETY NET: `npm ci`, `npm test`, `npm run typecheck` y `npm run test:ui`; registrar el baseline en verde; si algo falla, detenerse y reportarlo como falla preexistente
+- [x] 1.3 Verificar que la KB ya tiene RN-34 y RN-35 (`05`), DD-38 a DD-41 (`09`), las filas de pacientes de la matriz (`03`) y la pregunta abierta de alta de usuarios (`10`), como exige la regla dura 6
 
 ## 2. Pacientes desde recepción
 
-- [ ] 2.1 RED/GREEN/TRIANGULATE `normalizarBusqueda` y `coincidePaciente` (`src/domain/reglas/pacientes-recepcion.ts`): recorte, minúsculas, tildes (`Simulada`/`simulada`/`SIMULADA`, `Ñ`), 2 y 3 caracteres, solo dígitos como prefijo de DNI, nombre o apellido parcial; verificar `tests/domain/reglas/pacientes-recepcion.test.ts` en verde
-- [ ] 2.2 Agregar `paciente.buscar` y `paciente.crear` a `ACCIONES` y `MATRIZ` (design D1); actualizar la tabla esperada de `tests/domain/permisos/autorizar.test.ts`; RED/GREEN de los escenarios de "Pacientes por rol" (`specs/control-acceso`); verificar en verde
-- [ ] 2.3 Agregar `'RN-35'` a `CodigoRN` con `pacienteExistente` en `Violacion`/`ReglaNegocioError` y `listar()` a `PacienteRepositorio` y su adaptador en memoria; tests de `errores.test.ts` y `paciente-repositorio.test.ts` en verde sin editar sus casos existentes
-- [ ] 2.4 RED/GREEN `BuscarPacientes` (`src/application/buscar-pacientes.ts`): escenarios de "Búsqueda de pacientes", "Texto de búsqueda mínimo", "Resultado de búsqueda con mínimo dato", "Tope de resultados" y "Pacientes solo para recepción y administrador" (búsqueda) en `tests/application/pacientes-recepcion.test.ts`; verificar en verde
-- [ ] 2.5 RED/GREEN `AltaRapidaPaciente`: escenarios de "Alta rápida de paciente", "DNI único en el alta rápida" y el de alta de "Pacientes solo para recepción y administrador"; verificar que no se modifica `validarDatosPacienteOnline` y que las suites de C-10 siguen en verde
+- [x] 2.1 RED/GREEN/TRIANGULATE `normalizarBusqueda` y `coincidePaciente` (`src/domain/reglas/pacientes-recepcion.ts`): recorte, minúsculas, tildes (`Simulada`/`simulada`/`SIMULADA`, `Ñ`), 2 y 3 caracteres, solo dígitos como prefijo de DNI, nombre o apellido parcial; verificar `tests/domain/reglas/pacientes-recepcion.test.ts` en verde
+- [x] 2.2 Agregar `paciente.buscar` y `paciente.crear` a `ACCIONES` y `MATRIZ` (design D1); actualizar la tabla esperada de `tests/domain/permisos/autorizar.test.ts`; RED/GREEN de los escenarios de "Pacientes por rol" (`specs/control-acceso`); verificar en verde
+- [x] 2.3 Agregar `'RN-35'` a `CodigoRN` con `pacienteExistente` en `Violacion`/`ReglaNegocioError` y `listar()` a `PacienteRepositorio` y su adaptador en memoria; tests de `errores.test.ts` y `paciente-repositorio.test.ts` en verde sin editar sus casos existentes
+- [x] 2.4 RED/GREEN `BuscarPacientes` (`src/application/buscar-pacientes.ts`): escenarios de "Búsqueda de pacientes", "Texto de búsqueda mínimo", "Resultado de búsqueda con mínimo dato", "Tope de resultados" y "Pacientes solo para recepción y administrador" (búsqueda) en `tests/application/pacientes-recepcion.test.ts`; verificar en verde
+- [x] 2.5 RED/GREEN `AltaRapidaPaciente`: escenarios de "Alta rápida de paciente", "DNI único en el alta rápida" y el de alta de "Pacientes solo para recepción y administrador"; verificar que no se modifica `validarDatosPacienteOnline` y que las suites de C-10 siguen en verde
 
 ## 3. Vista de la agenda y catálogo interno
 
-- [ ] 3.1 RED/GREEN `VistaAgenda` (`src/application/vista-agenda.ts`, design D3) sobre `AgendaDiaria`/`AgendaSemanal`: escenarios de "Vista de la agenda con datos para mostrar" (`specs/consulta-agenda`) en `tests/application/vista-agenda.test.ts`; verificar que un turno con un id de catálogo inexistente no rompe la vista (nombre vacío) y que las suites de C-08 siguen en verde sin cambios
-- [ ] 3.2 RED/GREEN `ListarCatalogoInterno`: consultorio, recursos activos ordenados por nombre, prestaciones con duración; solo personal (el paciente recibe acceso denegado); verificar en verde
+- [x] 3.1 RED/GREEN `VistaAgenda` (`src/application/vista-agenda.ts`, design D3) sobre `AgendaDiaria`/`AgendaSemanal`: escenarios de "Vista de la agenda con datos para mostrar" (`specs/consulta-agenda`) en `tests/application/vista-agenda.test.ts`; verificar que un turno con un id de catálogo inexistente no rompe la vista (nombre vacío) y que las suites de C-08 siguen en verde sin cambios
+- [x] 3.2 RED/GREEN `ListarCatalogoInterno`: consultorio, recursos activos ordenados por nombre, prestaciones con duración; solo personal (el paciente recibe acceso denegado); verificar en verde
 
 ## 4. API interna
 

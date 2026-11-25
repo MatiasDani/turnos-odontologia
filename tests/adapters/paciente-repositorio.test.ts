@@ -56,3 +56,16 @@ describe('PacienteRepositorioEnMemoria', () => {
     await expect(repo.obtenerPorId('pa9')).resolves.toBeUndefined();
   });
 });
+
+describe('PacienteRepositorioEnMemoria.listar (C-15)', () => {
+  test('lista todos los pacientes, incluidos los guardados después', async () => {
+    const repo = new PacienteRepositorioEnMemoria(crearEntorno().pacientes);
+    await repo.guardar(pacienteFicticio4);
+    const todos = await repo.listar();
+    expect(todos.map((p) => p.id)).toEqual(['pa1', 'pa2', 'pa3', 'pa4']);
+  });
+
+  test('sin pacientes devuelve una lista vacía', async () => {
+    await expect(new PacienteRepositorioEnMemoria().listar()).resolves.toEqual([]);
+  });
+});

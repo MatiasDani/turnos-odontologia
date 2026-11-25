@@ -136,6 +136,8 @@ export interface PacienteRepositorio {
   obtenerPorId(id: string): Promise<Paciente | undefined>;
   /** Persiste el paciente (alta; si el id ya existe reemplaza el registro). */
   guardar(paciente: Paciente): Promise<void>;
+  /** Todos los pacientes, para la búsqueda del personal (C-15, RN-34). */
+  listar(): Promise<readonly Paciente[]>;
 }
 
 export interface TokenGestionRepositorio {

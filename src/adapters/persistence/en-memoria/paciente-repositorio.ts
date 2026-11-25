@@ -23,6 +23,10 @@ export class PacienteRepositorioEnMemoria implements PacienteRepositorio {
     return Promise.resolve();
   }
 
+  listar(): Promise<readonly Paciente[]> {
+    return Promise.resolve([...this.pacientes]);
+  }
+
   /** Solo para inspección en pruebas (no forma parte del puerto). */
   todos(): readonly Paciente[] {
     return [...this.pacientes];
