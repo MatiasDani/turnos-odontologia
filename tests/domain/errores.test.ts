@@ -169,3 +169,13 @@ describe('ConfiguracionInvalidaError', () => {
     expect(e.tramoEnConflicto).toBe(tramo);
   });
 });
+
+describe('RN-35 (alta rápida con DNI existente, C-15)', () => {
+  test('conserva el paciente existente y el código RN-35', () => {
+    const existente = { id: 'pa1', nombre: 'Carla', apellido: 'Prueba', dni: '00000001', telefono: '+54 9 11 0000-0001' };
+    const e = new ReglaNegocioError({ codigo: 'RN-35', pacienteExistente: existente });
+    expect(e.codigo).toBe('RN-35');
+    expect(e.message).toBe('Regla de negocio violada: RN-35');
+    expect(e.pacienteExistente).toEqual(existente);
+  });
+});

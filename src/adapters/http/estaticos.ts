@@ -15,6 +15,22 @@ export const ARCHIVOS_WEB: readonly string[] = [
   'gestion.js',
 ];
 
+/** Interfaz de recepción (C-15, DD-38): `src/adapters/http/web/recepcion/`, lista blanca. */
+export const ARCHIVOS_RECEPCION: readonly string[] = [
+  'recepcion.css',
+  'api.js',
+  'sesion.js',
+  'formato.js',
+  'dom.js',
+  'login.js',
+  'agenda.js',
+  'grilla.js',
+  'detalle.js',
+  'dar-turno.js',
+  'bloqueo.js',
+  'wa-me.js',
+];
+
 /** Archivos del design system servidos tal cual, sin modificarlos (DD-30). */
 export const ARCHIVOS_DESIGN_SYSTEM: readonly string[] = ['tokens.css', 'brand.js', 'assets/logo.svg'];
 
@@ -49,12 +65,15 @@ function tipoDe(nombre: string): string {
 /** Lee un archivo solo si está en la lista blanca; cualquier otro nombre devuelve `undefined`. */
 export async function leerEstatico(
   raiz: string,
-  carpeta: 'web' | 'design-system',
+  carpeta: 'web' | 'design-system' | 'recepcion',
   nombre: string,
 ): Promise<ArchivoEstatico | undefined> {
-  const permitidos = carpeta === 'web' ? ARCHIVOS_WEB : ARCHIVOS_DESIGN_SYSTEM;
+  const permitidos = carpeta === 'web' ? ARCHIVOS_WEB : carpeta === 'recepcion' ? ARCHIVOS_RECEPCION : ARCHIVOS_DESIGN_SYSTEM;
   if (!permitidos.includes(nombre)) return undefined;
-  const ruta = carpeta === 'web' ? join(raiz, 'src', 'adapters', 'http', 'web', nombre) : join(raiz, 'design-system', nombre);
+  const ruta =
+    carpeta === 'design-system'
+      ? join(raiz, 'design-system', nombre)
+      : join(raiz, 'src', 'adapters', 'http', 'web', ...(carpeta === 'recepcion' ? ['recepcion'] : []), nombre);
   try {
     return { contenido: await readFile(ruta), tipo: tipoDe(nombre) };
   } catch {
@@ -63,6 +82,9 @@ export async function leerEstatico(
 }
 
 /** Páginas HTML de la UI (`reserva.html` y `gestion.html`). */
-export async function leerPagina(raiz: string, pagina: 'reserva.html' | 'gestion.html'): Promise<Buffer> {
+export async function leerPagina(
+  raiz: string,
+  pagina: 'reserva.html' | 'gestion.html' | 'recepcion/login.html' | 'recepcion/agenda.html',
+): Promise<Buffer> {
   return readFile(join(raiz, 'src', 'adapters', 'http', 'web', pagina));
 }

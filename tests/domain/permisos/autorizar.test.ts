@@ -21,12 +21,14 @@ const ESPERADO: Readonly<Record<Accion, Readonly<Record<Rol, Permiso>>>> = {
   'recordatorio.listar': { administrador: 'si', recepcion: 'si', odontologo: 'no', paciente: 'no' },
   'recordatorio.marcarEnviado': { administrador: 'no', recepcion: 'si', odontologo: 'no', paciente: 'no' },
   'usuario.gestionar': { administrador: 'si', recepcion: 'no', odontologo: 'no', paciente: 'no' },
+  'paciente.buscar': { administrador: 'si', recepcion: 'si', odontologo: 'no', paciente: 'no' },
+  'paciente.crear': { administrador: 'si', recepcion: 'si', odontologo: 'no', paciente: 'no' },
 };
 
 const ROLES: readonly Rol[] = ['administrador', 'recepcion', 'odontologo', 'paciente'];
 
 describe('Matriz rol x acción (design D3)', () => {
-  test('lista las 13 acciones del design', () => {
+  test('lista las acciones del design (13 de C-09 y 2 de C-15)', () => {
     expect([...ACCIONES].sort()).toEqual(Object.keys(ESPERADO).sort());
   });
 

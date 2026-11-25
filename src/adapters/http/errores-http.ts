@@ -1,5 +1,14 @@
 import { CredencialesInvalidasError, SesionInvalidaError } from '../../application/errores-autenticacion.js';
-import { AccesoDenegadoError } from '../../domain/errores.js';
+import {
+  AccesoDenegadoError,
+  ConfiguracionInvalidaError,
+  ConsultaInvalidaError,
+  RecursoNoEncontradoError,
+  ReglaNegocioError,
+  type CodigoRN,
+  type PacienteResumen,
+} from '../../domain/errores.js';
+import { ErrorMarcarRecordatorio } from '../../domain/errores-recordatorio.js';
 import { ErrorEnlacePublico } from '../../application/errores-enlace-publico.js';
 import { ErrorGestionTurnoPublica } from '../../application/errores-gestion-turno-publica.js';
 import { ErrorReservaPublica } from '../../application/errores-reserva-publica.js';
@@ -33,6 +42,46 @@ export interface CuerpoError {
     readonly mensaje: string;
     readonly campos?: readonly string[];
     readonly nuevaOferta?: readonly { readonly inicio: string; readonly fin: string }[];
+    /** Rutas internas (C-15): horario del turno o bloqueo en conflicto. */
+    readonly conflicto?: { readonly inicio: string; readonly fin: string };
+    /** Rutas internas (C-15, RN-35): el paciente que ya tiene el DNI. */
+    readonly paciente?: PacienteResumen;
+  };
+}
+
+/**
+ * Mensajes fijos en español de cada regla, para las rutas internas de recepción (C-15, DD-41).
+ * Las rutas públicas nunca llegan acá: traducen antes sus errores (RN-22).
+ */
+export const MENSAJES_RN: Readonly<Record<CodigoRN, string>> = {
+  'RN-02': 'El profesional ya tiene un turno en ese horario.',
+  'RN-03': 'El sillón ya está ocupado en ese horario.',
+  'RN-06': 'La duración no es válida: tiene que ser un entero positivo múltiplo de 5 minutos.',
+  'RN-07': 'El horario está fuera de la atención o hay un bloqueo.',
+  'RN-08': 'El paciente solo puede cancelar o reprogramar con 24 h o más de anticipación.',
+  'RN-10': 'El turno no está en un estado que permita esa acción.',
+  'RN-16': 'Solo el personal del consultorio puede cambiar la duración del turno.',
+  'RN-17': 'El turno tiene que entrar completo en un solo tramo de atención.',
+  'RN-18': 'El profesional, el sillón o la prestación no están activos.',
+  'RN-24': 'Todavía no empezó el turno: no se puede marcar atendido ni ausente.',
+  'RN-27': 'No se puede desactivar: hay turnos futuros que lo usan.',
+  'RN-31': 'No se puede bloquear: hay turnos en ese horario.',
+  'RN-35': 'Ya existe un paciente con ese DNI.',
+};
+
+function errorDeRegla(error: ReglaNegocioError): RespuestaError {
+  const conflicto = error.turnoEnConflicto ?? error.bloqueoEnConflicto;
+  return {
+    estado: 409,
+    inesperado: false,
+    cuerpo: {
+      error: {
+        codigo: error.codigo,
+        mensaje: MENSAJES_RN[error.codigo],
+        ...(conflicto === undefined ? {} : { conflicto: { inicio: conflicto.inicio.toISOString(), fin: conflicto.fin.toISOString() } }),
+        ...(error.pacienteExistente === undefined ? {} : { paciente: error.pacienteExistente }),
+      },
+    },
   };
 }
 
@@ -86,6 +135,18 @@ export function traducirError(error: unknown): RespuestaError {
   }
   if (error instanceof AccesoDenegadoError) {
     return { estado: 403, inesperado: false, cuerpo: { error: { codigo: 'ACCESO_DENEGADO', mensaje: MENSAJE_ACCESO_DENEGADO } } };
+  }
+  if (error instanceof ReglaNegocioError) return errorDeRegla(error);
+  if (error instanceof ErrorMarcarRecordatorio) {
+    const estado = error.codigo === 'RECORDATORIO_NO_ENCONTRADO' ? 404 : 409;
+    return { estado, inesperado: false, cuerpo: { error: { codigo: error.codigo, mensaje: error.message } } };
+  }
+  if (error instanceof RecursoNoEncontradoError) {
+    return { estado: 404, inesperado: false, cuerpo: { error: { codigo: 'NO_ENCONTRADO', mensaje: MENSAJE_NO_ENCONTRADO } } };
+  }
+  if (error instanceof ConfiguracionInvalidaError || error instanceof ConsultaInvalidaError) {
+    const campos = error instanceof ConfiguracionInvalidaError ? error.campos : [error.campo];
+    return traducirError(new ErrorReservaPublica('DATOS_INVALIDOS', { campos: [...campos] }));
   }
   if (esErrorDeParseoDeFastify(error)) {
     const publico = new ErrorReservaPublica('DATOS_INVALIDOS', { campos: ['pedido'] });

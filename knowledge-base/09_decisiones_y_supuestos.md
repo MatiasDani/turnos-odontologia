@@ -369,6 +369,7 @@ C-02 **reutiliza** el `Reloj` (no lo redefine) y C-05 **extiende** `PacienteRepo
 **Alternativas consideradas**: `PATCH` del estado; reutilizar los errores públicos de C-10.
 **Justificación**: cada ruta corresponde a un caso de uso y a una acción de la matriz; recepción necesita saber qué regla falló y con qué turno.
 **Trade-offs aceptados**: muchas rutas pequeñas; un test garantiza que las rutas públicas nunca exponen códigos RN.
+**Precisiones del apply** (2026-11-25, Lautaro Medina): los mensajes fijos viven en `MENSAJES_RN` (`src/adapters/http/errores-http.ts`, 13 códigos); un rechazo RN-31 de un bloqueo devuelve los turnos en conflicto con el nombre del paciente para listarlos; `GET /interno/catalogo` agrega los tramos del horario del consultorio (la vista semana omite los días sin horario, turnos ni bloqueos); `src/composicion.ts` cablea `RecordatoriosConWaMe` sobre los recordatorios por e-mail, de modo que el alta interna y la reserva online programan también el pendiente `wa.me`; `npm start` carga un seed de demo relativo a la fecha del día (6 pacientes ficticios y 8 turnos en los 3 días hábiles siguientes).
 
 ## Supuestos inferidos
 

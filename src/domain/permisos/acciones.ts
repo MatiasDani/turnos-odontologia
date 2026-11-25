@@ -13,6 +13,9 @@ export const ACCIONES = [
   'recordatorio.listar',
   'recordatorio.marcarEnviado',
   'usuario.gestionar',
+  // C-15 (DD-40)
+  'paciente.buscar',
+  'paciente.crear',
 ] as const;
 
 export type Accion = (typeof ACCIONES)[number];

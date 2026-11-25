@@ -65,7 +65,7 @@ describe('Recordatorio de la reserva por HTTP', () => {
     const { token } = r.json();
     const turno = sistema.s.turnos.todos().find((t) => t.inicio.getTime() === local('2026-11-23', '11:00').getTime());
     expect(turno).toBeDefined();
-    const recordatorios = await sistema.s.repoRecordatorios.listarPorTurno(turno?.id ?? '');
+    const recordatorios = (await sistema.s.repoRecordatorios.listarPorTurno(turno?.id ?? '')).filter((x) => x.canal === 'email');
     expect(recordatorios).toHaveLength(1);
     expect(recordatorios[0]).toMatchObject({
       canal: 'email',

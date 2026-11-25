@@ -53,11 +53,12 @@ La agenda del día SHALL mostrar una columna por sillón o por profesional (a el
 - **THEN** ve las columnas `Ana Ejemplo` y `Bruno Muestra` y `Carla Prueba` en la de `Ana Ejemplo`
 
 ### Requirement: Semana de un recurso
-La vista semana SHALL mostrar una columna por día (lunes a sábado con horario, más domingo si tiene turnos o bloqueos) para un solo profesional o sillón elegido en un selector, con el primer profesional activo elegido por defecto (DD-39).
+La vista semana SHALL mostrar una columna por cada día de la semana que tenga horario de atención, turnos o bloqueos, para un solo profesional o sillón elegido en un selector, con el primer profesional activo elegido por defecto (DD-39).
 
 #### Scenario: Semana de un profesional
 - **WHEN** recepción abre la vista semana con `Ana Ejemplo`
-- **THEN** ve las columnas de lunes 23 a sábado 28 y `Carla Prueba` el martes a las 09:00
+- **THEN** ve las columnas de lunes 23 a viernes 27, sin sábado ni domingo porque no tienen horario
+- **AND** ve `Carla Prueba` el martes a las 09:00
 
 ### Requirement: Navegación de fechas y filtros
 La barra de la agenda SHALL permitir ir al día o semana anterior y siguiente, volver a "Hoy" y elegir una fecha, y conservar la vista y el recurso elegidos al navegar.
