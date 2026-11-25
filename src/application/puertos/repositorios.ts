@@ -94,6 +94,8 @@ export type RecursoDeTurno = {
 };
 
 export interface TurnoRepositorio {
+  listarTodos(): Promise<readonly Turno[]>;
+
   /**
    * Operación atómica (RN-12): lee los turnos del profesional y del sillón del candidato,
    * ejecuta `validar` con ellos y, si no hay violación, inserta el candidato. Si hay violación
