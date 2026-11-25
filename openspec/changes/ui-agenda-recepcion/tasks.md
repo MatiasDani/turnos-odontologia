@@ -34,19 +34,19 @@
 
 ## 5. Interfaz de recepción
 
-- [ ] 5.1 Estáticos y páginas: `login.html`, `agenda.html`, `recepcion.css` (componentes del design system sin cambios de valores) y la lista blanca `/recepcion/assets/*`; `tsconfig.web.json` incluye `web/recepcion/*.js`; verificar `npm run typecheck`
-- [ ] 5.2 RED/GREEN `api.js` y `sesion.js` + login: escenarios de "Inicio de sesión" y "Sesión en la pestaña" en `tests/ui/recepcion-sesion.ui.test.ts`; verificar `npm run test:ui` en verde
-- [ ] 5.3 RED/GREEN `grilla.js` y `agenda.js`: escenarios de "Agenda del día por sillón o por profesional", "Semana de un recurso", "Navegación de fechas y filtros" y "Estados de carga, vacío y error"; verificar en verde
-- [ ] 5.4 RED/GREEN `detalle.js`: escenarios de "Detalle y acciones de un turno", "Cancelar con confirmación" y "Reprogramar eligiendo un hueco"; verificar en verde
-- [ ] 5.5 RED/GREEN `dar-turno.js`: escenarios de "Dar turno con búsqueda y alta rápida" y "Mensajes de reglas de negocio"; verificar en verde
-- [ ] 5.6 RED/GREEN `bloqueo.js` y `wa-me.js`: escenarios de "Bloquear y liberar horarios" y "Pendientes de WhatsApp"; verificar en verde
-- [ ] 5.7 RED/GREEN escenarios de "Lo que ve el odontólogo" y "Accesibilidad de la agenda" (Tab y Enter, nombres accesibles, foco que vuelve al cerrar diálogos, objetivos de 44 px, sin scroll horizontal a 1440 px); verificar en verde
+- [x] 5.1 Estáticos y páginas: `login.html`, `agenda.html`, `recepcion.css` (componentes del design system sin cambios de valores) y la lista blanca `/recepcion/assets/*`; `tsconfig.web.json` incluye `web/recepcion/*.js`; verificar `npm run typecheck`
+- [x] 5.2 RED/GREEN `api.js` y `sesion.js` + login: escenarios de "Inicio de sesión" y "Sesión en la pestaña" en `tests/ui/recepcion.ui.test.ts` (un solo archivo para todos los escenarios, con el arnés `tests/ui/arnes-recepcion.ts`); verificar `npm run test:ui` en verde
+- [x] 5.3 RED/GREEN `grilla.js` y `agenda.js`: escenarios de "Agenda del día por sillón o por profesional", "Semana de un recurso", "Navegación de fechas y filtros" y "Estados de carga, vacío y error"; verificar en verde
+- [x] 5.4 RED/GREEN `detalle.js`: escenarios de "Detalle y acciones de un turno", "Cancelar con confirmación" y "Reprogramar eligiendo un hueco"; verificar en verde
+- [x] 5.5 RED/GREEN `dar-turno.js`: escenarios de "Dar turno con búsqueda y alta rápida" y "Mensajes de reglas de negocio"; verificar en verde
+- [x] 5.6 RED/GREEN `bloqueo.js` y `wa-me.js`: escenarios de "Bloquear y liberar horarios" y "Pendientes de WhatsApp"; verificar en verde
+- [x] 5.7 RED/GREEN escenarios de "Lo que ve el odontólogo" y "Accesibilidad de la agenda" (Tab y Enter, nombres accesibles, foco que vuelve al cerrar diálogos, objetivos de 44 px, sin scroll horizontal a 1440 px); verificar en verde
 
 ## 6. Verificación visual e integración
 
-- [ ] 6.1 Capturas de 1440 × 900 de las pantallas implementadas en `verify/` y comparación con los mockups aprobados; anotar diferencias y corregirlas o justificarlas
-- [ ] 6.2 Suite completa, `npm run test:ui`, `npm run typecheck`, `npm run build` y `openspec validate ui-agenda-recepcion --strict` en verde; `grep` de `any`, `innerHTML` con datos y `localStorage` en `web/recepcion/` (reglas duras 1 y design D5)
-- [ ] 6.3 Actualizar la KB con lo que precise el apply (mensajes por código RN, rutas) y marcar como resueltas las preguntas de `10` que cierra C-15
+- [x] 6.1 Capturas de 1440 × 900 de las pantallas implementadas en `verify/` y comparación con los mockups aprobados; anotar diferencias y corregirlas o justificarlas
+- [x] 6.2 Suite completa, `npm run test:ui`, `npm run typecheck`, `npm run build` y `openspec validate ui-agenda-recepcion --strict` en verde; `grep` de `any`, `innerHTML` con datos y `localStorage` en `web/recepcion/` (reglas duras 1 y design D5)
+- [x] 6.3 Actualizar la KB con lo que precise el apply (mensajes por código RN, rutas) y marcar como resueltas las preguntas de `10` que cierra C-15
 
 ## Workflow follow-up
 
