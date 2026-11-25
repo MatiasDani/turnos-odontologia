@@ -4,6 +4,7 @@ import { describe, expect, test } from 'vitest';
 import { RecursoNoEncontradoError, ReglaNegocioError } from '../../src/domain/errores.js';
 import { cancelar, crearSistemaCancelacion, rechazo, turnoBaseCancelacion } from '../fixtures/sistema.js';
 import { local, LUNES } from '../fixtures/seed.js';
+import { actores } from '../fixtures/actores.js';
 
 const DOMINGO = '2026-11-22';
 
@@ -146,7 +147,7 @@ describe('Personal del consultorio sin restricción de anticipación', () => {
 describe('Cancelar libera el horario', () => {
   const turnoNuevo = (sistema: ReturnType<typeof crearSistemaCancelacion>) =>
     sistema.agendarTurno.ejecutar({
-      actor: { rol: 'recepcion' },
+      actor: actores.recepcion,
       pacienteId: 'pa2',
       profesionalId: 'p1',
       sillonId: 's1',
@@ -174,7 +175,7 @@ describe('Cancelar libera el horario', () => {
     const sistema = crearSistemaCancelacion({ turnos: [turnoBaseCancelacion()] });
     const consultaDelLunes = () =>
       sistema.consultarDisponibilidad.ejecutar({
-        actor: { rol: 'recepcion' },
+        actor: actores.recepcion,
         prestacionId: 'pr1',
         rango: { desde: local(LUNES, '00:00'), hasta: local('2026-11-24', '00:00') },
         ahora: local(DOMINGO, '08:00'),

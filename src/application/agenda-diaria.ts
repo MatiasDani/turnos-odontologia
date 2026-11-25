@@ -2,6 +2,7 @@ import type { Actor } from '../domain/actor.js';
 import type { BloqueoHorario } from '../domain/bloqueo-horario.js';
 import { esActivo, type Turno } from '../domain/turno.js';
 import { AccesoDenegadoError } from '../domain/errores.js';
+import { permite, permiteSobre } from '../domain/permisos/autorizar.js';
 import { esFechaLocalValida, fechaLocal } from '../domain/reglas/horizonte-reserva.js';
 import type {
   BloqueoRepositorio,
@@ -41,12 +42,10 @@ export class AgendaDiaria {
     fechas: readonly string[],
   ): Promise<(ResultadoAgendaDiaria & { fecha: string })[]> {
     const { actor, sillonId } = consulta;
-    if (actor.rol === 'paciente' || (actor.rol === 'odontologo' && !actor.profesionalId)) {
-      throw new AccesoDenegadoError(actor.rol, 'consultar agenda diaria');
-    }
+    if (!permite(actor, 'agenda.ver')) throw new AccesoDenegadoError(actor.rol, 'consultar agenda diaria');
 
     const profesionalPropio = actor.rol === 'odontologo' ? actor.profesionalId : undefined;
-    if (profesionalPropio && consulta.profesionalId !== undefined && consulta.profesionalId !== profesionalPropio) {
+    if (consulta.profesionalId !== undefined && !permiteSobre(actor, 'agenda.ver', { profesionalId: consulta.profesionalId })) {
       throw new AccesoDenegadoError(actor.rol, 'consultar agenda ajena');
     }
 

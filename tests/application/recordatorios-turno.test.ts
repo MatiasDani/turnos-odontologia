@@ -15,6 +15,7 @@ import {
   reservarOnlinePa1,
   tokenDelMensaje,
 } from '../fixtures/sistema-recordatorios.js';
+import { actores } from '../fixtures/actores.js';
 
 const SABADO_ANTERIOR = '2026-11-21';
 const MARTES = '2026-11-24';
@@ -133,7 +134,7 @@ describe('La cancelación anula el recordatorio pendiente', () => {
   test('Cancelar el turno anula el pendiente', async () => {
     const sistema = crearSistemaRecordatorios();
     const turno = await agendarRecepcion(sistema);
-    await sistema.cancelarTurno.ejecutar({ turnoId: turno.id, actor: { rol: 'recepcion' } });
+    await sistema.cancelarTurno.ejecutar({ turnoId: turno.id, actor: actores.recepcion });
     const recordatorios = await recordatoriosDe(sistema, turno.id);
     expect(recordatorios.map((r) => r.estado)).toEqual(['cancelado']);
     await barrido(sistema, DOMINGO, '09:00');
@@ -147,7 +148,7 @@ describe('La cancelación anula el recordatorio pendiente', () => {
     if (original === undefined) throw new Error('falta el recordatorio original');
     const enviado = { ...original, estado: 'enviado' as const, enviadoEn: local(DOMINGO, '09:00') };
     await sistema.repoRecordatorios.guardar(enviado);
-    await sistema.cancelarTurno.ejecutar({ turnoId: turno.id, actor: { rol: 'recepcion' } });
+    await sistema.cancelarTurno.ejecutar({ turnoId: turno.id, actor: actores.recepcion });
     await expect(recordatoriosDe(sistema, turno.id)).resolves.toEqual([enviado]);
   });
 });
@@ -192,7 +193,7 @@ describe('El barrido revalida el turno antes de enviar', () => {
     const sistema = crearSistemaRecordatorios({ fallarAnulacion: true });
     const turno = await agendarRecepcion(sistema);
     await expect(
-      sistema.cancelarTurno.ejecutar({ turnoId: turno.id, actor: { rol: 'recepcion' } }),
+      sistema.cancelarTurno.ejecutar({ turnoId: turno.id, actor: actores.recepcion }),
     ).rejects.toThrow('anulación de recordatorios caída');
     expect((await recordatoriosDe(sistema, turno.id)).map((r) => r.estado)).toEqual(['pendiente']);
     await barrido(sistema, DOMINGO, '09:00');
@@ -406,7 +407,7 @@ describe('Enlace inválido sin revelar datos', () => {
 
   test('Turno cancelado', async () => {
     const { sistema, turnoId, tokenRecordatorio } = await reservaConRecordatorio();
-    await sistema.cancelarTurno.ejecutar({ turnoId, actor: { rol: 'recepcion' } });
+    await sistema.cancelarTurno.ejecutar({ turnoId, actor: actores.recepcion });
     esperarErrorGenerico(await rechazoEnlace(sistema.confirmarDesdeEnlace.ejecutar({ token: tokenRecordatorio })));
   });
 

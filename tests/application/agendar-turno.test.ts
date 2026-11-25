@@ -4,6 +4,7 @@ import { crearTurno, LUNES, local, MIERCOLES, SABADO } from '../fixtures/seed.js
 import { RecursoNoEncontradoError, ReglaNegocioError } from '../../src/domain/errores.js';
 import { crearEntorno } from '../fixtures/seed.js';
 import { agendar, crearSistema } from '../fixtures/sistema.js';
+import { actores } from '../fixtures/actores.js';
 
 describe('Ocupación conjunta de profesional y sillón', () => {
   test('Distinto profesional y sillón en el mismo horario', async () => {
@@ -201,7 +202,7 @@ describe('Horario de atención en la zona del consultorio', () => {
 
   test('Instante UTC convertido a hora local', async () => {
     const turno = await crearSistema().agendarTurno.ejecutar({
-      actor: { rol: 'recepcion' },
+      actor: actores.recepcion,
       pacienteId: 'pa1',
       profesionalId: 'p1',
       sillonId: 's1',
@@ -214,7 +215,7 @@ describe('Horario de atención en la zona del consultorio', () => {
   test('Instante UTC fuera de horario local', async () => {
     await expect(
       crearSistema().agendarTurno.ejecutar({
-        actor: { rol: 'recepcion' },
+        actor: actores.recepcion,
         pacienteId: 'pa1',
         profesionalId: 'p1',
         sillonId: 's1',

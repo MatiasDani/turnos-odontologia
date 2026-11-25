@@ -21,10 +21,11 @@ import { RecordatoriosEspia } from './recordatorios-espia.js';
 import { RelojFijo } from './reloj-fijo.js';
 import { GeneradorIdConPrefijo, GeneradorIdSecuencial } from './sistema.js';
 import { TurnoRepositorioDePrueba } from './turno-repositorio-de-prueba.js';
+import { actores } from './actores.js';
 
-export const ADMINISTRADOR: Actor = { rol: 'administrador' };
-export const RECEPCION: Actor = { rol: 'recepcion' };
-export const ODONTOLOGO: Actor = { rol: 'odontologo' };
+export const ADMINISTRADOR: Actor = actores.administrador;
+export const RECEPCION: Actor = actores.recepcion;
+export const ODONTOLOGO: Actor = actores.odontologo();
 export const PACIENTE: Actor = { rol: 'paciente' };
 
 /** Lunes 2026-11-23 10:00 local: el `ahora` del contexto común de los specs de C-05. */

@@ -2,9 +2,10 @@ import { describe, expect, test } from 'vitest';
 import type { Actor, Rol } from '../../../src/domain/actor.js';
 import { duracionEfectiva, validarDuracion } from '../../../src/domain/reglas/duracion.js';
 import { crearEntorno } from '../../fixtures/seed.js';
+import { actorDeRol } from '../../fixtures/actores.js';
 
 const pr1 = crearEntorno().prestaciones[0]!; // 30 min
-const actor = (rol: Rol): Actor => ({ rol });
+const actor = (rol: Rol): Actor => actorDeRol(rol);
 
 describe('duración efectiva (RN-06, RN-16)', () => {
   test('Duración por defecto de la prestación', () => {

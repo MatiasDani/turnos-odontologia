@@ -327,7 +327,7 @@ C-02 **reutiliza** el `Reloj` (no lo redefine) y C-05 **extiende** `PacienteRepo
 **Trade-offs aceptados**: cambian escenarios de C-01, C-02 y C-03 donde el odontólogo agendaba o cancelaba.
 
 ### DD-35 — Usuarios internos gestionados por el administrador
-**Decisión** (2026-11-25, propose de C-09, Lautaro Medina): solo el administrador crea, desactiva, reactiva y restablece la clave de usuarios; no se puede desactivar al último administrador activo. Política de clave RN-31. Al arrancar sin usuarios se crea un administrador desde `ADMIN_EMAIL_INICIAL` y `ADMIN_CLAVE_INICIAL` (ambas o ninguna). El usuario no cambia su propia clave en el MVP.
+**Decisión** (2026-11-25, propose de C-09, Lautaro Medina): solo el administrador crea, desactiva, reactiva y restablece la clave de usuarios; no se puede desactivar al último administrador activo. Política de clave RN-32. Al arrancar sin usuarios se crea un administrador desde `ADMIN_EMAIL_INICIAL` y `ADMIN_CLAVE_INICIAL` (ambas o ninguna). El usuario no cambia su propia clave en el MVP.
 **Contexto**: la matriz da al administrador CRUD de Usuario; los repositorios son en memoria.
 **Alternativas consideradas**: usuarios fijos en el seed; autoalta.
 **Justificación**: cumple la matriz y evita credenciales en el código (regla dura 9).
@@ -340,7 +340,7 @@ C-02 **reutiliza** el `Reloj` (no lo redefine) y C-05 **extiende** `PacienteRepo
 **Trade-offs aceptados**: algo menos resistente a GPU que argon2.
 
 ### DD-37 — Sesión con JWT y resolución en cada pedido
-**Decisión** (2026-11-25, propose de C-09, Lautaro Medina): JWT HS256 firmado con `JWT_SECRET` (≥ 32 caracteres) usando la librería `jose`; solo lleva `sub`, `iat`, `exp`, `iss` y `aud`; vence a las 8 h (RN-32). En cada pedido se verifica con la hora del `Reloj` y se arma el actor con los datos actuales del usuario. Errores públicos: `CREDENCIALES_INVALIDAS` 401 (mismo mensaje para e-mail inexistente, clave incorrecta o usuario inactivo), `SESION_INVALIDA` 401 y `ACCESO_DENEGADO` 403. Rutas `POST /auth/login`, `GET /auth/sesion` y un `preHandler` para las rutas internas de C-15.
+**Decisión** (2026-11-25, propose de C-09, Lautaro Medina): JWT HS256 firmado con `JWT_SECRET` (≥ 32 caracteres) usando la librería `jose`; solo lleva `sub`, `iat`, `exp`, `iss` y `aud`; vence a las 8 h (RN-33). En cada pedido se verifica con la hora del `Reloj` y se arma el actor con los datos actuales del usuario. Errores públicos: `CREDENCIALES_INVALIDAS` 401 (mismo mensaje para e-mail inexistente, clave incorrecta o usuario inactivo), `SESION_INVALIDA` 401 y `ACCESO_DENEGADO` 403. Rutas `POST /auth/login`, `GET /auth/sesion` y un `preHandler` para las rutas internas de C-15.
 **Alternativas consideradas**: token opaco guardado como hash (permite cerrar sesión, pero contradice la KB); `jsonwebtoken`; JWT hecho a mano.
 **Justificación**: respeta la KB, no guarda estado de sesión y la resolución por pedido hace efectiva la desactivación de un usuario.
 **Trade-offs aceptados**: no hay cierre de sesión anticipado; sin límite de intentos de login en el MVP (pregunta abierta).

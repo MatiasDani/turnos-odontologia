@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "fastify": "^5.12.8",
+    "jose": "^6.2.18",
     "nodemailer": "^10.6.1"
   }
 }

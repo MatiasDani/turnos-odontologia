@@ -2,10 +2,11 @@ import { describe, expect, test } from 'vitest';
 import type { Rol } from '../../../src/domain/actor.js';
 import { validarAlta, type EntradaValidacion } from '../../../src/domain/reglas/validar-alta.js';
 import { crearEntorno, crearTurno, LUNES, local, MIERCOLES, SABADO } from '../../fixtures/seed.js';
+import { actorDeRol } from '../../fixtures/actores.js';
 
 const e = crearEntorno();
 const base = (rol: Rol = 'recepcion'): EntradaValidacion => ({
-  actor: { rol },
+  actor: actorDeRol(rol),
   profesional: e.profesionales[0]!,
   sillon: e.sillones[0]!,
   prestacion: e.prestaciones[0]!, // pr1 30 min

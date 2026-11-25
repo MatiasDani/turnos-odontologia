@@ -2,6 +2,7 @@ import { expect, test } from 'vitest';
 import { AccesoDenegadoError } from '../../src/domain/errores.js';
 import { componerNucleo } from '../../src/composicion.js';
 import { crearEntorno, crearTurno, LUNES, local, MARTES } from '../fixtures/seed.js';
+import { actores } from '../fixtures/actores.js';
 
 test('La semana agrupa por fecha local y conserva los estados sin ocupación', async () => {
   const domingo = '2026-11-29';
@@ -24,7 +25,7 @@ test('La semana agrupa por fecha local y conserva los estados sin ocupación', a
     datos,
     reloj: { ahora: () => local(LUNES, '08:00') },
   });
-  const actor = { rol: 'recepcion' } as const;
+  const actor = actores.recepcion;
 
   const semana = await agendaSemanal.ejecutar({ actor, fecha: MARTES });
 
@@ -50,7 +51,7 @@ test('La agenda semanal aplica los filtros y el permiso del odontólogo', async 
     ],
   });
   const { agendaSemanal } = componerNucleo({ datos, reloj: { ahora: () => local(LUNES, '08:00') } });
-  const actor = { rol: 'odontologo', profesionalId: 'p1' } as const;
+  const actor = actores.odontologo('p1');
 
   const semana = await agendaSemanal.ejecutar({ actor, fecha: LUNES, sillonId: 's2' });
 

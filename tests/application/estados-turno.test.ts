@@ -14,6 +14,7 @@ import {
   turnoBaseCancelacion,
 } from '../fixtures/sistema.js';
 import { local, LUNES, MIERCOLES } from '../fixtures/seed.js';
+import { actores } from '../fixtures/actores.js';
 
 const DOMINGO = '2026-11-22';
 const MARTES = '2026-11-24';
@@ -216,7 +217,7 @@ describe('Orden de evaluación de los rechazos', () => {
 describe('La ausencia libera el horario', () => {
   function agendarPa2(sistema: SistemaCancelacion, sillonId: string): Promise<Turno> {
     return sistema.agendarTurno.ejecutar({
-      actor: { rol: 'recepcion' },
+      actor: actores.recepcion,
       pacienteId: 'pa2',
       profesionalId: 'p1',
       sillonId,

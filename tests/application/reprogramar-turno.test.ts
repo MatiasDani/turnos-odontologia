@@ -9,6 +9,7 @@ import {
   turnoBaseCancelacion,
 } from '../fixtures/sistema.js';
 import { crearEntorno, crearTurno, local, LUNES, MARTES, MIERCOLES } from '../fixtures/seed.js';
+import { actores } from '../fixtures/actores.js';
 
 const DOMINGO = '2026-11-22';
 const martes = (hhmm: string) => local(MARTES, hhmm);
@@ -210,7 +211,7 @@ describe('Atomicidad y liberación del horario original', () => {
     });
     const error = await rechazo(
       sistema.agendarTurno.ejecutar({
-        actor: { rol: 'recepcion' },
+        actor: actores.recepcion,
         pacienteId: 'pa2',
         profesionalId: 'p1',
         sillonId: 's1',
@@ -225,7 +226,7 @@ describe('Atomicidad y liberación del horario original', () => {
     const sistema = crearSistemaReprogramacion({ turnos: [base()] });
     await reprogramar(sistema, { turnoId: 't-base', inicio: martes('10:00') });
     const nuevo = await sistema.agendarTurno.ejecutar({
-      actor: { rol: 'recepcion' },
+      actor: actores.recepcion,
       pacienteId: 'pa2',
       profesionalId: 'p1',
       sillonId: 's1',

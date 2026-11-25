@@ -2,7 +2,7 @@
 
 ## Context
 
-Ver `proposal.md` (Why) y los specs de `specs/` (requisitos). Las decisiones de negocio están en RN-31 y RN-32 (`knowledge-base/05_reglas_de_negocio.md`), DD-33 a DD-37 (`09_decisiones_y_supuestos.md`) y la matriz de `03_actores_y_roles.md`. Estado actual relevante (con C-06 y C-08 mergeados):
+Ver `proposal.md` (Why) y los specs de `specs/` (requisitos). Las decisiones de negocio están en RN-32 y RN-33 (`knowledge-base/05_reglas_de_negocio.md`), DD-33 a DD-37 (`09_decisiones_y_supuestos.md`) y la matriz de `03_actores_y_roles.md`. Estado actual relevante (con C-06 y C-08 mergeados):
 
 - `src/domain/actor.ts`: `Actor { rol: Rol; profesionalId?: string }`. Nada impide armar un odontólogo sin `profesionalId` ni un administrador con uno.
 - `src/application/control-acceso.ts`: tres funciones sueltas que lanzan `AccesoDenegadoError(rol, operacion)` (`src/domain/errores.ts`, DD-28): `exigirAdministrador` (C-05), `exigirPermisoBloqueo` y `exigirPermisoLiberarBloqueo` (C-06). La agenda de C-08 controla al odontólogo en su propio caso de uso. `operacion` es texto libre.
@@ -35,7 +35,7 @@ src/domain/permisos/acciones.ts        NUEVO: type Accion (lista cerrada)
 src/domain/permisos/matriz.ts          NUEVO: MATRIZ rol x accion -> 'si' | 'propio' | 'no'
 src/domain/permisos/autorizar.ts       NUEVO: autorizar(actor, accion), autorizarSobre(actor, accion, recurso)
 src/domain/usuario.ts                  NUEVO: Usuario, RolInterno
-src/domain/reglas/usuario.ts           NUEVO: normalizarEmail, validarDatosUsuario, validarClave (RN-31), puras
+src/domain/reglas/usuario.ts           NUEVO: normalizarEmail, validarDatosUsuario, validarClave (RN-32), puras
 src/domain/errores.ts                  CampoConfiguracion + 'email' | 'clave' | 'rol' | 'profesionalId' | 'usuarioId'
 src/application/control-acceso.ts      sus tres funciones delegan en autorizar/autorizarSobre (compatibilidad)
 src/application/puertos/usuarios.ts    NUEVO: UsuarioRepositorio, HasherClaves, EmisorSesion
@@ -124,8 +124,8 @@ Puerto `HasherClaves { hashear(clave): Promise<string>; verificar(clave, hash): 
 
 Puerto `EmisorSesion { emitir(usuarioId, ahora): Promise<{ token; venceEn }>; verificar(token, ahora): Promise<string | null> }`. Adaptador `EmisorSesionJose`:
 
-- HS256 con `JWT_SECRET` (32 caracteres o más, validado al arrancar). Claims: `sub` = `usuarioId`, `iat`, `exp` = `ahora + 8 h` (RN-32), `iss` y `aud` = `turnos-odontologia`. El token no lleva rol, e-mail ni profesional.
-- `verificar` usa `jwtVerify` con `algorithms: ['HS256']`, `issuer`, `audience` y `currentDate: ahora` del `Reloj` (regla dura 3: la hora nunca sale del sistema). Cualquier excepción de `jose` (firma, formato, vencido, `alg` distinto) se traduce a `null`. `jose` considera vencido cuando `exp <= ahora`, que es lo que pide RN-32.
+- HS256 con `JWT_SECRET` (32 caracteres o más, validado al arrancar). Claims: `sub` = `usuarioId`, `iat`, `exp` = `ahora + 8 h` (RN-33), `iss` y `aud` = `turnos-odontologia`. El token no lleva rol, e-mail ni profesional.
+- `verificar` usa `jwtVerify` con `algorithms: ['HS256']`, `issuer`, `audience` y `currentDate: ahora` del `Reloj` (regla dura 3: la hora nunca sale del sistema). Cualquier excepción de `jose` (firma, formato, vencido, `alg` distinto) se traduce a `null`. `jose` considera vencido cuando `exp <= ahora`, que es lo que pide RN-33.
 - `jose` va en `dependencies` con la versión fijada por `package-lock` (6.2.x): es ESM, sin dependencias transitivas y mantenido. **Alternativas**: `jsonwebtoken` (CommonJS, varias dependencias) y un JWT hecho a mano (riesgo de errores de verificación); token opaco guardado como hash (descartado por el equipo para respetar la KB).
 
 ### D8. Casos de uso de autenticación y usuarios

@@ -6,16 +6,16 @@
 
 ## 1. Safety net, KB y dependencia
 
-- [ ] 1.1 SAFETY NET: `npm ci`, `npm test` y `npm run typecheck`; registrar el baseline en verde. Si algo falla, detenerse y reportarlo como falla preexistente
-- [ ] 1.2 Verificar que la KB ya tiene (se actualizó en el propose) RN-31 y RN-32 (`05`), DD-33 a DD-37 (`09`), la matriz completa (`03`), `Usuario` (`04`), las variables (`08`) y las preguntas cerradas (`10`), como exige la regla dura 6; si falta algo, completarlo antes de codear
-- [ ] 1.3 `npm install jose` (6.2.x) y verificar que queda en `dependencies` y en `package-lock.json`, y que `npm test` sigue en verde
+- [x] 1.1 SAFETY NET: `npm ci`, `npm test` y `npm run typecheck`; registrar el baseline en verde. Si algo falla, detenerse y reportarlo como falla preexistente
+- [x] 1.2 Verificar que la KB ya tiene (se actualizó en el propose) RN-32 y RN-33 (`05`), DD-33 a DD-37 (`09`), la matriz completa (`03`), `Usuario` (`04`), las variables (`08`) y las preguntas cerradas (`10`), como exige la regla dura 6; si falta algo, completarlo antes de codear
+- [x] 1.3 `npm install jose` (6.2.x) y verificar que queda en `dependencies` y en `package-lock.json`, y que `npm test` sigue en verde
 
 ## 2. Política de permisos pura (dominio)
 
-- [ ] 2.1 RED/GREEN/TRIANGULATE `Actor` discriminado (`src/domain/actor.ts`, design D2) con `expectTypeOf`: odontólogo sin `profesionalId` y recepción con `profesionalId` no compilan; crear helpers de actores en `tests/fixtures/actores.ts` y migrar los fixtures y tests que arman actores literales, sin cambiar sus títulos ni expectativas; verificar `npm run typecheck` y la suite completa en verde
-- [ ] 2.2 RED/GREEN/TRIANGULATE `Accion`, `MATRIZ` y `autorizar` (`src/domain/permisos/`, design D3): test tabular de las 13 acciones × 4 roles contra la tabla del design; verificar `tests/domain/permisos/autorizar.test.ts` en verde
-- [ ] 2.3 RED/GREEN/TRIANGULATE `autorizarSobre`: odontólogo propio y ajeno, paciente con su `turnoId`, con otro y sin `turnoId`, celdas `si` que no miran el recurso; el mensaje del error no contiene datos del recurso; verificar en verde y que `src/domain` no importa infraestructura ni usa `new Date()` / `Date.now()`
-- [ ] 2.4 Hacer que `exigirAdministrador`, `exigirPermisoBloqueo`, `exigirPermisoLiberarBloqueo` y el control de `AgendaDiaria`/`AgendaSemanal` deleguen en `autorizar`/`autorizarSobre` (design D4); verificar que las suites de C-05, C-06 y C-08 siguen en verde SIN modificar sus casos
+- [x] 2.1 RED/GREEN/TRIANGULATE `Actor` discriminado (`src/domain/actor.ts`, design D2) con `expectTypeOf`: odontólogo sin `profesionalId` y recepción con `profesionalId` no compilan; crear helpers de actores en `tests/fixtures/actores.ts` y migrar los fixtures y tests que arman actores literales, sin cambiar sus títulos ni expectativas; verificar `npm run typecheck` y la suite completa en verde
+- [x] 2.2 RED/GREEN/TRIANGULATE `Accion`, `MATRIZ` y `autorizar` (`src/domain/permisos/`, design D3): test tabular de las 13 acciones × 4 roles contra la tabla del design; verificar `tests/domain/permisos/autorizar.test.ts` en verde
+- [x] 2.3 RED/GREEN/TRIANGULATE `autorizarSobre`: odontólogo propio y ajeno, paciente con su `turnoId`, con otro y sin `turnoId`, celdas `si` que no miran el recurso; el mensaje del error no contiene datos del recurso; verificar en verde y que `src/domain` no importa infraestructura ni usa `new Date()` / `Date.now()`
+- [x] 2.4 Hacer que `exigirAdministrador`, `exigirPermisoBloqueo`, `exigirPermisoLiberarBloqueo` y el control de `AgendaDiaria`/`AgendaSemanal` deleguen en `autorizar`/`autorizarSobre` (design D4); verificar que las suites de C-05, C-06 y C-08 siguen en verde SIN modificar sus casos
 - [ ] 2.5 **CHECKPOINT 1**: mostrar la matriz implementada y el diff de `src/domain/permisos/`; esperar la revisión antes de tocar casos de uso
 
 ## 3. Control de acceso en los casos de uso de turnos

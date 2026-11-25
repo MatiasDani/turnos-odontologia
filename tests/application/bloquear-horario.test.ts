@@ -4,6 +4,7 @@ import { LiberarBloqueo } from '../../src/application/liberar-bloqueo.js';
 import { AccesoDenegadoError, RecursoNoEncontradoError, ReglaNegocioError } from '../../src/domain/errores.js';
 import { agendar, crearSistemaBloqueo } from '../fixtures/sistema.js';
 import { crearTurno, LUNES, local, MARTES } from '../fixtures/seed.js';
+import { actores } from '../fixtures/actores.js';
 
 describe('Alta de bloqueos válidos', () => {
   test('Bloqueo de profesional sin turnos', async () => {
@@ -15,7 +16,7 @@ describe('Alta de bloqueos válidos', () => {
     });
 
     const bloqueo = await useCase.ejecutar({
-      actor: { rol: 'recepcion' },
+      actor: actores.recepcion,
       profesionalId: 'p1',
       inicio: local(LUNES, '15:00'),
       fin: local(LUNES, '17:00'),
@@ -41,7 +42,7 @@ describe('Alta de bloqueos válidos', () => {
     });
 
     const bloqueo = await useCase.ejecutar({
-      actor: { rol: 'administrador' },
+      actor: actores.administrador,
       sillonId: 's1',
       inicio: local(MARTES, '09:00'),
       fin: local(MARTES, '12:00'),
@@ -67,7 +68,7 @@ describe('Alta de bloqueos válidos', () => {
     });
 
     const bloqueo = await useCase.ejecutar({
-      actor: { rol: 'recepcion' },
+      actor: actores.recepcion,
       profesionalId: 'p2',
       sillonId: 's2',
       inicio: local(LUNES, '10:00'),
@@ -97,7 +98,7 @@ describe('Conflicto con turnos activos preexistentes', () => {
 
     await expect(
       useCase.ejecutar({
-        actor: { rol: 'recepcion' },
+        actor: actores.recepcion,
         profesionalId: 'p1',
         inicio: local(LUNES, '10:30'),
         fin: local(LUNES, '12:00'),
@@ -129,7 +130,7 @@ describe('Conflicto con turnos activos preexistentes', () => {
 
     await expect(
       useCase.ejecutar({
-        actor: { rol: 'administrador' },
+        actor: actores.administrador,
         sillonId: 's1',
         inicio: local(LUNES, '10:00'),
         fin: local(LUNES, '12:00'),
@@ -166,7 +167,7 @@ describe('Conflicto con turnos activos preexistentes', () => {
     });
 
     const bloqueo = await useCase.ejecutar({
-      actor: { rol: 'recepcion' },
+      actor: actores.recepcion,
       profesionalId: 'p1',
       inicio: local(LUNES, '09:00'),
       fin: local(LUNES, '10:00'),
@@ -192,7 +193,7 @@ describe('Intervalos contiguos válidos', () => {
     });
 
     const bloqueo = await useCase.ejecutar({
-      actor: { rol: 'recepcion' },
+      actor: actores.recepcion,
       profesionalId: 'p1',
       inicio: local(LUNES, '10:00'),
       fin: local(LUNES, '11:00'),
@@ -216,7 +217,7 @@ describe('Intervalos contiguos válidos', () => {
     });
 
     const bloqueo = await useCase.ejecutar({
-      actor: { rol: 'recepcion' },
+      actor: actores.recepcion,
       profesionalId: 'p1',
       inicio: local(LUNES, '10:00'),
       fin: local(LUNES, '11:00'),
@@ -235,7 +236,7 @@ describe('Control de acceso por rol', () => {
     });
 
     const bloqueo = await useCase.ejecutar({
-      actor: { rol: 'odontologo', profesionalId: 'p1' },
+      actor: actores.odontologo('p1'),
       profesionalId: 'p1',
       inicio: local(LUNES, '15:00'),
       fin: local(LUNES, '16:00'),
@@ -253,7 +254,7 @@ describe('Control de acceso por rol', () => {
 
     await expect(
       useCase.ejecutar({
-        actor: { rol: 'odontologo', profesionalId: 'p1' },
+        actor: actores.odontologo('p1'),
         profesionalId: 'p2',
         inicio: local(LUNES, '15:00'),
         fin: local(LUNES, '16:00'),
@@ -292,7 +293,7 @@ describe('Liberación de bloqueos', () => {
 
     const useCase = new LiberarBloqueo({ bloqueos: sistema.bloqueos });
     await useCase.ejecutar({
-      actor: { rol: 'recepcion' },
+      actor: actores.recepcion,
       bloqueoId: 'b-1',
     });
 
@@ -305,7 +306,7 @@ describe('Liberación de bloqueos', () => {
 
     await expect(
       useCase.ejecutar({
-        actor: { rol: 'administrador' },
+        actor: actores.administrador,
         bloqueoId: 'inexistente',
       }),
     ).rejects.toThrow(RecursoNoEncontradoError);
@@ -324,7 +325,7 @@ describe('Liberación de bloqueos', () => {
 
     await expect(
       useCase.ejecutar({
-        actor: { rol: 'odontologo', profesionalId: 'p1' },
+        actor: actores.odontologo('p1'),
         bloqueoId: 'b-2',
       }),
     ).rejects.toThrow(AccesoDenegadoError);
@@ -341,7 +342,7 @@ describe('Integración: un bloqueo recién creado impide agendar turnos (RN-07)'
     });
 
     await useCaseBloquear.ejecutar({
-      actor: { rol: 'administrador' },
+      actor: actores.administrador,
       profesionalId: 'p1',
       inicio: local(LUNES, '11:00'),
       fin: local(LUNES, '12:00'),
