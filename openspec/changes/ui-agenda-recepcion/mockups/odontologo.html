@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Mi agenda - Turnos Odonto (TBD)</title>
+<!-- Mockup C-15 ui-agenda-recepcion: Vista del odontólogo. Datos 100 % ficticios. -->
+<link rel="stylesheet" href="../../../../design-system/tokens.css">
+<link rel="stylesheet" href="recepcion.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+<symbol id="i-alert" viewBox="0 0 20 20"><path d="M10 2.5 18 16.5H2L10 2.5Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M10 8v4M10 14.2v.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+<symbol id="i-check" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="m6.5 10.2 2.4 2.4 4.6-5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-info" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10 9v5M10 6.2v.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+<symbol id="i-res" viewBox="0 0 20 20"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+<symbol id="i-dot" viewBox="0 0 20 20"><circle cx="10" cy="10" r="5" fill="currentColor"/></symbol>
+<symbol id="i-plus" viewBox="0 0 20 20"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+<symbol id="i-lock" viewBox="0 0 20 20"><rect x="4" y="9" width="12" height="8.5" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M7 9V6.5a3 3 0 0 1 6 0V9" fill="none" stroke="currentColor" stroke-width="1.6"/></symbol>
+<symbol id="i-chat" viewBox="0 0 20 20"><path d="M4 15.5 5 12.6A6.5 6.5 0 1 1 7.6 15Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+<symbol id="i-cal" viewBox="0 0 20 20"><rect x="3" y="4.5" width="14" height="12.5" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3 8.5h14M7 2.5v4M13 2.5v4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+<symbol id="i-x" viewBox="0 0 20 20"><path d="m5 5 10 10M15 5 5 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+<symbol id="i-wifi" viewBox="0 0 20 20"><path d="M3 8a10 10 0 0 1 14 0M5.5 10.8a6.5 6.5 0 0 1 9 0M8 13.6a3 3 0 0 1 4 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="m3 3 14 14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+<symbol id="i-empty" viewBox="0 0 20 20"><rect x="3" y="4.5" width="14" height="12.5" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3 8.5h14M7.5 12.5h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+</svg>
+<a class="skip" href="#contenido">Saltar al contenido</a>
+<header class="topbar"><div class="topbar-in">
+  <div class="brand"><img src="../../../../design-system/assets/logo.svg" alt="" width="96" height="32"><div class="brand-text"><b data-brand-name>Turnos Odonto (TBD)</b><span>Consultorio Odontológico Demo</span></div></div>
+  <div class="who"><div><b>Dra. Ana Ejemplo</b><span class="role">Odontóloga</span></div><button class="btn btn-secondary btn-sm" type="button">Salir</button></div>
+</div></header><div class="toolbar" role="toolbar" aria-label="Agenda">
+  <div class="date"><h1>Martes 24 de noviembre <span class="muted small">Hoy</span></h1></div>
+  <div class="seg" role="group" aria-label="Vista"><button type="button" aria-pressed="true">Día</button><button type="button" aria-pressed="false">Semana</button></div><span class="muted small">Mi agenda · Dra. Ana Ejemplo</span>
+  <div class="nav"><button class="btn btn-secondary" type="button" aria-label="Anterior">‹</button><button class="btn btn-secondary" type="button">Hoy</button><button class="btn btn-secondary" type="button" aria-label="Siguiente">›</button>
+  <label class="visually-hidden" for="f">Fecha</label><input id="f" class="input select-sm mono" type="text" inputmode="numeric" value="24/11/2026" style="width:150px"></div>
+  <button class="btn btn-secondary" type="button"><svg class="icon"><use href="#i-lock"/></svg>Bloquear horario</button>
+</div><main id="contenido" class="workspace" tabindex="-1"><section aria-label="Agenda"><div class="agenda-wrap" role="region" aria-label="Mi agenda del martes 24 de noviembre" tabindex="0">
+<div class="agenda" style="--cols:1;--rows:40;--slot:17px">
+<div class="ag-head">Hora</div><div class="ag-head">Dra. Ana Ejemplo<small>Sillones 1 y 2</small></div>
+<div class="ag-times" style="grid-template-rows:repeat(40,17px)"><span style="grid-row:span 2">09:00</span><span style="grid-row:span 2">09:30</span><span style="grid-row:span 2">10:00</span><span style="grid-row:span 2">10:30</span><span style="grid-row:span 2">11:00</span><span style="grid-row:span 2">11:30</span><span style="grid-row:span 2">12:00</span><span style="grid-row:span 2">12:30</span><span style="grid-row:span 2">13:00</span><span style="grid-row:span 2">13:30</span><span style="grid-row:span 2">14:00</span><span style="grid-row:span 2">14:30</span><span style="grid-row:span 2">15:00</span><span style="grid-row:span 2">15:30</span><span style="grid-row:span 2">16:00</span><span style="grid-row:span 2">16:30</span><span style="grid-row:span 2">17:00</span><span style="grid-row:span 2">17:30</span><span style="grid-row:span 2">18:00</span><span style="grid-row:span 2">18:30</span></div>
+<div class="ag-col"><div class="closed" style="--s:17;--n:8">Fuera de horario</div><button class="cell-appt atendido compact" style="--s:1;--n:2" aria-label="09:00, Paciente Ficticio 1, Consulta/control, Atendido" title="Consulta/control · 09:00 a 09:30 · Sillón 1"><span class="top"><b>Paciente Ficticio 1</b><span class="st"><svg><use href="#i-dot"/></svg>Atendido</span></span></button><button class="cell-appt confirmado is-selected" style="--s:3;--n:6" aria-label="09:30, Paciente Ficticio 2, Endodoncia, Confirmado"><b>Paciente Ficticio 2</b><span>Endodoncia · 09:30 a 11:00 · Sillón 1</span><span class="st"><svg><use href="#i-check"/></svg>Confirmado</span></button><button class="cell-appt confirmado compact" style="--s:11;--n:2" aria-label="11:30, Paciente Ficticio 4, Consulta/control, Confirmado" title="Consulta/control · 11:30 a 12:00 · Sillón 1"><span class="top"><b>Paciente Ficticio 4</b><span class="st"><svg><use href="#i-check"/></svg>Confirmado</span></span></button><button class="cell-appt reservado compact" style="--s:31;--n:2" aria-label="16:30, Paciente Ficticio 9, Consulta/control, Reservado" title="Consulta/control · 16:30 a 17:00 · Sillón 1"><span class="top"><b>Paciente Ficticio 9</b><span class="st"><svg><use href="#i-res"/></svg>Reservado</span></span></button><button class="cell-appt confirmado" style="--s:33;--n:6" aria-label="17:00, Paciente Ficticio 10, Endodoncia, Confirmado"><b>Paciente Ficticio 10</b><span>Endodoncia · 17:00 a 18:30 · Sillón 2</span><span class="st"><svg><use href="#i-check"/></svg>Confirmado</span></button></div>
+</div></div>
+<div class="legend"><span class="muted">Estados:</span><span class="badge b-reservado"><svg><use href="#i-res"/></svg>Reservado</span><span class="badge b-confirmado"><svg><use href="#i-check"/></svg>Confirmado</span><span class="badge b-atendido"><svg><use href="#i-dot"/></svg>Atendido</span><span class="badge b-ausente"><svg><use href="#i-alert"/></svg>Ausente</span><span class="muted">· Rayado: bloqueado o fuera de horario</span></div></section><aside class="panel" aria-labelledby="det-t">
+<div class="panel-head"><h2 id="det-t">Turno</h2><button class="btn btn-ghost btn-sm" type="button" aria-label="Cerrar detalle"><svg class="icon"><use href="#i-x"/></svg></button></div>
+<p><b>Paciente Ficticio 2</b></p>
+<span class="badge b-confirmado" style="justify-self:start"><svg><use href="#i-check"/></svg>Confirmado</span>
+<dl class="dl"><dt>Horario</dt><dd class="mono">mar 24/11 · 09:30 a 11:00</dd><dt>Prestación</dt><dd>Endodoncia · 90 min</dd><dt>Profesional</dt><dd>Dra. Ana Ejemplo</dd><dt>Sillón</dt><dd>Sillón 1</dd><dt>Origen</dt><dd>Recepción</dd></dl>
+<hr class="divider">
+<div class="actions"><button class="btn btn-secondary" type="button">Atendido</button><button class="btn btn-secondary" type="button">Ausente</button></div>
+<p class="small muted">Atendido y Ausente se habilitan desde la hora del turno.</p>
+</aside></main>
+<p class="mock-note">Mockup C-15 · Vista del odontólogo · Approval: pending · Design system revisión 1 · Datos ficticios</p>
+</body>
+</html>

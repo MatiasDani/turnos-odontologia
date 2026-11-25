@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Agenda - Turnos Odonto (TBD)</title>
+<!-- Mockup C-15 ui-agenda-recepcion: Estado: día sin turnos. Datos 100 % ficticios. -->
+<link rel="stylesheet" href="../../../../design-system/tokens.css">
+<link rel="stylesheet" href="recepcion.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+<symbol id="i-alert" viewBox="0 0 20 20"><path d="M10 2.5 18 16.5H2L10 2.5Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M10 8v4M10 14.2v.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+<symbol id="i-check" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="m6.5 10.2 2.4 2.4 4.6-5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-info" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10 9v5M10 6.2v.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+<symbol id="i-res" viewBox="0 0 20 20"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+<symbol id="i-dot" viewBox="0 0 20 20"><circle cx="10" cy="10" r="5" fill="currentColor"/></symbol>
+<symbol id="i-plus" viewBox="0 0 20 20"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+<symbol id="i-lock" viewBox="0 0 20 20"><rect x="4" y="9" width="12" height="8.5" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M7 9V6.5a3 3 0 0 1 6 0V9" fill="none" stroke="currentColor" stroke-width="1.6"/></symbol>
+<symbol id="i-chat" viewBox="0 0 20 20"><path d="M4 15.5 5 12.6A6.5 6.5 0 1 1 7.6 15Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+<symbol id="i-cal" viewBox="0 0 20 20"><rect x="3" y="4.5" width="14" height="12.5" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3 8.5h14M7 2.5v4M13 2.5v4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+<symbol id="i-x" viewBox="0 0 20 20"><path d="m5 5 10 10M15 5 5 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+<symbol id="i-wifi" viewBox="0 0 20 20"><path d="M3 8a10 10 0 0 1 14 0M5.5 10.8a6.5 6.5 0 0 1 9 0M8 13.6a3 3 0 0 1 4 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="m3 3 14 14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+<symbol id="i-empty" viewBox="0 0 20 20"><rect x="3" y="4.5" width="14" height="12.5" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3 8.5h14M7.5 12.5h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+</svg>
+<a class="skip" href="#contenido">Saltar al contenido</a>
+<header class="topbar"><div class="topbar-in">
+  <div class="brand"><img src="../../../../design-system/assets/logo.svg" alt="" width="96" height="32"><div class="brand-text"><b data-brand-name>Turnos Odonto (TBD)</b><span>Consultorio Odontológico Demo</span></div></div>
+  <div class="who"><div><b>Recepción Demo</b><span class="role">Recepción</span></div><button class="btn btn-secondary btn-sm" type="button">Salir</button></div>
+</div></header><div class="toolbar" role="toolbar" aria-label="Agenda">
+  <div class="date"><h1>Miércoles 25 de noviembre</h1></div>
+  <div class="seg" role="group" aria-label="Vista"><button type="button" aria-pressed="true">Día</button><button type="button" aria-pressed="false">Semana</button></div><div class="seg" role="group" aria-label="Columnas"><button type="button" aria-pressed="true">Por sillón</button><button type="button" aria-pressed="false">Por profesional</button></div>
+  <div class="nav"><button class="btn btn-secondary" type="button" aria-label="Anterior">‹</button><button class="btn btn-secondary" type="button">Hoy</button><button class="btn btn-secondary" type="button" aria-label="Siguiente">›</button>
+  <label class="visually-hidden" for="f">Fecha</label><input id="f" class="input select-sm mono" type="text" inputmode="numeric" value="24/11/2026" style="width:150px"></div>
+  <button class="btn btn-secondary" type="button"><svg class="icon"><use href="#i-lock"/></svg>Bloquear horario</button><button class="btn btn-primary" type="button"><svg class="icon"><use href="#i-plus"/></svg>Dar turno</button>
+</div><main id="contenido" class="workspace" tabindex="-1"><section aria-label="Agenda"><div class="agenda-wrap"><div class="state-box" role="status"><svg><use href="#i-empty"/></svg><h2>No hay turnos para este día.</h2><p>Podés dar un turno o elegir otra fecha.</p><button class="btn btn-primary" type="button"><svg class="icon"><use href="#i-plus"/></svg>Dar turno</button></div></div></section><aside class="panel" aria-labelledby="wa-t">
+<div class="panel-head"><h2 id="wa-t">Recordatorios por WhatsApp</h2><span class="count">3</span></div>
+<p class="small muted">Turnos de mañana sin e-mail. Abrí el mensaje, envialo y marcalo.</p>
+<ul style="list-style:none;margin:0;padding:0;display:grid;gap:var(--space-2)"><li class="wa-item"><b>Paciente Ficticio 11</b><span class="small muted">mié 25/11 · 09:00 · Consulta/control · Dra. Ejemplo</span><span class="small mono">+54 9 11 0000-0011</span><div class="row"><a class="btn btn-secondary btn-sm" href="#" target="_blank" rel="noopener"><svg class="icon"><use href="#i-chat"/></svg>Abrir WhatsApp</a><button class="btn btn-ghost btn-sm" type="button">Marcar enviado</button></div></li><li class="wa-item"><b>Paciente Ficticio 12</b><span class="small muted">mié 25/11 · 10:30 · Limpieza · Dr. Muestra</span><span class="small mono">+54 9 11 0000-0012</span><div class="row"><a class="btn btn-secondary btn-sm" href="#" target="_blank" rel="noopener"><svg class="icon"><use href="#i-chat"/></svg>Abrir WhatsApp</a><button class="btn btn-ghost btn-sm" type="button">Marcar enviado</button></div></li><li class="wa-item"><b>Paciente Ficticio 13</b><span class="small muted">mié 25/11 · 15:00 · Endodoncia · Dra. Ejemplo</span><span class="small mono">+54 9 11 0000-0013</span><div class="row"><a class="btn btn-secondary btn-sm" href="#" target="_blank" rel="noopener"><svg class="icon"><use href="#i-chat"/></svg>Abrir WhatsApp</a><button class="btn btn-ghost btn-sm" type="button">Marcar enviado</button></div></li></ul>
+</aside></main>
+<p class="mock-note">Mockup C-15 · Estado: día sin turnos · Approval: pending · Design system revisión 1 · Datos ficticios</p>
+</body>
+</html>
