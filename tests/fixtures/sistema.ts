@@ -68,6 +68,35 @@ export function crearSistema(overrides: Partial<Entorno> = {}): Sistema {
   return { datos, turnos, agendarTurno, consultarDisponibilidad };
 }
 
+export interface SistemaBloqueo {
+  readonly datos: Entorno;
+  readonly turnos: TurnoRepositorioEnMemoria;
+  readonly bloqueos: BloqueoRepositorioEnMemoria;
+  readonly generadorId: GeneradorId;
+  readonly agendarTurno: AgendarTurno;
+  readonly consultarDisponibilidad: ConsultarDisponibilidad;
+}
+
+/** Cableado para pruebas de bloqueos (C-06). */
+export function crearSistemaBloqueo(overrides: Partial<Entorno> = {}): SistemaBloqueo {
+  const datos = crearEntorno(overrides);
+  const turnos = new TurnoRepositorioEnMemoria(datos.turnos);
+  const bloqueos = new BloqueoRepositorioEnMemoria(datos.bloqueos);
+  const repos = {
+    profesionales: new ProfesionalRepositorioEnMemoria(datos.profesionales),
+    sillones: new SillonRepositorioEnMemoria(datos.sillones),
+    prestaciones: new PrestacionRepositorioEnMemoria(datos.prestaciones),
+    consultorios: new ConsultorioRepositorioEnMemoria([datos.consultorio]),
+    horarios: new HorarioAtencionRepositorioEnMemoria(datos.horarios),
+    bloqueos,
+    turnos,
+  };
+  const generadorId = new GeneradorIdSecuencial();
+  const agendarTurno = new AgendarTurno({ ...repos, ids: generadorId });
+  const consultarDisponibilidad = new ConsultarDisponibilidad(repos);
+  return { datos, turnos, bloqueos, generadorId, agendarTurno, consultarDisponibilidad };
+}
+
 export interface Solicitud {
   rol?: Rol;
   pacienteId?: string;

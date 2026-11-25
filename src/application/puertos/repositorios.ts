@@ -56,6 +56,14 @@ export interface BloqueoRepositorio {
     sillonId: string,
     intervalo: Intervalo,
   ): Promise<readonly BloqueoHorario[]>;
+  /** Alta o reemplazo por `id` (C-06). */
+  guardar(bloqueo: BloqueoHorario): Promise<void>;
+  /** Bloqueo por id, o `undefined` si no existe (C-06). */
+  obtenerPorId(id: string): Promise<BloqueoHorario | undefined>;
+  /** Elimina el bloqueo; un id inexistente no hace nada (C-06). */
+  eliminar(id: string): Promise<void>;
+  /** Lista todos los bloqueos registrados (C-06, C-08). */
+  listarTodos(): Promise<readonly BloqueoHorario[]>;
 }
 
 /** Resultado de un cambio sobre un turno: el turno nuevo o la regla que lo impide (C-02, DD-19). */

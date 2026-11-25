@@ -229,7 +229,7 @@ Carriles: **A** = núcleo y reserva online (Matías: C-01 → C-07 → C-10); **
   - `knowledge-base/09_decisiones_y_supuestos.md` DD-10, SU-08, SU-09
 
 ### [C-06] `bloquear-horarios-profesional`
-- **Estado**: `[ ]` pendiente
+- **Estado**: `[x]` completado (archivado 2026-11-23)
 - **Owner**: Mara Ferrer (51974)
 - **Scope**:
   - Caso de uso `BloquearHorario` / `LiberarBloqueo` sobre `BloqueoHorario` (`profesionalId?` y/o `sillonId?`, al menos uno; ver 04), intervalo semiabierto

@@ -95,6 +95,19 @@ describe('contratos de los puertos (5.1)', () => {
     expectTypeOf<HorarioAtencionRepositorio['eliminar']>().toEqualTypeOf<(id: string) => Promise<void>>();
   });
 
+  test('BloqueoRepositorio suma guardar, obtenerPorId, eliminar y listarTodos (C-06)', () => {
+    expectTypeOf<BloqueoRepositorio['guardar']>().toEqualTypeOf<
+      (b: import('../../src/domain/bloqueo-horario.js').BloqueoHorario) => Promise<void>
+    >();
+    expectTypeOf<BloqueoRepositorio['obtenerPorId']>().toEqualTypeOf<
+      (id: string) => Promise<import('../../src/domain/bloqueo-horario.js').BloqueoHorario | undefined>
+    >();
+    expectTypeOf<BloqueoRepositorio['eliminar']>().toEqualTypeOf<(id: string) => Promise<void>>();
+    expectTypeOf<BloqueoRepositorio['listarTodos']>().toEqualTypeOf<
+      () => Promise<readonly import('../../src/domain/bloqueo-horario.js').BloqueoHorario[]>
+    >();
+  });
+
   test('TurnoRepositorio.listarPorRecurso recibe un RecursoDeTurno y devuelve todos sus turnos', () => {
     expectTypeOf<RecursoDeTurno>().toEqualTypeOf<{
       readonly tipo: 'profesional' | 'sillon' | 'prestacion';
