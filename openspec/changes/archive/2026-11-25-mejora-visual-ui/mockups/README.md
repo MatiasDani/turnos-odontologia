@@ -115,7 +115,7 @@ Gestión del turno (`/public/turnos/:token`) y login de recepción no tienen moc
 
 ## Cómo verlos y regenerar capturas
 
-- Abrir cualquier `.html` con doble clic (file://). Importan `../../../../design-system/tokens.css`, `brand.js`, el logo propuesto y `mockups.css`; `reserva-paso-1.html` además usa el `paciente.css` real.
+- Abrir cualquier `.html` con doble clic (file://). Importan `../../../../../design-system/tokens.css`, `brand.js`, el logo propuesto y `mockups.css`; `reserva-paso-1.html` además usa el `paciente.css` real.
 - Fuentes: `src/` (plantilla de la agenda y generador `gen_agenda.py`). Regenerar: desde `mockups/`, `python src/gen_agenda.py`.
 - Capturas: desde la raíz del repo, `node openspec/changes/mejora-visual-ui/mockups/src/render.mjs v1` (Edge por Playwright; informa `scrollWidth` de cada captura).
 - La etiqueta oscura "Mockup · …" abajo a la derecha es solo del mockup.
