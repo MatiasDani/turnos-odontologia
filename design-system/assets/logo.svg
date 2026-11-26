@@ -1,9 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 64" role="img" aria-label="Logo provisional">
-  <title>LOGO PROVISIONAL</title>
-  <rect x="2" y="2" width="60" height="60" rx="14" fill="#0b6b66"/>
-  <rect x="16" y="18" width="32" height="6" rx="3" fill="#ffffff"/>
-  <rect x="16" y="29" width="22" height="6" rx="3" fill="#ffffff" opacity="0.85"/>
-  <rect x="16" y="40" width="28" height="6" rx="3" fill="#ffffff" opacity="0.7"/>
-  <text x="74" y="30" font-family="system-ui, Segoe UI, Arial, sans-serif" font-size="16" font-weight="700" fill="#17211f">LOGO</text>
-  <text x="74" y="50" font-family="system-ui, Segoe UI, Arial, sans-serif" font-size="16" font-weight="700" fill="#b42318">PROVISIONAL</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" role="img" aria-label="Turnos Odonto">
+  <title>Turnos Odonto</title>
+  <path d="M7.6 3.5C5 3.5 3.5 5.6 3.5 8.2c0 2.2.9 3.6 1.5 5.2.8 2.1.9 7.1 2.7 7.1 1.6 0 1.5-4.7 4.3-4.7s2.7 4.7 4.3 4.7c1.8 0 1.9-5 2.7-7.1.6-1.6 1.5-3 1.5-5.2 0-2.6-1.5-4.7-4.1-4.7-1.9 0-2.8 1.1-4.4 1.1S9.5 3.5 7.6 3.5Z" fill="none" stroke="#2f3f8f" stroke-width="1.6" stroke-linejoin="round"/>
 </svg>

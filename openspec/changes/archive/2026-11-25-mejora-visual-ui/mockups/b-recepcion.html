@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agenda · Turnos Odonto</title>
+<link rel="stylesheet" href="../../../../design-system/paleta-b.css">
+<link rel="stylesheet" href="v2.css">
+</head>
+<body>
+<div class="rc">
+  <header class="bar topbar">
+    <a class="brand" href="b-portada.html" aria-label="Turnos Odonto, inicio"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7.6 3.5C5 3.5 3.5 5.6 3.5 8.2c0 2.2.9 3.6 1.5 5.2.8 2.1.9 7.1 2.7 7.1 1.6 0 1.5-4.7 4.3-4.7s2.7 4.7 4.3 4.7c1.8 0 1.9-5 2.7-7.1.6-1.6 1.5-3 1.5-5.2 0-2.6-1.5-4.7-4.1-4.7-1.9 0-2.8 1.1-4.4 1.1S9.5 3.5 7.6 3.5Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg><b data-brand-name>Turnos Odonto</b></a>
+    <span class="sep" aria-hidden="true"></span>
+    <span id="consultorio" class="consul">Consultorio Odontológico Demo</span>
+    <span class="grow"></span>
+    <div class="who"><span id="usuario-email">recepcion@demo.test</span><span class="dot" aria-hidden="true">·</span><span id="usuario-rol" class="role">Recepción</span></div>
+    <button id="salir" class="btn btn-quiet" type="button">Salir</button>
+  </header>
+  <div class="toolbar" role="toolbar" aria-label="Agenda">
+    <div class="datenav">
+      <button id="anterior" class="icon-btn" type="button" aria-label="Anterior"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M12.5 4.5 7 10l5.5 5.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button id="hoy" class="btn btn-quiet" type="button">Hoy</button>
+      <button id="siguiente" class="icon-btn" type="button" aria-label="Siguiente"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M7.5 4.5 13 10l-5.5 5.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <h1 id="titulo">Martes 24 de noviembre</h1>
+      <label class="visually-hidden" for="fecha">Fecha</label><input id="fecha" type="date" value="2026-11-24">
+    </div>
+    <span class="grow"></span>
+    <div class="views">
+      <div class="seg" role="group" aria-label="Vista"><button id="v-dia" type="button" aria-pressed="true">Día</button><button id="v-semana" type="button" aria-pressed="false">Semana</button></div>
+      <div id="modo" class="seg quiet" role="group" aria-label="Columnas"><button id="m-sillon" type="button" aria-pressed="true">Por sillón</button><button id="m-profesional" type="button" aria-pressed="false">Por profesional</button></div>
+    </div>
+    <span class="sep" aria-hidden="true"></span>
+    <div class="rc-actions">
+      <button id="btn-bloquear" class="btn btn-quiet" type="button">Bloquear horario</button>
+      <button id="btn-dar-turno" class="btn btn-primary" type="button"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 4.5v11M4.5 10h11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Dar turno</button>
+    </div>
+  </div>
+  <main id="contenido" class="ws" tabindex="-1">
+    <section id="agenda" aria-label="Agenda" aria-busy="false">
+      <div class="ag-top"><div class="legend" aria-label="Estados"><span><i style="background:var(--v-res-mark)"></i>Reservado</span><span><i style="background:var(--v-conf-mark)"></i>Confirmado</span><span><i style="background:var(--v-at-mark)"></i>Atendido</span><span><i style="background:var(--v-aus-mark)"></i>Ausente</span></div><span class="num">10 turnos · 1 bloqueo</span></div>
+      <div class="agenda-scroll agenda-wrap" role="region" aria-label="Agenda del martes 24 de noviembre por sillón" tabindex="0"><div class="agenda" style="--cols:3">
+  <div class="ag-head corner"><span class="visually-hidden">Hora</span></div>
+  <div class="ag-head">Sillón 1<small>Ana Ejemplo</small></div><div class="ag-head">Sillón 2<small>Bruno Muestra</small></div><div class="ag-head">Sillón 3<small>Ana Ejemplo</small></div>
+  <div class="ag-times"><span class="num">09:00</span><span class="num">10:00</span><span class="num">11:00</span><span class="num">12:00</span><span class="num">13:00</span><span class="num">14:00</span><span class="num">15:00</span><span class="num">16:00</span><span class="num">17:00</span><span class="num">18:00</span></div>
+  <div class="ag-col"><div class="closed" style="--s:17;--n:8">Fuera de horario</div><button class="appt confirmado" type="button" style="--s:1;--n:2" aria-label="09:00, Carla Prueba, Consulta/control, Confirmado"><b>Carla Prueba</b><span>Confirmado · Consulta/control</span></button><button class="appt reservado sel" type="button" style="--s:5;--n:3" aria-label="10:00, Paciente Ficticio 3, Limpieza, Reservado"><b>Paciente Ficticio 3</b><span>Limpieza · <span class="num">10:00–10:45</span></span><span>Reservado</span></button><button class="appt atendido" type="button" style="--s:13;--n:2" aria-label="12:00, Paciente Ficticio 6, Consulta/control, Atendido"><b>Paciente Ficticio 6</b><span>Atendido · Consulta/control</span></button><button class="blocked" type="button" style="--s:31;--n:4" aria-label="Bloqueado de 16:30 a 17:30, Capacitación"><b>Bloqueado</b> · Capacitación</button></div>
+  <div class="ag-col"><div class="closed" style="--s:17;--n:8">Fuera de horario</div><button class="appt ausente" type="button" style="--s:3;--n:2" aria-label="09:30, Paciente Ficticio 9, Consulta/control, Ausente"><b>Paciente Ficticio 9</b><span>Ausente · Consulta/control</span></button><button class="appt confirmado" type="button" style="--s:9;--n:4" aria-label="11:00, Diego Modelo, Extracción simple, Confirmado"><b>Diego Modelo</b><span>Extracción simple · <span class="num">11:00–12:00</span></span><span>Confirmado</span></button><button class="appt reservado" type="button" style="--s:25;--n:6" aria-label="15:00, Paciente Ficticio 4, Endodoncia, Reservado"><b>Paciente Ficticio 4</b><span>Endodoncia · <span class="num">15:00–16:30</span></span><span>Reservado</span></button><button class="appt reservado" type="button" style="--s:35;--n:2" aria-label="17:30, Paciente Ficticio 5, Consulta/control, Reservado"><b>Paciente Ficticio 5</b><span>Reservado · Consulta/control</span></button></div>
+  <div class="ag-col"><div class="closed" style="--s:17;--n:8">Fuera de horario</div><button class="appt confirmado" type="button" style="--s:3;--n:3" aria-label="09:30, Paciente Ficticio 7, Limpieza, Confirmado"><b>Paciente Ficticio 7</b><span>Limpieza · <span class="num">09:30–10:15</span></span><span>Confirmado</span></button><button class="appt reservado" type="button" style="--s:27;--n:2" aria-label="15:30, Paciente Ficticio 8, Consulta/control, Reservado"><b>Paciente Ficticio 8</b><span>Reservado · Consulta/control</span></button></div>
+</div></div>
+    </section>
+    <div id="panel">
+      <aside class="wa" aria-labelledby="wa-t">
+        <h2 id="wa-t">Recordatorios por WhatsApp</h2>
+        <p class="hint"><span class="num">2</span> turnos de mañana sin aviso.</p>
+        <ul>
+          <li><b>Carla Prueba</b><span class="meta">Mañana 09:00 · Consulta/control</span><div class="acts"><a class="btn btn-quiet" href="#" aria-label="Abrir WhatsApp para Carla Prueba">Abrir WhatsApp</a><button class="btn btn-quiet" type="button" aria-label="Marcar enviado el recordatorio de Carla Prueba">Marcar enviado</button></div></li>
+          <li><b>Diego Modelo</b><span class="meta">Mañana 11:00 · Extracción simple</span><div class="acts"><a class="btn btn-quiet" href="#" aria-label="Abrir WhatsApp para Diego Modelo">Abrir WhatsApp</a><button class="btn btn-quiet" type="button" aria-label="Marcar enviado el recordatorio de Diego Modelo">Marcar enviado</button></div></li>
+        </ul>
+      </aside>
+    </div>
+  </main>
+</div>
+<span class="mock-note" aria-hidden="true">Mockup v2 · B · Clínico calmo · recepción</span>
+<script src="../../../../design-system/brand.js"></script>
+<script src="brand-propuesto.js"></script>
+</body>
+</html>

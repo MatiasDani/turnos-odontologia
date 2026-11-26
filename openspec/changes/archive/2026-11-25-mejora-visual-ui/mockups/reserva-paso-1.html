@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reservá tu turno · Turnos Odonto</title>
+<link rel="icon" href="../../../../design-system/assets/logo-propuesto.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../../../../design-system/tokens.css">
+<link rel="stylesheet" href="../../../../src/adapters/http/web/paciente.css">
+<link rel="stylesheet" href="mockups.css">
+</head>
+<body class="pac">
+<svg class="sprite" aria-hidden="true" focusable="false">
+<symbol id="i-check" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="m6.5 10.2 2.4 2.4 4.6-5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-res" viewBox="0 0 20 20"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+<symbol id="i-dot" viewBox="0 0 20 20"><circle cx="10" cy="10" r="5" fill="currentColor"/></symbol>
+<symbol id="i-plus" viewBox="0 0 20 20"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+<symbol id="i-lock" viewBox="0 0 20 20"><rect x="4" y="9" width="12" height="8.5" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M7 9V6.5a3 3 0 0 1 6 0V9" fill="none" stroke="currentColor" stroke-width="1.6"/></symbol>
+<symbol id="i-chat" viewBox="0 0 20 20"><path d="M4 15.5 5 12.6A6.5 6.5 0 1 1 7.6 15Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+<symbol id="i-cal" viewBox="0 0 20 20"><rect x="3" y="4.5" width="14" height="12.5" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3 8.5h14M7 2.5v4M13 2.5v4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+<symbol id="i-link" viewBox="0 0 20 20"><path d="M11 4h5v5M16 4l-7 7M14 12v3.5a1.5 1.5 0 0 1-1.5 1.5h-8A1.5 1.5 0 0 1 3 15.5v-8A1.5 1.5 0 0 1 4.5 6H8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-shield" viewBox="0 0 20 20"><path d="M10 2.5 16 5v4.5c0 4-2.7 6.7-6 8-3.3-1.3-6-4-6-8V5Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="m7.3 10 1.9 1.9 3.6-3.8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-clock" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10 6v4.2l2.8 1.8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+<symbol id="i-swap" viewBox="0 0 20 20"><path d="M4 7h11l-3-3M16 13H5l3 3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-login" viewBox="0 0 20 20"><path d="M11 3.5h3.5A1.5 1.5 0 0 1 16 5v10a1.5 1.5 0 0 1-1.5 1.5H11M8 13.5 11.5 10 8 6.5M11.5 10H3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-out" viewBox="0 0 20 20"><path d="M9 3.5H5.5A1.5 1.5 0 0 0 4 5v10a1.5 1.5 0 0 0 1.5 1.5H9M12.5 13.5 16 10l-3.5-3.5M16 10H8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</svg>
+
+<header class="appbar">
+  <div class="appbar-in contained">
+    <a class="brand" href="portada.html" aria-label="Turnos Odonto, inicio">
+      <img src="../../../../design-system/assets/logo-propuesto.svg" alt="" width="36" height="36">
+      <span class="brand-text"><b data-brand-name>Turnos Odonto</b><span id="nombre-consultorio">Consultorio Odontológico Demo</span></span>
+    </a>
+    <div class="appbar-end"><span class="appbar-meta hide-sm">Turnos online</span></div>
+  </div>
+</header>
+<main id="contenido" class="shell" tabindex="-1">
+  <div id="app">
+    <div class="pac-head">
+      <div><p>Reserva online</p><p class="pac-title">Reservá tu turno</p></div>
+      <p>Te lleva menos de 2 minutos.</p>
+    </div>
+    <div class="layout with-aside">
+      <section class="panel" aria-labelledby="h1">
+        <ol class="stepper" aria-hidden="true"><li class="on"><span>1 · Prestación</span></li><li><span>2 · Día y horario</span></li><li><span>3 · Tus datos</span></li><li><span>4 · Listo</span></li></ol>
+        <p class="step-label">Paso 1 de 4 · Prestación</p>
+        <div class="page-head"><h1 id="h1">¿Qué necesitás?</h1><p>Elegí la prestación. La duración es aproximada y la define el consultorio.</p></div>
+        <fieldset class="choices"><legend class="visually-hidden">Prestación</legend><label class="choice is-on"><input type="radio" name="prestacion" checked><span class="dot"></span><span class="grow"><b>Consulta/control</b><span class="dur">Duración aproximada: <span class="mono">30 min</span></span></span></label><label class="choice"><input type="radio" name="prestacion"><span class="dot"></span><span class="grow"><b>Endodoncia</b><span class="dur">Duración aproximada: <span class="mono">90 min</span></span></span></label><label class="choice"><input type="radio" name="prestacion"><span class="dot"></span><span class="grow"><b>Extracción simple</b><span class="dur">Duración aproximada: <span class="mono">60 min</span></span></span></label><label class="choice"><input type="radio" name="prestacion"><span class="dot"></span><span class="grow"><b>Limpieza</b><span class="dur">Duración aproximada: <span class="mono">45 min</span></span></span></label></fieldset>
+        <div class="sticky-actions"><button type="button" class="btn btn-primary">Continuar</button></div>
+      </section>
+      <aside class="aside" aria-label="Resumen de tu turno">
+        <div class="panel">
+          <h2>Tu turno</h2>
+          <dl class="summary">
+            <div><dt>Prestación</dt><dd>Consulta/control · 30 min</dd></div>
+            <div><dt>Profesional</dt><dd class="pending">Sin elegir</dd></div>
+            <div><dt>Día</dt><dd class="pending">Sin elegir</dd></div>
+            <div><dt>Horario</dt><dd class="pending">Sin elegir</dd></div>
+          </dl>
+          <p class="note">Podés cancelar o reprogramar online hasta 24 h antes del turno.</p>
+        </div>
+      </aside>
+    </div>
+  </div>
+</main>
+<footer class="footer">
+  <div class="footer-in">
+    <span><span id="pie-consultorio">Consultorio Odontológico Demo · </span>Usamos tus datos solo para gestionar tu turno (Ley 25.326).</span>
+    <span><a href="portada.html">Volver al inicio</a></span>
+  </div>
+</footer>
+<span class="mock-note">Mockup · reserva paso 1 (pulido)</span>
+<script src="../../../../design-system/brand.js"></script>
+<script src="brand-propuesto.js"></script>
+</body>
+</html>

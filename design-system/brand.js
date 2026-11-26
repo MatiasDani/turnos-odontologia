@@ -1,6 +1,6 @@
-/* Brand constants. Product name is NOT decided: edit ONLY this constant to rename. */
+/* Brand constants. Para renombrar el producto, editar SOLO esta constante. */
 (function () {
-  var BRAND_NAME = "Turnos Odonto (TBD)";
+  var BRAND_NAME = "Turnos Odonto";
   window.BRAND_NAME = BRAND_NAME;
   function bind() {
     var nodes = document.querySelectorAll("[data-brand-name]");

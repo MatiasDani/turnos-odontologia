@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agenda · Turnos Odonto</title>
+<link rel="icon" href="../../../../design-system/assets/logo-propuesto.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../../../../design-system/tokens.css">
+<link rel="stylesheet" href="mockups.css">
+</head>
+<body>
+<svg class="sprite" aria-hidden="true" focusable="false">
+<symbol id="i-check" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="m6.5 10.2 2.4 2.4 4.6-5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-res" viewBox="0 0 20 20"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+<symbol id="i-dot" viewBox="0 0 20 20"><circle cx="10" cy="10" r="5" fill="currentColor"/></symbol>
+<symbol id="i-plus" viewBox="0 0 20 20"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+<symbol id="i-lock" viewBox="0 0 20 20"><rect x="4" y="9" width="12" height="8.5" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M7 9V6.5a3 3 0 0 1 6 0V9" fill="none" stroke="currentColor" stroke-width="1.6"/></symbol>
+<symbol id="i-chat" viewBox="0 0 20 20"><path d="M4 15.5 5 12.6A6.5 6.5 0 1 1 7.6 15Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+<symbol id="i-cal" viewBox="0 0 20 20"><rect x="3" y="4.5" width="14" height="12.5" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3 8.5h14M7 2.5v4M13 2.5v4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+<symbol id="i-link" viewBox="0 0 20 20"><path d="M11 4h5v5M16 4l-7 7M14 12v3.5a1.5 1.5 0 0 1-1.5 1.5h-8A1.5 1.5 0 0 1 3 15.5v-8A1.5 1.5 0 0 1 4.5 6H8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-shield" viewBox="0 0 20 20"><path d="M10 2.5 16 5v4.5c0 4-2.7 6.7-6 8-3.3-1.3-6-4-6-8V5Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="m7.3 10 1.9 1.9 3.6-3.8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-clock" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10 6v4.2l2.8 1.8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+<symbol id="i-swap" viewBox="0 0 20 20"><path d="M4 7h11l-3-3M16 13H5l3 3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-login" viewBox="0 0 20 20"><path d="M11 3.5h3.5A1.5 1.5 0 0 1 16 5v10a1.5 1.5 0 0 1-1.5 1.5H11M8 13.5 11.5 10 8 6.5M11.5 10H3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-out" viewBox="0 0 20 20"><path d="M9 3.5H5.5A1.5 1.5 0 0 0 4 5v10a1.5 1.5 0 0 0 1.5 1.5H9M12.5 13.5 16 10l-3.5-3.5M16 10H8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</svg>
+
+<header class="appbar topbar">
+  <div class="appbar-in">
+    <a class="brand" href="portada.html" aria-label="Turnos Odonto, inicio">
+      <img src="../../../../design-system/assets/logo-propuesto.svg" alt="" width="36" height="36">
+      <span class="brand-text"><b data-brand-name>Turnos Odonto</b><span id="consultorio">Consultorio Odontológico Demo</span></span>
+    </a>
+    <nav class="appnav" aria-label="Principal">
+      <a href="recepcion-agenda.html" aria-current="page"><svg aria-hidden="true"><use href="#i-cal"/></svg>Agenda</a>
+      <a href="reserva-paso-1.html" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-link"/></svg>Reserva online</a>
+    </nav>
+    <div class="appbar-end who">
+      <div class="who-id"><b id="usuario-email">recepcion@demo.test</b><span id="usuario-rol" class="role">Recepción</span></div>
+      <button id="salir" class="btn btn-secondary btn-sm" type="button"><svg class="icon" aria-hidden="true"><use href="#i-out"/></svg>Salir</button>
+    </div>
+  </div>
+</header>
+<div class="toolbar" role="toolbar" aria-label="Agenda">
+  <div class="tb-group tb-date"><h1 id="titulo">Martes 24 de noviembre</h1></div>
+  <div class="tb-group tb-nav nav">
+    <button id="anterior" class="btn btn-secondary" type="button" aria-label="Anterior">‹</button>
+    <button id="hoy" class="btn btn-secondary" type="button">Hoy</button>
+    <button id="siguiente" class="btn btn-secondary" type="button" aria-label="Siguiente">›</button>
+    <label class="visually-hidden" for="fecha">Fecha</label><input id="fecha" class="input-sm mono" type="date" value="2026-11-24">
+  </div>
+  <span class="tb-sep" aria-hidden="true"></span>
+  <div class="tb-group tb-view">
+    <div class="seg" role="group" aria-label="Vista"><button id="v-dia" type="button" aria-pressed="true">Día</button><button id="v-semana" type="button" aria-pressed="false">Semana</button></div>
+    <div id="modo" class="seg" role="group" aria-label="Columnas"><button id="m-sillon" type="button" aria-pressed="true">Por sillón</button><button id="m-profesional" type="button" aria-pressed="false">Por profesional</button></div>
+  </div>
+  <span class="tb-sep" aria-hidden="true"></span>
+  <div class="tb-group tb-actions">
+    <button id="btn-bloquear" class="btn btn-secondary" type="button"><svg class="icon" aria-hidden="true"><use href="#i-lock"/></svg>Bloquear horario</button>
+    <button id="btn-dar-turno" class="btn btn-primary" type="button"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg>Dar turno</button>
+  </div>
+</div>
+<main id="contenido" class="workspace" tabindex="-1">
+  <section id="agenda" class="agenda-card" aria-label="Agenda">
+    <div class="agenda-card-head">
+      <div class="legend"><span class="muted">Estados:</span>
+        <span class="badge b-reservado"><svg><use href="#i-res"/></svg>Reservado</span>
+        <span class="badge b-confirmado"><svg><use href="#i-check"/></svg>Confirmado</span>
+        <span class="badge b-atendido"><svg><use href="#i-dot"/></svg>Atendido</span>
+        <span class="badge b-ausente"><svg><use href="#i-res"/></svg>Ausente</span>
+        <span class="rayado"><i></i>Bloqueado o fuera de horario</span>
+      </div>
+    </div>
+    <div class="agenda-scroll" role="region" aria-label="Agenda del martes 24 de noviembre por sillón" tabindex="0"><div class="agenda" style="--cols:3"><div class="ag-head corner">Hora</div><div class="ag-head">Sillón 1<small>Ana Ejemplo</small></div><div class="ag-head">Sillón 2<small>Bruno Muestra</small></div><div class="ag-head">Sillón 3<small>Ana Ejemplo</small></div><div class="ag-times"><span>09:00</span><span>09:30</span><span>10:00</span><span>10:30</span><span>11:00</span><span>11:30</span><span>12:00</span><span>12:30</span><span>13:00</span><span>13:30</span><span>14:00</span><span>14:30</span><span>15:00</span><span>15:30</span><span>16:00</span><span>16:30</span><span>17:00</span><span>17:30</span><span>18:00</span><span>18:30</span></div><div class="ag-col"><div class="closed" style="--s:17;--n:8">Fuera de horario</div><button class="cell-appt confirmado compact" type="button" style="--s:1;--n:2" aria-label="09:00, Carla Prueba, Consulta/control, Confirmado" title="Consulta/control · 09:00 a 09:30 · Ana Ejemplo"><b>Carla Prueba</b><span class="st"><svg><use href="#i-check"/></svg>Confirmado</span></button><button class="cell-appt reservado compact" type="button" style="--s:5;--n:3" aria-label="10:00, Paciente Ficticio 3, Limpieza, Reservado" title="Limpieza · 10:00 a 10:45 · Ana Ejemplo"><b>Paciente Ficticio 3</b><span>Limpieza · 10:00 a 10:45 · Ana Ejemplo</span><span class="st"><svg><use href="#i-res"/></svg>Reservado</span></button><button class="cell-appt atendido compact" type="button" style="--s:13;--n:2" aria-label="12:00, Paciente Ficticio 6, Consulta/control, Atendido" title="Consulta/control · 12:00 a 12:30 · Ana Ejemplo"><b>Paciente Ficticio 6</b><span class="st"><svg><use href="#i-dot"/></svg>Atendido</span></button><button class="cell-block" type="button" style="--s:31;--n:4" aria-label="Bloqueado de 16:30 a 17:30, Capacitación, Sillón 1"><b>Bloqueado</b> · 16:30 a 17:30<br>Capacitación</button></div><div class="ag-col"><div class="closed" style="--s:17;--n:8">Fuera de horario</div><button class="cell-appt confirmado" type="button" style="--s:9;--n:4" aria-label="11:00, Diego Modelo, Extracción simple, Confirmado" title="Extracción simple · 11:00 a 12:00 · Bruno Muestra"><b>Diego Modelo</b><span>Extracción simple · 11:00 a 12:00 · Bruno Muestra</span><span class="st"><svg><use href="#i-check"/></svg>Confirmado</span></button><button class="cell-appt reservado" type="button" style="--s:25;--n:6" aria-label="15:00, Paciente Ficticio 4, Endodoncia, Reservado" title="Endodoncia · 15:00 a 16:30 · Bruno Muestra"><b>Paciente Ficticio 4</b><span>Endodoncia · 15:00 a 16:30 · Bruno Muestra</span><span class="st"><svg><use href="#i-res"/></svg>Reservado</span></button><button class="cell-appt reservado compact" type="button" style="--s:35;--n:2" aria-label="17:30, Paciente Ficticio 5, Consulta/control, Reservado" title="Consulta/control · 17:30 a 18:00 · Bruno Muestra"><b>Paciente Ficticio 5</b><span class="st"><svg><use href="#i-res"/></svg>Reservado</span></button></div><div class="ag-col"><div class="closed" style="--s:17;--n:8">Fuera de horario</div><button class="cell-appt confirmado compact" type="button" style="--s:3;--n:3" aria-label="09:30, Paciente Ficticio 7, Limpieza, Confirmado" title="Limpieza · 09:30 a 10:15 · Ana Ejemplo"><b>Paciente Ficticio 7</b><span>Limpieza · 09:30 a 10:15 · Ana Ejemplo</span><span class="st"><svg><use href="#i-check"/></svg>Confirmado</span></button><button class="cell-appt reservado compact" type="button" style="--s:27;--n:2" aria-label="15:30, Paciente Ficticio 8, Consulta/control, Reservado" title="Consulta/control · 15:30 a 16:00 · Ana Ejemplo"><b>Paciente Ficticio 8</b><span class="st"><svg><use href="#i-res"/></svg>Reservado</span></button></div></div></div>
+  </section>
+  <div id="panel">
+    <aside class="panel" aria-labelledby="wa-t">
+      <div class="panel-head"><h2 id="wa-t">Recordatorios por WhatsApp</h2><span class="count">2</span></div>
+      <p class="small muted">Abrí el mensaje, envialo desde tu WhatsApp y marcalo como enviado.</p>
+      <ul class="lista-limpia">
+        <li class="wa-item"><b>Carla Prueba</b><span class="small muted">Mar 24 · 09:00 · Consulta/control · Ana Ejemplo</span>
+          <div class="row"><a class="btn btn-secondary btn-sm" href="#" aria-label="Abrir WhatsApp para Carla Prueba"><svg class="icon" aria-hidden="true"><use href="#i-chat"/></svg>Abrir WhatsApp</a><button class="btn btn-ghost btn-sm" type="button" aria-label="Marcar enviado el recordatorio de Carla Prueba">Marcar enviado</button></div></li>
+        <li class="wa-item"><b>Diego Modelo</b><span class="small muted">Mar 24 · 11:00 · Extracción simple · Bruno Muestra</span>
+          <div class="row"><a class="btn btn-secondary btn-sm" href="#" aria-label="Abrir WhatsApp para Diego Modelo"><svg class="icon" aria-hidden="true"><use href="#i-chat"/></svg>Abrir WhatsApp</a><button class="btn btn-ghost btn-sm" type="button" aria-label="Marcar enviado el recordatorio de Diego Modelo">Marcar enviado</button></div></li>
+      </ul>
+    </aside>
+  </div>
+</main>
+<span class="mock-note">Mockup · recepción, agenda del día (celular)</span>
+<script src="../../../../design-system/brand.js"></script>
+<script src="brand-propuesto.js"></script>
+</body>
+</html>

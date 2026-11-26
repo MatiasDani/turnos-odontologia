@@ -47,7 +47,7 @@ describe('Navegación segura de los enlaces', () => {
     expect(pagina.headers['referrer-policy']).toBe('no-referrer');
     expect(pagina.headers['x-content-type-options']).toBe('nosniff');
     expect(pagina.headers['content-security-policy']).toContain("default-src 'self'");
-    for (const ruta of ['/public/design-system/tokens.css', '/public/design-system/brand.js', '/public/design-system/assets/logo.svg', '/public/assets/paciente.css']) {
+    for (const ruta of ['/public/design-system/tokens.css', '/public/design-system/brand.js', '/public/design-system/assets/logo.svg', '/public/assets/paciente.css', '/public/assets/portada.css']) {
       const r = await sistema.get(ruta);
       expect(r.statusCode, ruta).toBe(200);
     }
@@ -61,6 +61,7 @@ describe('Navegación segura de los enlaces', () => {
       '/public/design-system/%2e%2e/package.json',
       '/public/assets/..%2fapp.ts',
       '/public/assets/reserva.html',
+      '/public/assets/portada.html',
     ]) {
       const r = await sistema.get(ruta);
       expect(r.statusCode, ruta).toBe(404);

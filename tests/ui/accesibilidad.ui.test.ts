@@ -28,7 +28,7 @@ async function focoActual(page: Page): Promise<Foco> {
     const contenedor = el.closest('.choice, .check') ?? el;
     const lleva = (nodo: Element) => {
       const estilo = getComputedStyle(nodo);
-      return estilo.boxShadow.includes('rgb(11, 107, 102)') || (estilo.outlineStyle !== 'none' && parseFloat(estilo.outlineWidth) > 0);
+      return estilo.boxShadow.includes('rgb(47, 63, 143)') || (estilo.outlineStyle !== 'none' && parseFloat(estilo.outlineWidth) > 0);
     };
     const etiqueta = el.getAttribute('aria-label') ?? (el.textContent ?? '').trim();
     return { id: el.id, nombre: etiqueta, tag: el.tagName.toLowerCase(), anillo: lleva(el) || lleva(contenedor) };
@@ -91,7 +91,7 @@ describe('Accesibilidad y diseño adaptable', () => {
     const { page } = await arnes.nuevaPagina(MOVIL);
     const medir = async (pantalla: string) => {
       // La entrada del diálogo escala de 0.96 a 1: se mide con las animaciones terminadas.
-      await page.evaluate(() => Promise.all(document.getAnimations().filter((a) => a.effect?.getComputedTiming().iterations !== Infinity).map((a) => a.finished)));
+      await page.evaluate(() => Promise.all(document.getAnimations().filter((a) => a.effect?.getComputedTiming().iterations !== Infinity).map((a) => a.finished.catch(() => undefined))));
       const m = await page.evaluate(() => {
         const visible = (el: Element) => {
           const r = el.getBoundingClientRect();

@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Turnos Odonto · Reservá tu turno odontológico</title>
+<link rel="icon" href="../../../../design-system/assets/logo-propuesto.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../../../../design-system/tokens.css">
+<link rel="stylesheet" href="mockups.css">
+</head>
+<body>
+{{SPRITE}}
+<header class="appbar">
+  <div class="appbar-in contained">
+    <a class="brand" href="portada.html" aria-label="Turnos Odonto, inicio">
+      <img src="../../../../design-system/assets/logo-propuesto.svg" alt="" width="36" height="36">
+      <span class="brand-text"><b data-brand-name>Turnos Odonto</b><span>Consultorio Odontológico Demo</span></span>
+    </a>
+    <div class="appbar-end">
+      <a class="btn btn-ghost btn-sm hide-sm" href="recepcion-agenda.html"><svg class="icon" aria-hidden="true"><use href="#i-login"/></svg>Ingresar al consultorio</a>
+    </div>
+  </div>
+</header>
+<main id="contenido">
+  <section class="hero" aria-labelledby="titulo">
+    <div>
+      <span class="eyebrow"><svg aria-hidden="true"><use href="#i-cal"/></svg>Turnos online las 24 horas</span>
+      <h1 id="titulo">Sacá tu turno con el dentista <em>en minutos</em></h1>
+      <p class="lead">Elegí la prestación, el día y el horario que te quede cómodo. Ves solo horarios libres de verdad y te llevás un enlace para confirmar, cambiar o cancelar.</p>
+      <div class="cta">
+        <a class="btn btn-primary btn-lg" href="reserva-paso-1.html"><svg class="icon" aria-hidden="true"><use href="#i-cal"/></svg>Reservar turno</a>
+        <a id="ingresar" class="btn btn-secondary btn-lg" href="recepcion-agenda.html"><svg class="icon" aria-hidden="true"><use href="#i-login"/></svg>Ingresar</a>
+      </div>
+      <p class="cta-staff">"Ingresar" es para el personal del consultorio.</p>
+      <ol class="steps-inline" aria-label="Cómo funciona">
+        <li><span class="n">1</span>Prestación</li>
+        <li><span class="n">2</span>Día y horario</li>
+        <li><span class="n">3</span>Tus datos</li>
+        <li><span class="n">4</span>¡Listo!</li>
+      </ol>
+    </div>
+    <div class="showcase" aria-hidden="true">
+      <div class="show-card">
+        <p class="kicker">Lunes 23 de noviembre</p>
+        <h2>Horarios libres · Consulta/control</h2>
+        <div class="show-slots">
+          <span>09:00</span><span class="off">09:30</span><span class="on">10:00</span><span>10:30</span>
+          <span>11:00</span><span>11:30</span><span class="off">12:00</span><span>12:30</span>
+        </div>
+      </div>
+      <div class="show-card show-turno">
+        <div class="row"><h2>Tu turno</h2><span class="badge b-confirmado"><svg><use href="#i-check"/></svg>Confirmado</span></div>
+        <dl>
+          <dt>Prestación</dt><dd>Consulta/control · 30 min</dd>
+          <dt>Día</dt><dd>Lunes 23 de noviembre, 10:00</dd>
+          <dt>Profesional</dt><dd>Ana Ejemplo</dd>
+        </dl>
+      </div>
+      <p class="show-caption">Ilustración con datos ficticios</p>
+    </div>
+  </section>
+
+  <section class="features" aria-label="Qué podés hacer">
+    <article class="feature">
+      <span class="ic"><svg aria-hidden="true"><use href="#i-clock"/></svg></span>
+      <h3>Horarios reales</h3>
+      <p>Solo te mostramos horarios libres: el consultorio no puede dar dos turnos al mismo profesional ni al mismo sillón a la vez.</p>
+    </article>
+    <article class="feature">
+      <span class="ic"><svg aria-hidden="true"><use href="#i-swap"/></svg></span>
+      <h3>Cambiá o cancelá</h3>
+      <p>Con el enlace que te damos al reservar podés confirmar, reprogramar o cancelar tu turno hasta 24 h antes.</p>
+    </article>
+    <article class="feature">
+      <span class="ic"><svg aria-hidden="true"><use href="#i-shield"/></svg></span>
+      <h3>Tus datos, cuidados</h3>
+      <p>Pedimos solo lo necesario para tu turno y lo usamos únicamente para eso (Ley 25.326).</p>
+    </article>
+  </section>
+
+  <section class="staff" aria-labelledby="staff-t">
+    <div class="staff-in">
+      <div>
+        <h2 id="staff-t">¿Trabajás en el consultorio?</h2>
+        <p>Agenda del día por sillón o por profesional, dar turno, bloquear horarios y recordatorios por WhatsApp.</p>
+      </div>
+      <a class="btn btn-secondary btn-lg" href="recepcion-agenda.html"><svg class="icon" aria-hidden="true"><use href="#i-login"/></svg>Ingresar a la agenda</a>
+    </div>
+  </section>
+</main>
+<footer class="footer">
+  <div class="footer-in">
+    <span><span data-brand-name>Turnos Odonto</span> · Consultorio Odontológico Demo · Datos ficticios</span>
+    <span>Usamos tus datos solo para gestionar tu turno (Ley 25.326).</span>
+  </div>
+</footer>
+<span class="mock-note">Mockup · portada · rev. 2 propuesta</span>
+<script src="../../../../design-system/brand.js"></script>
+<script src="brand-propuesto.js"></script>
+</body>
+</html>

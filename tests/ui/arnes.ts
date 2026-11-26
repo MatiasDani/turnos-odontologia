@@ -34,7 +34,7 @@ export const ESCRITORIO = { ancho: 1440, alto: 900 } as const;
 let navegador: Browser | undefined;
 
 async function obtenerNavegador(): Promise<Browser> {
-  navegador ??= await chromium.launch();
+  navegador ??= await chromium.launch(opcionesLanzamiento());
   return navegador;
 }
 
@@ -81,4 +81,10 @@ export async function iniciarArnes(opciones: OpcionesSistemaPublico = {}): Promi
       await app.close();
     },
   };
+}
+
+/** Con `UI_NAVEGADOR=msedge` (o `chrome`) usa el navegador instalado en vez del Chromium de Playwright. */
+export function opcionesLanzamiento(): { channel?: string } {
+  const canal = process.env['UI_NAVEGADOR'];
+  return canal ? { channel: canal } : {};
 }

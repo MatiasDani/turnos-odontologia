@@ -100,3 +100,15 @@ Las pantallas SHALL usar `design-system/tokens.css` y `brand.js` sin redefinir s
 #### Scenario: Sin desplazamiento horizontal en el celular
 - **WHEN** se recorren todas las pantallas de reserva y gestión a 390x844
 - **THEN** ninguna tiene desplazamiento horizontal y todos los botones y horarios miden al menos 44 px de alto
+
+#### Scenario: Sin desplazamiento horizontal en 375 px en la reserva
+- **WHEN** el paciente abre `/public/reservar` a 375 × 812
+- **THEN** el ancho del documento no supera el de la ventana
+
+### Requirement: Marca en el encabezado
+El encabezado SHALL mostrar el logo y el nombre del producto del design system (sin "(TBD)" ni "LOGO PROVISIONAL") y la marca SHALL enlazar a la portada `/`.
+
+#### Scenario: Encabezado con la marca aprobada
+- **WHEN** el paciente abre `/public/reservar`
+- **THEN** el encabezado muestra "Turnos Odonto", sin el texto "(TBD)"
+- **AND** la marca es un enlace a `/`

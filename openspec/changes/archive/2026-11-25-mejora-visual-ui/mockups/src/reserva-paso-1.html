@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reservá tu turno · Turnos Odonto</title>
+<link rel="icon" href="../../../../design-system/assets/logo-propuesto.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../../../../design-system/tokens.css">
+<link rel="stylesheet" href="../../../../src/adapters/http/web/paciente.css">
+<link rel="stylesheet" href="mockups.css">
+</head>
+<body class="pac">
+{{SPRITE}}
+<header class="appbar">
+  <div class="appbar-in contained">
+    <a class="brand" href="portada.html" aria-label="Turnos Odonto, inicio">
+      <img src="../../../../design-system/assets/logo-propuesto.svg" alt="" width="36" height="36">
+      <span class="brand-text"><b data-brand-name>Turnos Odonto</b><span id="nombre-consultorio">Consultorio Odontológico Demo</span></span>
+    </a>
+    <div class="appbar-end"><span class="appbar-meta hide-sm">Turnos online</span></div>
+  </div>
+</header>
+<main id="contenido" class="shell" tabindex="-1">
+  <div id="app">
+    <div class="pac-head">
+      <div><p>Reserva online</p><p class="pac-title">Reservá tu turno</p></div>
+      <p>Te lleva menos de 2 minutos.</p>
+    </div>
+    <div class="layout with-aside">
+      <section class="panel" aria-labelledby="h1">
+        <ol class="stepper" aria-hidden="true"><li class="on"><span>1 · Prestación</span></li><li><span>2 · Día y horario</span></li><li><span>3 · Tus datos</span></li><li><span>4 · Listo</span></li></ol>
+        <p class="step-label">Paso 1 de 4 · Prestación</p>
+        <div class="page-head"><h1 id="h1">¿Qué necesitás?</h1><p>Elegí la prestación. La duración es aproximada y la define el consultorio.</p></div>
+        <fieldset class="choices"><legend class="visually-hidden">Prestación</legend><label class="choice is-on"><input type="radio" name="prestacion" checked><span class="dot"></span><span class="grow"><b>Consulta/control</b><span class="dur">Duración aproximada: <span class="mono">30 min</span></span></span></label><label class="choice"><input type="radio" name="prestacion"><span class="dot"></span><span class="grow"><b>Endodoncia</b><span class="dur">Duración aproximada: <span class="mono">90 min</span></span></span></label><label class="choice"><input type="radio" name="prestacion"><span class="dot"></span><span class="grow"><b>Extracción simple</b><span class="dur">Duración aproximada: <span class="mono">60 min</span></span></span></label><label class="choice"><input type="radio" name="prestacion"><span class="dot"></span><span class="grow"><b>Limpieza</b><span class="dur">Duración aproximada: <span class="mono">45 min</span></span></span></label></fieldset>
+        <div class="sticky-actions"><button type="button" class="btn btn-primary">Continuar</button></div>
+      </section>
+      <aside class="aside" aria-label="Resumen de tu turno">
+        <div class="panel">
+          <h2>Tu turno</h2>
+          <dl class="summary">
+            <div><dt>Prestación</dt><dd>Consulta/control · 30 min</dd></div>
+            <div><dt>Profesional</dt><dd class="pending">Sin elegir</dd></div>
+            <div><dt>Día</dt><dd class="pending">Sin elegir</dd></div>
+            <div><dt>Horario</dt><dd class="pending">Sin elegir</dd></div>
+          </dl>
+          <p class="note">Podés cancelar o reprogramar online hasta 24 h antes del turno.</p>
+        </div>
+      </aside>
+    </div>
+  </div>
+</main>
+<footer class="footer">
+  <div class="footer-in">
+    <span><span id="pie-consultorio">Consultorio Odontológico Demo · </span>Usamos tus datos solo para gestionar tu turno (Ley 25.326).</span>
+    <span><a href="portada.html">Volver al inicio</a></span>
+  </div>
+</footer>
+<span class="mock-note">Mockup · reserva paso 1 (pulido)</span>
+<script src="../../../../design-system/brand.js"></script>
+<script src="brand-propuesto.js"></script>
+</body>
+</html>

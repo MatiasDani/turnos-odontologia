@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agenda · Turnos Odonto</title>
+<link rel="icon" href="../../../../design-system/assets/logo-propuesto.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../../../../design-system/tokens.css">
+<link rel="stylesheet" href="mockups.css">
+</head>
+<body>
+{{SPRITE}}
+<header class="appbar topbar">
+  <div class="appbar-in">
+    <a class="brand" href="portada.html" aria-label="Turnos Odonto, inicio">
+      <img src="../../../../design-system/assets/logo-propuesto.svg" alt="" width="36" height="36">
+      <span class="brand-text"><b data-brand-name>Turnos Odonto</b><span id="consultorio">Consultorio Odontológico Demo</span></span>
+    </a>
+    <nav class="appnav" aria-label="Principal">
+      <a href="recepcion-agenda.html" aria-current="page"><svg aria-hidden="true"><use href="#i-cal"/></svg>Agenda</a>
+      <a href="reserva-paso-1.html" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-link"/></svg>Reserva online</a>
+    </nav>
+    <div class="appbar-end who">
+      <div class="who-id"><b id="usuario-email">recepcion@demo.test</b><span id="usuario-rol" class="role">Recepción</span></div>
+      <button id="salir" class="btn btn-secondary btn-sm" type="button"><svg class="icon" aria-hidden="true"><use href="#i-out"/></svg>Salir</button>
+    </div>
+  </div>
+</header>
+<div class="toolbar" role="toolbar" aria-label="Agenda">
+  <div class="tb-group tb-date"><h1 id="titulo">Martes 24 de noviembre</h1></div>
+  <div class="tb-group tb-nav nav">
+    <button id="anterior" class="btn btn-secondary" type="button" aria-label="Anterior">‹</button>
+    <button id="hoy" class="btn btn-secondary" type="button">Hoy</button>
+    <button id="siguiente" class="btn btn-secondary" type="button" aria-label="Siguiente">›</button>
+    <label class="visually-hidden" for="fecha">Fecha</label><input id="fecha" class="input-sm mono" type="date" value="2026-11-24">
+  </div>
+  <span class="tb-sep" aria-hidden="true"></span>
+  <div class="tb-group tb-view">
+    <div class="seg" role="group" aria-label="Vista"><button id="v-dia" type="button" aria-pressed="true">Día</button><button id="v-semana" type="button" aria-pressed="false">Semana</button></div>
+    <div id="modo" class="seg" role="group" aria-label="Columnas"><button id="m-sillon" type="button" aria-pressed="true">Por sillón</button><button id="m-profesional" type="button" aria-pressed="false">Por profesional</button></div>
+  </div>
+  <span class="tb-sep" aria-hidden="true"></span>
+  <div class="tb-group tb-actions">
+    <button id="btn-bloquear" class="btn btn-secondary" type="button"><svg class="icon" aria-hidden="true"><use href="#i-lock"/></svg>Bloquear horario</button>
+    <button id="btn-dar-turno" class="btn btn-primary" type="button"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg>Dar turno</button>
+  </div>
+</div>
+<main id="contenido" class="workspace" tabindex="-1">
+  <section id="agenda" class="agenda-card" aria-label="Agenda">
+    <div class="agenda-card-head">
+      <div class="legend"><span class="muted">Estados:</span>
+        <span class="badge b-reservado"><svg><use href="#i-res"/></svg>Reservado</span>
+        <span class="badge b-confirmado"><svg><use href="#i-check"/></svg>Confirmado</span>
+        <span class="badge b-atendido"><svg><use href="#i-dot"/></svg>Atendido</span>
+        <span class="badge b-ausente"><svg><use href="#i-res"/></svg>Ausente</span>
+        <span class="rayado"><i></i>Bloqueado o fuera de horario</span>
+      </div>
+    </div>
+    <div class="agenda-scroll" role="region" aria-label="Agenda del martes 24 de noviembre por sillón" tabindex="0">{{GRID}}</div>
+  </section>
+  <div id="panel">
+    <aside class="panel" aria-labelledby="wa-t">
+      <div class="panel-head"><h2 id="wa-t">Recordatorios por WhatsApp</h2><span class="count">2</span></div>
+      <p class="small muted">Abrí el mensaje, envialo desde tu WhatsApp y marcalo como enviado.</p>
+      <ul class="lista-limpia">
+        <li class="wa-item"><b>Carla Prueba</b><span class="small muted">Mar 24 · 09:00 · Consulta/control · Ana Ejemplo</span>
+          <div class="row"><a class="btn btn-secondary btn-sm" href="#" aria-label="Abrir WhatsApp para Carla Prueba"><svg class="icon" aria-hidden="true"><use href="#i-chat"/></svg>Abrir WhatsApp</a><button class="btn btn-ghost btn-sm" type="button" aria-label="Marcar enviado el recordatorio de Carla Prueba">Marcar enviado</button></div></li>
+        <li class="wa-item"><b>Diego Modelo</b><span class="small muted">Mar 24 · 11:00 · Extracción simple · Bruno Muestra</span>
+          <div class="row"><a class="btn btn-secondary btn-sm" href="#" aria-label="Abrir WhatsApp para Diego Modelo"><svg class="icon" aria-hidden="true"><use href="#i-chat"/></svg>Abrir WhatsApp</a><button class="btn btn-ghost btn-sm" type="button" aria-label="Marcar enviado el recordatorio de Diego Modelo">Marcar enviado</button></div></li>
+      </ul>
+    </aside>
+  </div>
+</main>
+<span class="mock-note">{{NOTA}}</span>
+<script src="../../../../design-system/brand.js"></script>
+<script src="brand-propuesto.js"></script>
+</body>
+</html>

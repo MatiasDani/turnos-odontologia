@@ -11,6 +11,14 @@ afterAll(async () => {
 });
 
 describe('Humo de la interfaz', () => {
+  test('la portada carga sin errores de consola', async () => {
+    const { page, errores } = await arnes.nuevaPagina();
+    await page.goto(`${arnes.url}/`);
+    await page.getByRole('heading', { level: 1 }).waitFor();
+    await page.waitForLoadState('networkidle');
+    expect(errores).toEqual([]);
+  });
+
   test('la página de reserva carga sin errores de consola', async () => {
     const { page, errores } = await arnes.nuevaPagina();
     await page.goto(`${arnes.url}/public/reservar`);

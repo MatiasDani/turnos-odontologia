@@ -107,6 +107,13 @@ function dibujarPanel() {
   }
 }
 
+/** En el celular el panel queda debajo de la grilla: al elegir un turno se desplaza hasta el detalle. */
+function mostrarPanelEnCelular() {
+  if (!window.matchMedia('(max-width: 768px)').matches) return;
+  const sinMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  el.panel.scrollIntoView({ block: 'start', behavior: sinMovimiento ? 'auto' : 'smooth' });
+}
+
 async function cargar() {
   if (ctx === null) return;
   const c = ctx;
@@ -186,6 +193,7 @@ async function cargar() {
     etiqueta = `Agenda del ${fechaLarga(dia.fecha).toLowerCase()} por ${detalleColumna === 'sillon' ? 'sillón' : 'profesional'}`;
   }
   el.agenda.replaceChildren(
+    h('div', { class: 'ag-top' }, leyenda()),
     dibujarGrilla({
       columnas,
       zona: c.zona,
@@ -199,10 +207,10 @@ async function cargar() {
         dibujarPanel();
         el.agenda.querySelectorAll('.cell-appt.is-selected').forEach((x) => x.classList.remove('is-selected'));
         el.agenda.querySelector(`[data-turno="${CSS.escape(t.id)}"]`)?.classList.add('is-selected');
+        mostrarPanelEnCelular();
       },
       onBloqueo: (b) => abrirLiberar(b, c),
     }),
-    leyenda(),
   );
   dibujarPanel();
 }
