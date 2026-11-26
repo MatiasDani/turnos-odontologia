@@ -13,6 +13,12 @@ Trabajo práctico de Metodología I (Desarrollo de Software), hecho con desarrol
 | Mara Ferrer | 51974 | C-06, C-08 |
 | Lautaro Medina | 52043 | C-09, C-15 |
 
+## Entregables del TP
+
+- **Reflexión escrita:** [REFLEXION.md](REFLEXION.md) (también en [PDF](REFLEXION.pdf)).
+- **Informe de Discovery:** [docs/discovery/informe-discovery.pdf](docs/discovery/informe-discovery.pdf).
+- **Roadmap y estado de los changes:** [CHANGES.md](CHANGES.md).
+
 ## Requisitos
 
 - [Node.js](https://nodejs.org/) **20 o superior** (incluye npm).
