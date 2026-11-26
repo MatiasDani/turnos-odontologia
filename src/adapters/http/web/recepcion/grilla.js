@@ -5,6 +5,8 @@ import { h, icono } from './dom.js';
 import { aHHMM, aMinutos, ESTADOS, hora, minutosLocales } from './formato.js';
 
 const PASO = 15;
+/** Alto de una fila de 15 minutos: 30 minutos miden 44 px, lo justo para nombre y estado sin recortar. */
+const ALTO_FILA = 22;
 
 /**
  * @typedef {import('./api.js').TurnoVista} TurnoVista
@@ -27,14 +29,17 @@ export function nombreTurno(t, zona) {
 export function dibujarGrilla(p) {
   const filas = Math.max(1, Math.ceil((p.fin - p.inicio) / PASO));
   const fila = (/** @type {number} */ minutos) => Math.max(1, Math.floor((minutos - p.inicio) / PASO) + 1);
+  // Etiquetas solo en las horas enteras (más quietas); la primera sigue al inicio del horario.
   const horas = [];
-  for (let m = p.inicio; m < p.fin; m += 30) horas.push(h('span', { style: { 'grid-row': 'span 2' }, text: aHHMM(m) }));
+  for (let m = p.inicio; m < p.fin; m = m === p.inicio && m % 60 !== 0 ? m + (60 - (m % 60)) : m + 60) {
+    horas.push(h('span', { class: 'num', style: { 'grid-row': `${fila(m)} / span ${Math.min(4, filas - fila(m) + 1)}` }, text: aHHMM(m) }));
+  }
   const agenda = h(
     'div',
-    { class: 'agenda', style: { '--cols': String(p.columnas.length), '--rows': String(filas), '--slot': '17px' } },
-    h('div', { class: 'ag-head', text: 'Hora' }),
+    { class: 'agenda', style: { '--cols': String(p.columnas.length), '--rows': String(filas), '--slot': `${ALTO_FILA}px` } },
+    h('div', { class: 'ag-head corner' }, h('span', { class: 'visually-hidden', text: 'Hora' })),
     ...p.columnas.map((c) => h('div', { class: `ag-head${c.hoy ? ' is-today' : ''}` }, c.titulo, h('small', { text: c.subtitulo }))),
-    h('div', { class: 'ag-times', style: { 'grid-template-rows': `repeat(${filas}, 17px)` } }, ...horas),
+    h('div', { class: 'ag-times', style: { 'grid-template-rows': `repeat(${filas}, ${ALTO_FILA}px)` } }, ...horas),
     ...p.columnas.map((c) => columna(c)),
   );
   return h('div', { class: 'agenda-wrap', role: 'region', 'aria-label': p.etiqueta, tabindex: 0 }, agenda);
@@ -103,12 +108,11 @@ export function dibujarGrilla(p) {
 export function leyenda() {
   return h(
     'div',
-    { class: 'legend' },
-    h('span', { class: 'muted', text: 'Estados:' }),
+    { class: 'legend', 'aria-label': 'Estados' },
     ...['reservado', 'confirmado', 'atendido', 'ausente'].map((e) => {
       const estado = ESTADOS[/** @type {keyof typeof ESTADOS} */ (e)];
-      return h('span', { class: `badge b-${e}` }, icono(estado.icono, ''), estado.texto);
+      return h('span', { class: `lg lg-${e}` }, h('i', { 'aria-hidden': 'true' }), estado.texto);
     }),
-    h('span', { class: 'muted', text: '· Rayado: bloqueado o fuera de horario' }),
+    h('span', { class: 'lg lg-hatch' }, h('i', { 'aria-hidden': 'true' }), 'Bloqueado o fuera de horario'),
   );
 }

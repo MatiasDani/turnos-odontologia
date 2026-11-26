@@ -1,38 +1,42 @@
-/* Design tokens - Turnos Odonto (TBD). Revision 1. Light mode first. */
+/* Design tokens - Turnos Odonto. Revision 2 (direccion B "Clinico calmo", aprobada 2026-11-25). Light mode first.
+   Los nombres de los tokens no cambian respecto de la revision 1: solo sus valores. */
 :root {
-  /* Neutrals (cool-green tinted slate; never pure black) */
-  --color-bg: #f6f8f8;
+  /* Neutrals (blanco frio y grafito; nunca negro puro) */
+  --color-bg: #f6f7f9;
   --color-surface: #ffffff;
-  --color-surface-2: #eef2f2;
-  --color-border: #d5dcdc;
-  --color-border-strong: #aab6b6;
-  --color-text: #17211f;        /* 15.9:1 on surface */
-  --color-text-muted: #4b5a58;  /* 7.0:1 on surface */
-  --color-text-faint: #5f6e6c;  /* 5.3:1 on surface */
+  --color-surface-2: #eff1f4;
+  --color-border: #e3e6eb;          /* hairline, decorativa */
+  --color-border-strong: #b4bac5;   /* borde de campos y controles */
+  --color-text: #16181d;            /* 17.8:1 on surface */
+  --color-text-muted: #5d6470;      /* 6.0:1 on surface · 5.6:1 on bg */
+  --color-text-faint: #6a717d;      /* 4.9:1 on surface */
 
-  /* Single accent: clinical teal */
-  --color-accent: #0b6b66;          /* 6.2:1 on white */
-  --color-accent-hover: #095853;
-  --color-accent-soft: #e0f1ef;
+  /* Single accent: indigo profundo */
+  --color-accent: #2f3f8f;          /* 9.4:1 con texto blanco encima */
+  --color-accent-hover: #26337a;
+  --color-accent-soft: #e9ecf8;     /* acento sobre soft 8.0:1 */
   --color-on-accent: #ffffff;
 
   /* Semantic */
   --color-success: #17683a;  --color-success-soft: #e1f3e8;
   --color-warning: #8a5300;  --color-warning-soft: #fdf0d8;
   --color-danger:  #b42318;  --color-danger-soft:  #fde8e6;
-  --color-info:    #25506f;  --color-info-soft:    #e3eef7;
+  --color-info:    #2f3f8f;  --color-info-soft:    #e9ecf8;
 
-  /* Estados de turno (texto sobre fondo >= 4.5:1) */
-  --turno-reservado-fg: #25506f;  --turno-reservado-bg: #e3eef7;
-  --turno-confirmado-fg: #17683a; --turno-confirmado-bg: #e1f3e8;
-  --turno-cancelado-fg: #5b6563;  --turno-cancelado-bg: #e8ecec;
-  --turno-ausente-fg: #8a5300;    --turno-ausente-bg: #fdf0d8;
-  --turno-atendido-fg: #0b6b66;   --turno-atendido-bg: #d3ece9;
-  --block-bg: repeating-linear-gradient(135deg, #e8ecec 0 6px, #f6f8f8 6px 12px);
+  /* Estados de turno (texto sobre fondo >= 4.5:1; el estado siempre va tambien como texto) */
+  --turno-reservado-fg: #3a4868;  --turno-reservado-bg: #edf0f7;  --turno-reservado-mark: #8e9bc0;
+  --turno-confirmado-fg: #2b5e4c; --turno-confirmado-bg: #e4f1eb; --turno-confirmado-mark: #6fae95;
+  --turno-cancelado-fg: #5d6470;  --turno-cancelado-bg: #f6f7f9;  --turno-cancelado-mark: #cbd0d8;
+  --turno-ausente-fg: #874719;    --turno-ausente-bg: #f8ece2;    --turno-ausente-mark: #d9a174;
+  --turno-atendido-fg: #5d6470;   --turno-atendido-bg: #eff1f4;   --turno-atendido-mark: #b7bdc7;
+  --block-bg: repeating-linear-gradient(135deg, #e3e6eb 0 1px, #ffffff 1px 9px);
 
-  /* Typography: system stack only, no remote fonts */
-  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  /* Typography: sans del sistema (Segoe UI Variable en Windows 11, SF en macOS); Inter solo si ya esta instalada */
+  --font-sans: "Inter", "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-display: "Inter Display", "Segoe UI Variable Display", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
   --font-mono: ui-monospace, "Cascadia Mono", "SF Mono", Consolas, monospace;
+  --display-weight: 600;
+  --display-tracking: -0.022em;
   --text-xs: 0.75rem; --text-sm: 0.875rem; --text-base: 1rem;
   --text-lg: 1.125rem; --text-xl: 1.375rem; --text-2xl: 1.75rem;
   --leading-tight: 1.25; --leading-normal: 1.5;
@@ -41,14 +45,15 @@
   --space-1: 0.25rem; --space-2: 0.5rem; --space-3: 0.75rem; --space-4: 1rem;
   --space-5: 1.5rem; --space-6: 2rem; --space-7: 3rem;
 
-  /* Radii & shadows (shadow tinted to bg hue) */
-  --radius-sm: 6px; --radius-md: 10px; --radius-lg: 16px; --radius-pill: 999px;
-  --shadow-sm: 0 1px 2px rgba(23, 33, 31, 0.08);
-  --shadow-md: 0 8px 24px -8px rgba(23, 33, 31, 0.18);
-  --shadow-lg: 0 24px 48px -16px rgba(23, 33, 31, 0.28);
+  /* Radii & shadows (sombra casi nula: la estructura la dan las lineas de 1 px) */
+  --radius-sm: 6px; --radius-md: 8px; --radius-lg: 12px; --radius-pill: 999px;
+  --shadow-sm: 0 1px 2px rgba(22, 24, 29, 0.04);
+  --shadow-md: 0 8px 24px -8px rgba(22, 24, 29, 0.14);
+  --shadow-lg: 0 24px 48px -16px rgba(22, 24, 29, 0.22);
+  --scrim: rgba(22, 24, 29, 0.45);
 
   /* Focus */
-  --focus-ring: 0 0 0 2px var(--color-surface), 0 0 0 4px #0b6b66;
+  --focus-ring: 0 0 0 2px var(--color-surface), 0 0 0 4px #2f3f8f;
 
   /* Motion: UI under 300ms, ease-out */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);

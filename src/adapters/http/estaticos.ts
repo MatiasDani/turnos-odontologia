@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 /** Archivos de la UI servidos desde `src/adapters/http/web/` (lista blanca, DD-29). */
 export const ARCHIVOS_WEB: readonly string[] = [
   'paciente.css',
+  'portada.css',
   'api.js',
   'formato.js',
   'dialogo.js',
@@ -81,10 +82,10 @@ export async function leerEstatico(
   }
 }
 
-/** Páginas HTML de la UI (`reserva.html` y `gestion.html`). */
+/** Páginas HTML de la UI (portada, reserva, gestión y recepción). */
 export async function leerPagina(
   raiz: string,
-  pagina: 'reserva.html' | 'gestion.html' | 'recepcion/login.html' | 'recepcion/agenda.html',
+  pagina: 'portada.html' | 'reserva.html' | 'gestion.html' | 'recepcion/login.html' | 'recepcion/agenda.html',
 ): Promise<Buffer> {
   return readFile(join(raiz, 'src', 'adapters', 'http', 'web', pagina));
 }

@@ -4,9 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
-<title>Agenda - Turnos Odonto (TBD)</title>
+<link rel="icon" href="/public/design-system/assets/logo.svg" type="image/svg+xml">
+<title>Agenda - Turnos Odonto</title>
 <link rel="stylesheet" href="/public/design-system/tokens.css">
 <link rel="stylesheet" href="/recepcion/assets/recepcion.css">
+<script src="/public/design-system/brand.js" defer></script>
 <script type="module" src="/recepcion/assets/agenda.js"></script>
 </head>
 <body>
@@ -23,22 +25,38 @@
 <symbol id="i-x" viewBox="0 0 20 20"><path d="m5 5 10 10M15 5 5 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
 <symbol id="i-wifi" viewBox="0 0 20 20"><path d="M3 8a10 10 0 0 1 14 0M5.5 10.8a6.5 6.5 0 0 1 9 0M8 13.6a3 3 0 0 1 4 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="m3 3 14 14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
 <symbol id="i-empty" viewBox="0 0 20 20"><rect x="3" y="4.5" width="14" height="12.5" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3 8.5h14M7.5 12.5h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+<symbol id="i-chev-l" viewBox="0 0 20 20"><path d="M12.5 4.5 7 10l5.5 5.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-chev-r" viewBox="0 0 20 20"><path d="M7.5 4.5 13 10l-5.5 5.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
 </svg>
 <a class="skip" href="#contenido">Saltar al contenido</a>
-<header class="topbar"><div class="topbar-in">
-  <div class="brand"><img src="/public/design-system/assets/logo.svg" alt="" width="96" height="32"><div class="brand-text"><b data-brand-name>Turnos Odonto (TBD)</b><span id="consultorio">Consultorio</span></div></div>
-  <div class="who"><div><b id="usuario-email"></b><span id="usuario-rol" class="role"></span></div><button id="salir" class="btn btn-secondary btn-sm" type="button">Salir</button></div>
-</div></header>
+<header class="topbar">
+  <a class="brand" href="/" aria-label="Turnos Odonto, inicio"><img src="/public/design-system/assets/logo.svg" alt="" width="28" height="28"><b data-brand-name>Turnos Odonto</b></a>
+  <span class="sep" aria-hidden="true"></span>
+  <span id="consultorio" class="consul">Consultorio</span>
+  <span class="grow"></span>
+  <div class="who"><span id="usuario-email"></span><span class="dot" aria-hidden="true">·</span><span id="usuario-rol" class="role"></span></div>
+  <button id="salir" class="btn btn-quiet" type="button">Salir</button>
+</header>
 <div class="toolbar" role="toolbar" aria-label="Agenda">
-  <div class="date"><h1 id="titulo">Agenda</h1><span id="hoy-marca" class="muted small" hidden>Hoy</span></div>
-  <div class="seg" role="group" aria-label="Vista"><button id="v-dia" type="button" aria-pressed="true">Día</button><button id="v-semana" type="button" aria-pressed="false">Semana</button></div>
-  <div id="modo" class="seg" role="group" aria-label="Columnas"><button id="m-sillon" type="button" aria-pressed="true">Por sillón</button><button id="m-profesional" type="button" aria-pressed="false">Por profesional</button></div>
-  <label class="visually-hidden" for="recurso">Profesional o sillón</label><select id="recurso" class="select select-sm" hidden></select>
-  <span id="mi-agenda" class="muted small" hidden></span>
-  <div class="nav"><button id="anterior" class="btn btn-secondary" type="button" aria-label="Anterior">‹</button><button id="hoy" class="btn btn-secondary" type="button">Hoy</button><button id="siguiente" class="btn btn-secondary" type="button" aria-label="Siguiente">›</button>
-  <label class="visually-hidden" for="fecha">Fecha</label><input id="fecha" class="input select-sm mono" type="date"></div>
-  <button id="btn-bloquear" class="btn btn-secondary" type="button"><svg class="icon" aria-hidden="true"><use href="#i-lock"/></svg>Bloquear horario</button>
-  <button id="btn-dar-turno" class="btn btn-primary" type="button"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg>Dar turno</button>
+  <div class="datenav">
+    <button id="anterior" class="icon-btn" type="button" aria-label="Anterior"><svg class="icon" aria-hidden="true"><use href="#i-chev-l"/></svg></button>
+    <button id="hoy" class="btn btn-quiet" type="button">Hoy</button>
+    <button id="siguiente" class="icon-btn" type="button" aria-label="Siguiente"><svg class="icon" aria-hidden="true"><use href="#i-chev-r"/></svg></button>
+    <h1 id="titulo">Agenda</h1><span id="hoy-marca" class="muted small" hidden>Hoy</span>
+    <label class="visually-hidden" for="fecha">Fecha</label><input id="fecha" class="fecha" type="date">
+  </div>
+  <span class="grow"></span>
+  <div class="views">
+    <div class="seg" role="group" aria-label="Vista"><button id="v-dia" type="button" aria-pressed="true">Día</button><button id="v-semana" type="button" aria-pressed="false">Semana</button></div>
+    <div id="modo" class="seg quiet" role="group" aria-label="Columnas"><button id="m-sillon" type="button" aria-pressed="true">Por sillón</button><button id="m-profesional" type="button" aria-pressed="false">Por profesional</button></div>
+    <label class="visually-hidden" for="recurso">Profesional o sillón</label><select id="recurso" class="select select-sm" hidden></select>
+    <span id="mi-agenda" class="muted small" hidden></span>
+  </div>
+  <span class="sep" aria-hidden="true"></span>
+  <div class="rc-actions">
+    <button id="btn-bloquear" class="btn btn-quiet" type="button">Bloquear horario</button>
+    <button id="btn-dar-turno" class="btn btn-primary" type="button"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg>Dar turno</button>
+  </div>
 </div>
 <main id="contenido" class="workspace" tabindex="-1">
   <section id="agenda" aria-label="Agenda" aria-busy="false"></section>

@@ -502,6 +502,17 @@ Carriles: **A** = núcleo y reserva online (Matías: C-01 → C-07 → C-10); **
 - Importación desde otros sistemas
 - Persistencia PostgreSQL (el MVP usa repositorios en memoria)
 
+### [MEJ-01] `mejora-visual-ui`
+- **Estado**: `[x]` completado (archivado 2026-11-25)
+- **Owner**: Matías Ibañez (52006)
+- **Scope**:
+  - Portada en `/` (antes 404) con una acción principal "Reservar turno" y el enlace "Soy del consultorio"
+  - Design system revisión 2, dirección B "Clínico calmo" aprobada por el owner: paleta índigo/grafito, nombre "Turnos Odonto" y logo definitivos (sin "(TBD)" ni "LOGO PROVISIONAL")
+  - Recepción adaptable al celular (sin desplazamiento horizontal, grilla con scroll propio, acciones fijas abajo) y agenda más legible en escritorio
+  - Pulido visual de reserva, gestión y login; sin cambios de dominio, API ni flujos
+- **Dependencias**: `C-14`, `C-15`
+- **Governance**: BAJO (presentación); mockups aprobados antes del apply
+
 ---
 
 ## Resumen

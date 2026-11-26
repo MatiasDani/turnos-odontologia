@@ -4,20 +4,26 @@ import type { BrowserContext, Page } from 'playwright';
 import { local, LUNES } from '../fixtures/seed.js';
 import { CLAVE_FICTICIA } from '../fixtures/sistema-autenticacion.js';
 import { crearSistemaHttpRecepcion, type OpcionesSistemaHttpRecepcion, type SistemaHttpRecepcion } from '../fixtures/sistema-http-recepcion.js';
-import { cerrarNavegador } from './arnes.js';
+import { cerrarNavegador, opcionesLanzamiento } from './arnes.js';
 import { chromium, type Browser } from 'playwright';
 
 export { cerrarNavegador };
 
 export const EMAILS = { 'u-rec': 'recepcion@demo.test', 'u-admin': 'admin@demo.test', 'u-odo1': 'odontologo1@demo.test' } as const;
 
+/** Tamaño de la ventana del navegador (por defecto 1440 × 900). */
+export interface Tamano {
+  readonly ancho: number;
+  readonly alto: number;
+}
+
 export interface ArnesRecepcion {
   readonly sistema: SistemaHttpRecepcion;
   readonly url: string;
   /** Página nueva, con el reloj del navegador fijado en `ahora` del sistema. */
-  pagina(): Promise<{ page: Page; contexto: BrowserContext; errores: string[] }>;
+  pagina(tamano?: Tamano): Promise<{ page: Page; contexto: BrowserContext; errores: string[] }>;
   /** Página con la sesión ya iniciada por el formulario y la agenda abierta en `fecha`. */
-  conSesion(usuario?: keyof typeof EMAILS, fecha?: string): Promise<{ page: Page; contexto: BrowserContext; errores: string[] }>;
+  conSesion(usuario?: keyof typeof EMAILS, fecha?: string, tamano?: Tamano): Promise<{ page: Page; contexto: BrowserContext; errores: string[] }>;
   cerrar(): Promise<void>;
 }
 
@@ -32,10 +38,10 @@ export async function iniciarArnesRecepcion(opciones: OpcionesSistemaHttpRecepci
   const contextos: BrowserContext[] = [];
   const ahora = opciones.ahora ?? local(LUNES, '10:00');
 
-  const pagina = async () => {
-    navegador ??= await chromium.launch();
+  const pagina = async ({ ancho, alto }: Tamano = { ancho: 1440, alto: 900 }) => {
+    navegador ??= await chromium.launch(opcionesLanzamiento());
     const contexto = await navegador.newContext({
-      viewport: { width: 1440, height: 900 },
+      viewport: { width: ancho, height: alto },
       locale: 'es-AR',
       timezoneId: 'America/Argentina/Buenos_Aires',
       deviceScaleFactor: 1,
@@ -55,8 +61,8 @@ export async function iniciarArnesRecepcion(opciones: OpcionesSistemaHttpRecepci
     sistema,
     url,
     pagina,
-    async conSesion(usuario = 'u-rec', fecha) {
-      const p = await pagina();
+    async conSesion(usuario = 'u-rec', fecha, tamano) {
+      const p = await pagina(tamano);
       await p.page.goto(`${url}/recepcion/login`);
       await p.page.getByLabel('E-mail').fill(EMAILS[usuario]);
       await p.page.getByLabel('Clave').fill(CLAVE_FICTICIA);

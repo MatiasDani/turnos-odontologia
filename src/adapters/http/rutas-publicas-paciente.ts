@@ -44,7 +44,7 @@ function quiereJson(request: FastifyRequest): boolean {
   return acepta.includes('application/json') && !acepta.includes('text/html');
 }
 
-async function enviarPagina(reply: FastifyReply, raiz: string, pagina: 'reserva.html' | 'gestion.html'): Promise<void> {
+async function enviarPagina(reply: FastifyReply, raiz: string, pagina: 'portada.html' | 'reserva.html' | 'gestion.html'): Promise<void> {
   const html = await leerPagina(raiz, pagina);
   await reply.header('cache-control', 'no-store').type('text/html; charset=utf-8').send(html);
 }
@@ -58,6 +58,7 @@ export function rutasPublicasPaciente(casos: CasosDeUsoPublicos, opciones: Opcio
     const { raiz } = opciones;
 
     // Páginas y estáticos
+    app.get('/', async (_request, reply) => enviarPagina(reply, raiz, 'portada.html'));
     app.get('/public/reservar', async (_request, reply) => enviarPagina(reply, raiz, 'reserva.html'));
     app.get('/public/assets/:archivo', async (request, reply) => {
       const { archivo } = request.params as { archivo: string };

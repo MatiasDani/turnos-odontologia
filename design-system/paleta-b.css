@@ -1,0 +1,32 @@
+/* PROPUESTA (revisión 2, Approval: pending) · Dirección B "Clínico calmo".
+   No reemplaza tokens.css: solo la usan los mockups v2 de openspec/changes/mejora-visual-ui/.
+   Contrastes WCAG calculados (ver mockups/README.md). */
+:root {
+  --v-bg: #f6f7f9;            /* casi blanco frío */
+  --v-surface: #ffffff;
+  --v-ink: #16181d;           /* grafito · 16.57:1 sobre bg · 17.76:1 sobre surface */
+  --v-muted: #5d6470;         /* 5.56:1 sobre bg · 5.96:1 sobre surface */
+  --v-line: #e3e6eb;          /* decorativa (hairline) */
+  --v-line-soft: #eef0f3;
+  --v-accent: #2f3f8f;        /* índigo profundo · blanco encima 9.42:1 · sobre bg 8.79:1 */
+  --v-accent-hover: #26337a;
+  --v-accent-soft: #e9ecf8;   /* acento sobre soft 8.00:1 */
+  --v-on-accent: #ffffff;
+
+  /* Estados (texto fg sobre bg) */
+  --v-res-fg: #3a4868;  --v-res-bg: #edf0f7;  --v-res-mark: #8e9bc0;   /* reservado 7.98:1 */
+  --v-conf-fg: #2b5e4c; --v-conf-bg: #e4f1eb; --v-conf-mark: #6fae95;  /* confirmado 6.44:1 */
+  --v-at-fg: #5d6470;   --v-at-bg: #eff1f4;   --v-at-mark: #b7bdc7;    /* atendido 5.27:1 */
+  --v-aus-fg: #874719;  --v-aus-bg: #f8ece2;  --v-aus-mark: #d9a174;   /* ausente 6.14:1 */
+  --v-can-fg: var(--v-muted); --v-can-bg: var(--v-surface); --v-can-mark: var(--v-line); /* cancelado: tinta secundaria sobre superficie (≈5.9:1), nombre tachado */
+
+  /* Tipografía: solo sans del sistema (Segoe UI Variable en Windows 11, SF en macOS). Inter es opcional si está instalada localmente. */
+  --v-font-display: "Inter Display", "Segoe UI Variable Display", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --v-font-sans: "Inter", "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --v-display-weight: 600;
+  --v-display-tracking: -0.022em;
+
+  --v-radius: 8px;
+  --v-radius-sm: 6px;
+  --v-shadow: 0 1px 2px rgba(22, 24, 29, 0.04);
+}

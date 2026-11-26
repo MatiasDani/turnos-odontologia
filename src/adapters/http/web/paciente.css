@@ -1,4 +1,4 @@
-/* C-14 - UI del paciente. Solo usa variables de design-system/tokens.css (revision 1). */
+/* C-14 - UI del paciente. Solo usa variables de design-system/tokens.css (revision 2, direccion B "Clinico calmo" desde mejora-visual-ui; el bloque final reemplaza el estilo de tarjetas por filas y lineas). */
 *, *::before, *::after { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
 body {
@@ -191,7 +191,7 @@ a:hover { color: var(--color-accent-hover); }
 .link-row input { font: var(--text-sm)/1.4 var(--font-mono); min-height: var(--target-min); padding: 0 var(--space-3); border: 1px solid var(--color-border-strong); border-radius: var(--radius-md); background: var(--color-surface); color: var(--color-text); width: 100%; min-width: 0; }
 
 /* Dialogo */
-.backdrop { position: fixed; inset: 0; background: rgba(23, 33, 31, 0.45); display: flex; align-items: flex-end; justify-content: center; padding: var(--space-4); z-index: 20; }
+.backdrop { position: fixed; inset: 0; background: var(--scrim); display: flex; align-items: flex-end; justify-content: center; padding: var(--space-4); z-index: 20; }
 .dialog { background: var(--color-surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); width: 100%; max-width: 440px; padding: var(--space-5); transform-origin: center; animation: pop var(--dur-slow) var(--ease-out); }
 .dialog h2 { margin-bottom: var(--space-2); }
 .dialog p { color: var(--color-text-muted); }
@@ -250,7 +250,7 @@ button.alert-action { margin-top: var(--space-3); }
 
 /* Diálogo nativo (equivale al `.backdrop > .dialog` del mockup) */
 dialog.dialog { border: 0; margin: auto auto var(--space-4); padding: var(--space-5); background: var(--color-surface); color: var(--color-text); max-width: min(440px, calc(100vw - 2 * var(--space-4))); width: 100%; }
-dialog.dialog::backdrop { background: rgba(23, 33, 31, 0.45); }
+dialog.dialog::backdrop { background: var(--scrim); }
 dialog.dialog:focus-visible { outline: none; }
 @media (min-width: 720px) { dialog.dialog { margin: auto; } }
 
@@ -263,3 +263,97 @@ dialog.dialog:focus-visible { outline: none; }
 
 /* Destinos de foco programático (títulos y avisos): reciben foco para lectores de pantalla, sin anillo */
 h1[tabindex="-1"]:focus, main[tabindex="-1"]:focus, .alert[tabindex="-1"]:focus { outline: none; }
+
+/* ===== mejora-visual-ui · revisión 2 · dirección B "Clínico calmo" (referencia: mockups/b-reserva-1.html y b-reserva-2.html) ===== */
+h1, h2, h3 { font-family: var(--font-display); font-weight: var(--display-weight); letter-spacing: var(--display-tracking); }
+a { color: var(--color-accent); }
+:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+
+/* Encabezado: marca-enlace a la portada y consultorio a la derecha */
+.topbar { background: transparent; border-bottom: 0; }
+.topbar-in { max-width: 640px; min-height: 68px; padding: 0 20px; }
+.brand { display: inline-flex; align-items: center; gap: 10px; min-height: var(--target-min); text-decoration: none; color: var(--color-text); }
+.brand img { width: 28px; height: 28px; }
+.brand b { font: var(--display-weight) 17px/1 var(--font-display); letter-spacing: var(--display-tracking); }
+.consul { font-size: var(--text-sm); color: var(--color-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+@media (max-width: 600px) { .consul { display: none; } }
+
+/* Una columna de 640 px, sin tarjetas */
+.shell { max-width: 640px; padding: var(--space-5) 20px 120px; }
+@media (min-width: 720px) { .shell { padding-top: var(--space-5); } }
+.panel { background: transparent; border: 0; border-radius: 0; box-shadow: none; padding: 0; }
+.panel + .panel { margin-top: var(--space-5); }
+.layout, .layout.with-aside { grid-template-columns: minmax(0, 1fr); gap: var(--space-5); }
+.aside:not(.always) { display: none; }
+.aside.always { position: static; border-top: 1px solid var(--color-border); padding-top: var(--space-4); }
+.with-aside .summary-inline { display: flex; }
+.page-head { margin: var(--space-5) 0 0; }
+.page-head h1 { font-size: 32px; line-height: 1.15; }
+.page-head p { margin-top: var(--space-2); }
+
+/* Progreso: 4 tramos finos */
+.steps { gap: 6px; margin: 0 0 14px; }
+.steps li { height: 3px; }
+.step-label { font-size: 13px; margin: 0; }
+
+/* Botones */
+.btn { border-radius: var(--radius-sm); }
+.btn-secondary { color: var(--color-text); font-weight: 500; }
+.btn-secondary:hover { background: var(--color-surface-2); }
+.btn-primary { border-radius: var(--radius-sm); }
+.sticky-actions { background: color-mix(in srgb, var(--color-bg) 94%, transparent); }
+@media (min-width: 720px) { .sticky-actions { justify-content: space-between; } }
+
+/* Prestaciones: filas con la duración a la derecha */
+.choices { gap: 0; border-top: 1px solid var(--color-border); margin-top: var(--space-5); }
+.choice { border: 0; border-bottom: 1px solid var(--color-border); border-radius: 0; background: transparent; min-height: 64px; padding: 0 12px; margin: 0 -12px; }
+.choice .dot { width: 18px; height: 18px; border-width: 1.5px; border-color: var(--color-text-muted); }
+.choice b { font-weight: 500; }
+.choice .grow { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
+.choice .grow b { display: inline; }
+.choice.is-on { background: var(--color-accent-soft); border-color: transparent; box-shadow: none; border-radius: var(--radius-sm); }
+.choice.is-on .dot { border-color: var(--color-accent); border-width: 5px; }
+.choice.is-on .dot::after { content: none; }
+@media (hover: hover) and (pointer: fine) { .choice:hover:not(.is-on) { background: var(--color-surface-2); border-color: var(--color-border); } }
+
+/* Profesional: píldoras */
+.chip { border-color: var(--color-border); font-size: var(--text-sm); }
+.chip[aria-checked="true"] { background: var(--color-accent-soft); color: var(--color-accent); border-color: var(--color-accent); }
+.field-title { font-weight: 500; color: var(--color-text-muted); font-size: 13px; margin-top: var(--space-3); }
+.field-title span { font-weight: 400; }
+
+/* Días: botones quietos; el elegido, con borde del acento */
+.day { width: 58px; border-color: transparent; background: transparent; }
+.day b { font-family: var(--font-sans); font-weight: 600; font-variant-numeric: tabular-nums; }
+.day[aria-checked="true"] { background: var(--color-accent-soft); border-color: var(--color-accent); color: var(--color-text); }
+.day[aria-checked="true"] small { color: var(--color-text-muted); }
+.day[aria-checked="true"] b { color: var(--color-accent); }
+.day[disabled], .day[aria-disabled="true"] { opacity: 0.55; cursor: default; }
+@media (hover: hover) and (pointer: fine) { .slot:hover:not([aria-pressed="true"]), .day:hover:not([aria-checked="true"]), .chip:hover:not([aria-checked="true"]) { background: var(--color-surface-2); } }
+
+/* Horarios: grilla agrupada en Mañana y Tarde */
+.slot-group h3 { font-weight: 500; font-family: var(--font-sans); letter-spacing: 0; }
+.slots { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.slot { border-color: var(--color-border); border-radius: var(--radius-sm); font-family: var(--font-sans); font-weight: 400; font-variant-numeric: tabular-nums; font-size: 15px; }
+.slot:hover:not([aria-pressed="true"]) { border-color: var(--color-accent); color: var(--color-accent); }
+.slot[aria-pressed="true"] { font-weight: 600; }
+@media (min-width: 720px) { .slots { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+
+/* Resumen en una línea */
+.summary-inline { background: transparent; border-radius: 0; border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border); padding: 12px 0; margin: var(--space-4) 0 0; font-size: 15px; color: var(--color-text); }
+
+/* Campos, alertas, enlace de gestión: líneas finas en vez de tarjetas */
+.input { border-radius: var(--radius-sm); }
+.check { background: transparent; border-radius: var(--radius-sm); }
+.link-box { background: transparent; border-radius: var(--radius-sm); }
+.empty { background: transparent; }
+.alert { border-radius: var(--radius-sm); }
+.a-info { border-color: #c2c9ea; color: #222f6c; }
+.dialog, dialog.dialog { border-radius: var(--radius-lg); }
+
+/* Pie */
+.footer { background: transparent; }
+.footer-in { max-width: 640px; padding: var(--space-4) 20px; }
+.footer-in a { color: var(--color-text-muted); }
+.choice .dur { white-space: nowrap; }
+@media (max-width: 600px) { .choice .grow { flex-direction: column; align-items: flex-start; gap: 0; } }
