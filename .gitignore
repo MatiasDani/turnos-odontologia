@@ -4,3 +4,28 @@ coverage/
 .env.*
 !.env.example
 dist/
+
+# Configuración de IDEs y editores
+.vscode/
+.idea/
+*.iml
+*.swp
+*.swo
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs y temporales
+*.log
+npm-debug.log*
+*.tmp
+
+# Resultados de Playwright
+test-results/
+playwright-report/
+
+# Configuración local de agentes
+.claude/settings.local.json
+.claude/launch.json
